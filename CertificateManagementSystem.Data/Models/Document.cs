@@ -7,8 +7,8 @@
         public string RegistrationNumber { get; set; }
         public string FilePath { get; set; }
         
-        public VerificationMethodic VerificationMethodic { get; set; }
-        public Contract Contract { get; set; }
-        public Device Device { get; set; }        
+        public virtual Contract Contract { get; set; }
+        public virtual Device Device { get; set; }        
+        public virtual VerificationMethodic VerificationMethodic { get; set; }
     }
 }

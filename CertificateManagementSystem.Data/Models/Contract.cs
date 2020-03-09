@@ -13,7 +13,7 @@ namespace CertificateManagementSystem.Data.Models
         // Название организации-заказчика
         public string ClientName { get; set; }
         // Название объекта эксплуатации
-        public string ObjectName { get; set; }
+        public string ExploitationPlace { get; set; }
 
         // Список оборудования в рамках данного договора
         public IEnumerable<Device> Devices { get; set; }
