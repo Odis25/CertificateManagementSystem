@@ -11,9 +11,7 @@ namespace CertificateManagementSystem.Data.Models
         // Номер договора
         public string ContractNumber { get; set; }
         // Название организации-заказчика
-        public string ClientName { get; set; }
-        // Название объекта эксплуатации
-        public string ObjectName { get; set; }
+        public Client Client { get; set; }       
 
         // Список оборудования в рамках данного договора
         public IEnumerable<Device> Devices { get; set; }
