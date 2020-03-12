@@ -7,7 +7,7 @@ namespace CertificateManagementSystem.Data.Models
         public int Id { get; set; }
         public string Name { get; set; }
 
-        // Название объектов эксплуатации
+        public IEnumerable<Contract> Contracts { get; set; }
         public IEnumerable<ExploitationPlace> ExploitationPlaces { get; set; }
     }
 }

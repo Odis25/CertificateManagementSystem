@@ -8,7 +8,7 @@ namespace CertificateManagementSystem.Models.Document
 
         public string ContractNumber { get; set; }
         public string ClientName { get; set; }
-        public string ObjectName { get; set; }
+        public string ExploitationPlace { get; set; }
 
         public string RegistrationNumber { get; set; }
         public string FilePath { get; set; }

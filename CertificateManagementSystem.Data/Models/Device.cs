@@ -6,14 +6,12 @@ namespace CertificateManagementSystem.Data.Models
     {
         public int Id { get; set; }
 
-        // Наименование оборудования
         public string Name { get; set; }
-        // Тип оборудования
         public string Type { get; set; }
-        // Заводской номер
         public string SerialNumber { get; set; }
 
-        // Документы на данное оборудование
+        public Contract Contract { get; set; }        
+        
         public IEnumerable<Document> Documents { get; set; }
     }
 }

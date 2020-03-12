@@ -5,15 +5,12 @@ namespace CertificateManagementSystem.Data.Models
     public class Contract
     {
         public int Id { get; set; }
-        // Год заключения договора
+
         public int Year { get; set; }
-
-        // Номер договора
         public string ContractNumber { get; set; }
-        // Название организации-заказчика
-        public Client Client { get; set; }       
 
-        // Список оборудования в рамках данного договора
+        public Client Client { get; set; }
+
         public IEnumerable<Device> Devices { get; set; }
     }
 }

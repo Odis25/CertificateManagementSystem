@@ -10,12 +10,13 @@ namespace CertificateManagementSystem.Data
             Database.EnsureCreated();
         }
 
-        public DbSet<Document> Documents { get; set; }
+        public DbSet<Client> Clients { get; set; }
+        public DbSet<Certificate> Certificates { get; set; }
         public DbSet<Contract> Contracts { get; set; }
         public DbSet<Device> Devices { get; set; }
-        public DbSet<Certificate> Certificates { get; set; }
+        public DbSet<Document> Documents { get; set; }
+        public DbSet<ExploitationPlace> ExploitationPlaces { get; set; }
         public DbSet<FailureNotification> FailureNotifications { get; set; }
         public DbSet<VerificationMethodic> VerificationMethodics { get; set; }
-
     }
 }
