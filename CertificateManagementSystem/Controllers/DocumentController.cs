@@ -18,12 +18,13 @@ namespace CertificateManagementSystem.Controllers
             _documents = documents;
         }
 
-        public async Task<IActionResult> Create()
+        public IActionResult Create()
         {
             var model = new NewDocumentModel
             {
+                DocumentNumber = "TestDocumentNumber",
                 ClientName = "TestClient",
-                ExploitationPlace = "TestPlace1",
+                ExploitationPlace = "TestPlace",
                 ContractNumber = "TestContractNumber",
                 DeviceName = "TestDeviceName",
                 DeviceType = "TestDeviceType",
@@ -34,62 +35,59 @@ namespace CertificateManagementSystem.Controllers
                 CalibrationExpireDate = DateTime.Now.AddDays(30)
             };
 
-            var client = _documents.GetClient(model.ClientName);
+            return View(model);
+        }
 
-            if (client == null)
+        [HttpPost]
+        public async Task<IActionResult> Create(NewDocumentModel model)
+        {            
+            // Проверка правильности введенных данных
+            if (ModelState.IsValid)
             {
-                client = new Client
+                var device = _documents.GetDevice(model.DeviceName, model.SerialNumber);
+                var contract = _documents.GetContract(model.ContractNumber, model.Year);
+                var client = _documents.GetClient(model.ClientName, model.ExploitationPlace);
+                var verificationMethodic = _documents.GetVerificationMethodic(model.RegistrationNumber);
+
+                if (device == null)
                 {
-                    Name = model.ClientName
-                };
-                var expPlace = new ExploitationPlace
-                {
-                    Name = model.ExploitationPlace,
-                    Client = client
-                };
-            }
-            else
-            {
-                if (!client.ExploitationPlaces.Any(ep => ep.Name == model.ExploitationPlace))
-                {
-                    var expPlace = new ExploitationPlace
+                    device = new Device
                     {
-                        Name = model.ExploitationPlace,
-                        Client = client
+                        Name = model.DeviceName,
+                        Type = model.DeviceType,
+                        SerialNumber = model.SerialNumber,
+                        Contract = contract ?? new Contract
+                        {
+                            Year = model.Year,
+                            ContractNumber = model.ContractNumber,
+                            Client = client ?? new Client
+                            {
+                                Name = model.ClientName,
+                                ExploitationPlace = model.ExploitationPlace
+                            }
+                        },
+                        VerificationMethodic = verificationMethodic ?? new VerificationMethodic
+                        {
+                            RegistrationNumber = model.RegistrationNumber,
+                            Name = model.VerificationMethodic,
+                            FileName = ""
+                            // todo: продумать логику добавления методики поверки
+                        }
                     };
                 }
+
+                var document = new Certificate
+                {
+                    Device = device,
+                    DocumentNumber = model.DocumentNumber,
+                    CalibrationDate = model.CalibrationDate,
+                    CalibrationExpireDate = model.CalibrationExpireDate
+                };
+
+                await _documents.Add(document);
             }
 
-            var contract = _documents.GetContract(model.ContractNumber);
-
-            contract ??= new Contract
-            {
-                Year = model.Year,
-                ContractNumber = model.ContractNumber,
-                Client = client
-            };
-
-            var device = _documents.GetDevice(model.DeviceName, model.SerialNumber);
-
-            device ??= new Device
-            {
-                Name = model.DeviceName,
-                Type = model.DeviceType,
-                SerialNumber = model.SerialNumber,
-                Contract = contract
-            };
-
-            var document = new Certificate
-            {
-                Device = device,
-                RegistrationNumber = model.RegistrationNumber,
-                CalibrationDate = model.CalibrationDate,
-                CalibrationExpireDate = model.CalibrationExpireDate
-            };
-
-            await _documents.Add(document);
-
-            return View("~/Home/Index");
+            return View(model);
         }
     }
 }

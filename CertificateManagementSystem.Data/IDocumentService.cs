@@ -11,7 +11,8 @@ namespace CertificateManagementSystem.Data
         Task Add(Document newDocument);
 
         Device GetDevice(string deviceName, string serialNumber);
-        Contract GetContract(string contractNumber);
-        Client GetClient(string clientName);
+        Contract GetContract(string contractNumber, int year);
+        Client GetClient(string clientName, string exploitationPlace);
+        VerificationMethodic GetVerificationMethodic(string registrationNumber);
     }
 }

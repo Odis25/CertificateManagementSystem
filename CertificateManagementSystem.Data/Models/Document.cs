@@ -4,10 +4,9 @@
     {
         public int Id { get; set; }
 
-        public string RegistrationNumber { get; set; }
+        public string DocumentNumber { get; set; }
         public string FilePath { get; set; }
         
         public virtual Device Device { get; set; }
-        public virtual VerificationMethodic VerificationMethodic { get; set; }
     }
 }
