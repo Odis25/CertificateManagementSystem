@@ -17,42 +17,59 @@ namespace CertificateManagementSystem.Services
             _context = context;
         }
 
-        public async Task Add(Document newDocument)
+        public async Task<int> Add(Document newDocument)
         {
-            _context.Devices.Add(newDocument.Device);
-            await _context.SaveChangesAsync();
+            // Проверяем существует ли в базе такой документ
+            var isExist = _context.Documents.Any(c => c.DocumentNumber == newDocument.DocumentNumber);
+
+            if (!isExist)
+            {
+                _context.Devices.Add(newDocument.Device);
+                return await _context.SaveChangesAsync();
+            }
+            else
+            {
+                return 1; // 1 - свидетельство уже есть в базе
+            }
         }
 
         public IEnumerable<Document> GetAll()
         {
-            throw new NotImplementedException();
+            return _context.Documents;
         }
 
         public Document GetById(int id)
         {
-            throw new NotImplementedException();
+            return GetAll().FirstOrDefault(d => d.Id == id);
         }
 
-        public Client GetClient(string clientName)
+        public Client GetClient(string clientName, string exploitationPlace)
         {
             return _context.Clients
-                .Include(c=>c.Contracts)
-                .Include(c=>c.ExploitationPlaces)
-                .FirstOrDefault(c => c.Name == clientName);
+                .FirstOrDefault(c => c.Name == clientName && c.ExploitationPlace == exploitationPlace);
         }
 
-        public Contract GetContract(string contractNumber)
+        public Contract GetContract(string contractNumber, int year)
         {
             return _context.Contracts
-                .Include(c=>c.Client)
-                .FirstOrDefault(c => c.ContractNumber == contractNumber);
+                .Include(c => c.Client)
+                .FirstOrDefault(c => c.ContractNumber == contractNumber && c.Year == year);
         }
 
-        public Device GetDevice(string deviceName, string serialNumber)
+        public Device GetDevice(string deviceName, string serialNumber, string contractNumber, int year)
         {
             return _context.Devices
                 .Include(d => d.Contract)
-                .FirstOrDefault(d => d.SerialNumber == serialNumber && d.Name == deviceName);
+                .Include(d => d.VerificationMethodic)
+                .FirstOrDefault(d => d.SerialNumber == serialNumber &&
+                    d.Name == deviceName &&
+                    d.Contract.ContractNumber == contractNumber &&
+                    d.Contract.Year == year);
+        }
+
+        public VerificationMethodic GetVerificationMethodic(string registrationNumber)
+        {
+            return _context.VerificationMethodics.FirstOrDefault(m => m.RegistrationNumber == registrationNumber);
         }
     }
 }

@@ -40,42 +40,44 @@ namespace CertificateManagementSystem.Controllers
 
         [HttpPost]
         public async Task<IActionResult> Create(NewDocumentModel model)
-        {            
+        {
             // Проверка правильности введенных данных
             if (ModelState.IsValid)
             {
-                var device = _documents.GetDevice(model.DeviceName, model.SerialNumber);
-                var contract = _documents.GetContract(model.ContractNumber, model.Year);
-                var client = _documents.GetClient(model.ClientName, model.ExploitationPlace);
-                var verificationMethodic = _documents.GetVerificationMethodic(model.RegistrationNumber);
+                // Находим существующее средство измерения, или создаем новое
+                var device = _documents.GetDevice(model.DeviceName, model.SerialNumber, model.ContractNumber, model.Year);
 
-                if (device == null)
+                device ??= new Device
                 {
-                    device = new Device
+                    Name = model.DeviceName,
+                    Type = model.DeviceType,
+                    SerialNumber = model.SerialNumber,
+                    // Находим существующий договор, или создаем новый
+                    Contract = _documents.GetContract(model.ContractNumber, model.Year) ?? 
+                    new Contract
                     {
-                        Name = model.DeviceName,
-                        Type = model.DeviceType,
-                        SerialNumber = model.SerialNumber,
-                        Contract = contract ?? new Contract
+                        Year = model.Year,
+                        ContractNumber = model.ContractNumber,
+                        // Находим существующего заказчика, или создаем нового
+                        Client = _documents.GetClient(model.ClientName, model.ExploitationPlace) ?? 
+                        new Client
                         {
-                            Year = model.Year,
-                            ContractNumber = model.ContractNumber,
-                            Client = client ?? new Client
-                            {
-                                Name = model.ClientName,
-                                ExploitationPlace = model.ExploitationPlace
-                            }
-                        },
-                        VerificationMethodic = verificationMethodic ?? new VerificationMethodic
-                        {
-                            RegistrationNumber = model.RegistrationNumber,
-                            Name = model.VerificationMethodic,
-                            FileName = ""
-                            // todo: продумать логику добавления методики поверки
+                            Name = model.ClientName,
+                            ExploitationPlace = model.ExploitationPlace
                         }
-                    };
-                }
+                    },
+                    // Находим существующую методику, или создаем новую
+                    VerificationMethodic = _documents.GetVerificationMethodic(model.RegistrationNumber) ??
+                    new VerificationMethodic
+                    {
+                        RegistrationNumber = model.RegistrationNumber,
+                        Name = model.VerificationMethodic,
+                        FileName = ""
+                        // todo: продумать логику добавления методики поверки
+                    }
+                };
 
+                // Создаем новое свидетельство
                 var document = new Certificate
                 {
                     Device = device,
@@ -84,7 +86,11 @@ namespace CertificateManagementSystem.Controllers
                     CalibrationExpireDate = model.CalibrationExpireDate
                 };
 
-                await _documents.Add(document);
+                var result = await _documents.Add(document);
+                if (result == 1)
+                {
+                    ModelState.AddModelError("", "Такое свидетельство уже есть в базе");
+                }
             }
 
             return View(model);
