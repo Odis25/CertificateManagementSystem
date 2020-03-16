@@ -44,56 +44,79 @@ namespace CertificateManagementSystem.Controllers
             // Проверка правильности введенных данных
             if (ModelState.IsValid)
             {
-                // Находим существующее средство измерения, или создаем новое
-                var device = _documents.GetDevice(model.DeviceName, model.SerialNumber, model.ContractNumber, model.Year);
+                var newDocument = BuildNewDocument(model);
 
-                device ??= new Device
+                // Проверка корректности введенных данных
+                if (newDocument.Device.Contract.Client.ExploitationPlace != model.ExploitationPlace)
                 {
-                    Name = model.DeviceName,
-                    Type = model.DeviceType,
-                    SerialNumber = model.SerialNumber,
-                    // Находим существующий договор, или создаем новый
-                    Contract = _documents.GetContract(model.ContractNumber, model.Year) ?? 
-                    new Contract
-                    {
-                        Year = model.Year,
-                        ContractNumber = model.ContractNumber,
-                        // Находим существующего заказчика, или создаем нового
-                        Client = _documents.GetClient(model.ClientName, model.ExploitationPlace) ?? 
-                        new Client
-                        {
-                            Name = model.ClientName,
-                            ExploitationPlace = model.ExploitationPlace
-                        }
-                    },
-                    // Находим существующую методику, или создаем новую
-                    VerificationMethodic = _documents.GetVerificationMethodic(model.RegistrationNumber) ??
-                    new VerificationMethodic
-                    {
-                        RegistrationNumber = model.RegistrationNumber,
-                        Name = model.VerificationMethodic,
-                        FileName = ""
-                        // todo: продумать логику добавления методики поверки
-                    }
-                };
-
-                // Создаем новое свидетельство
-                var document = new Certificate
+                    // Место эксплуатации не совпадает
+                    ModelState.AddModelError("", "Место эксплуатации отличается от указанного ранее для этого номера договора");
+                }
+                if (newDocument.Device.Contract.Client.Name != model.ClientName)
                 {
-                    Device = device,
-                    DocumentNumber = model.DocumentNumber,
-                    CalibrationDate = model.CalibrationDate,
-                    CalibrationExpireDate = model.CalibrationExpireDate
-                };
+                    // Имя заказчика не совпадает
+                    ModelState.AddModelError("", "Имя заказчика отличается от указанного ранее");
+                }
+                if (newDocument.Device.VerificationMethodic.RegistrationNumber != model.RegistrationNumber)
+                {
+                    // Номер в гос.реестре не совпадает
+                    ModelState.AddModelError("", "За данным оборудованием закреплен другой номер в гос.реестре.");
+                }
 
-                var result = await _documents.Add(document);
+                var result = await _documents.Add(newDocument);
+
                 if (result == 1)
                 {
-                    ModelState.AddModelError("", "Такое свидетельство уже есть в базе");
+                    ModelState.AddModelError("", "Свидетельство с таким номером уже есть в базе.");
                 }
             }
 
             return View(model);
+        }
+
+        private Document BuildNewDocument(NewDocumentModel model)
+        {
+            // Находим существующее средство измерения, или создаем новое
+            var device = _documents.GetDevice(model.DeviceName, model.SerialNumber, model.ContractNumber, model.Year);
+
+            device ??= new Device
+            {
+                Name = model.DeviceName,
+                Type = model.DeviceType,
+                SerialNumber = model.SerialNumber,
+                // Находим существующий договор, или создаем новый
+                Contract = _documents.GetContract(model.ContractNumber, model.Year) ??
+                new Contract
+                {
+                    Year = model.Year,
+                    ContractNumber = model.ContractNumber,
+                    // Находим существующего заказчика, или создаем нового
+                    Client = _documents.GetClient(model.ClientName, model.ExploitationPlace) ??
+                    new Client
+                    {
+                        Name = model.ClientName,
+                        ExploitationPlace = model.ExploitationPlace
+                    }
+                },
+                // Находим существующую методику, или создаем новую
+                VerificationMethodic = _documents.GetVerificationMethodic(model.RegistrationNumber) ??
+                new VerificationMethodic
+                {
+                    RegistrationNumber = model.RegistrationNumber,
+                    Name = model.VerificationMethodic,
+                    FileName = ""
+                    // todo: продумать логику добавления методики поверки
+                }
+            };
+           
+            // Создаем новое свидетельство
+            return new Certificate
+            {
+                Device = device,
+                DocumentNumber = model.DocumentNumber,
+                CalibrationDate = model.CalibrationDate,
+                CalibrationExpireDate = model.CalibrationExpireDate
+            };
         }
     }
 }

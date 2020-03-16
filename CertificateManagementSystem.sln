@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CertificateManagementSystem
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CertificateManagementSystem.Data", "CertificateManagementSystem.Data\CertificateManagementSystem.Data.csproj", "{4394D3F3-4A7E-47A4-873B-FAC6D4732F9E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CertificateManagementSystem.Services", "CertificateManagementSystem.Services\CertificateManagementSystem.Services.csproj", "{82901BAB-7248-4513-A24A-301E8CAF02C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CertificateManagementSystem.Services", "CertificateManagementSystem.Services\CertificateManagementSystem.Services.csproj", "{82901BAB-7248-4513-A24A-301E8CAF02C7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

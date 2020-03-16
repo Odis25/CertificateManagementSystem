@@ -24,8 +24,9 @@ namespace CertificateManagementSystem.Services
 
             if (!isExist)
             {
-                _context.Devices.Add(newDocument.Device);
-                return await _context.SaveChangesAsync();
+                _context.Documents.Add(newDocument);
+                var result = await _context.SaveChangesAsync();
+                return 0;
             }
             else
             {
@@ -60,6 +61,7 @@ namespace CertificateManagementSystem.Services
         {
             return _context.Devices
                 .Include(d => d.Contract)
+                .ThenInclude(c=>c.Client)
                 .Include(d => d.VerificationMethodic)
                 .FirstOrDefault(d => d.SerialNumber == serialNumber &&
                     d.Name == deviceName &&
