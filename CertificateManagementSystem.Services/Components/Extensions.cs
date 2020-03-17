@@ -4,7 +4,7 @@
     {
         public static string Capitalize(this string inputString)
         {
-            if (inputString.Length >0)
+            if (!string.IsNullOrEmpty(inputString))
             {
                 var charArray = inputString.ToCharArray();
                 charArray[0] = char.ToUpper(charArray[0]);

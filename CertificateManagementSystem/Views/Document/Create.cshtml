@@ -7,69 +7,82 @@
                 <div class="form-group">
                     <label asp-for="Year">Год</label>
                     <input class="form-control form-control-sm shadow-sm" asp-for="Year" />
+                    <span class="text-danger" asp-validation-for="Year"></span>
                 </div>
                 <div class="form-group">
                     <label asp-for="ContractNumber">Номер договора</label>
                     <input class="form-control form-control-sm shadow-sm" asp-for="ContractNumber" />
+                    <span class="text-danger" asp-validation-for="ContractNumber"></span>
                 </div>
 
                 <div class="form-group">
                     <label asp-for="RegistrationNumber">Номер в гос.реестре</label>
                     <input class="form-control form-control-sm shadow-sm" asp-for="RegistrationNumber" />
+                    <span class="text-danger" asp-validation-for="RegistrationNumber"></span>
                 </div>
                 <div class="form-group">
                     <label asp-for="VerificationMethodic">Методика поверки</label>
                     <input class="form-control form-control-sm shadow-sm" asp-for="VerificationMethodic" />
+                    <span class="text-danger" asp-validation-for="VerificationMethodic"></span>
                 </div>
 
                 <div class="form-group">
-                    <label asp-for="ClientName">Наименование организации заказчика</label>
+                    <label asp-for="ClientName">Эксплуатирующая организация</label>
                     <input class="form-control form-control-sm shadow-sm" asp-for="ClientName" />
+                    <span class="text-danger" asp-validation-for="ClientName"></span>
                 </div>
                 <div class="form-group">
                     <label asp-for="ExploitationPlace">Место эксплуатации</label>
                     <input class="form-control form-control-sm shadow-sm" asp-for="ExploitationPlace" />
+                    <span class="text-danger" asp-validation-for="ExploitationPlace"></span>
                 </div>
 
                 <div class="form-group">
                     <label asp-for="DeviceType">Группа СИ</label>
                     <input class="form-control form-control-sm shadow-sm" asp-for="DeviceType" />
+                    <span class="text-danger" asp-validation-for="DeviceType"></span>
                 </div>
                 <div class="form-group">
                     <label asp-for="DeviceName">Наименование СИ</label>
                     <input class="form-control form-control-sm shadow-sm" asp-for="DeviceName" />
+                    <span class="text-danger" asp-validation-for="DeviceName"></span>
                 </div>
                 <div class="form-group">
                     <label asp-for="SerialNumber">Заводской номер СИ</label>
                     <input class="form-control form-control-sm shadow-sm" asp-for="SerialNumber" />
+                    <span class="text-danger" asp-validation-for="SerialNumber"></span>
                 </div>
 
                 <div class="form-group">
                     <label asp-for="DocumentNumber">Номер документа</label>
                     <input class="form-control form-control-sm shadow-sm" asp-for="DocumentNumber" />
+                    <span class="text-danger" asp-validation-for="DocumentNumber"></span>
                 </div>
-                <div class="form-group">
-                    <label asp-for="CalibrationDate">Дата поверки</label>
-                    <input type="date" class="form-control form-control-sm shadow-sm" asp-for="CalibrationDate" />
+                
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label asp-for="CalibrationDate">Дата поверки</label>
+                        <input type="date" class="form-control form-control-sm shadow-sm" asp-for="CalibrationDate" />
+                        <span class="text-danger" asp-validation-for="CalibrationDate"></span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label asp-for="CalibrationExpireDate">Дата окончания срока поверки</label>
+                        <input type="date" class="form-control form-control-sm shadow-sm" asp-for="CalibrationExpireDate" />
+                        <span class="text-danger" asp-validation-for="CalibrationExpireDate"></span>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label asp-for="CalibrationExpireDate">Дата окончания срока поверки</label>
-                    <input type="date" class="form-control form-control-sm shadow-sm" asp-for="CalibrationExpireDate" />
-                </div>
-
                 <div class="text-danger" asp-validation-summary="ModelOnly"></div>
-                <div class="text-center">
-                    <button class="btn btn-success mb-1" type="submit" form="newDocumentForm">Добавить</button>
-                </div>
             </form>
         </div>
     </div>
     <div class="col-md-6">
         <div class="half-section">
-            <div class="pdfHolder">
-
-            </div>
+            <iframe class="pdfHolder" src="file://d:/Stuff/PassportZ.pdf" frameborder="0">
+            </iframe>
         </div>
     </div>
+</div>
+<div class="row justify-content-center p-2">
+    <button class="btn btn-success mb-1" type="submit" form="newDocumentForm">Добавить</button>
 </div>
 

@@ -45,19 +45,27 @@ a {
     border-radius: 6px;
     font-size: 16px;
     padding: 5px;
+    overflow-y: auto;
 }
 
     .section .half-section {
+        display: flex;
         padding: 5px;
         margin: 2px;
         border: 1px solid #ccc;
         min-height: 100%;
         background-color: #eee;
+        align-items:stretch;
+    }
+    .half-section form{
+        width: 100%
     }
 
-    .section .pdfHolder{
+    .section .pdfHolder {
+        display: flex;
         border: 1px dashed #ccc;
         min-height: 100%;
+        width: 100%;
     }
 
     .section label {
@@ -65,5 +73,9 @@ a {
     }
 
     .section .form-group {
-        margin: 5px;
+        margin: 5px 0;
     }
+
+        .section .form-group span {
+            font-size: 14px;
+        }
