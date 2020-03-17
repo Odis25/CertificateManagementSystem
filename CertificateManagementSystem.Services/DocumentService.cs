@@ -1,7 +1,6 @@
 ﻿using CertificateManagementSystem.Data;
 using CertificateManagementSystem.Data.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,21 +16,10 @@ namespace CertificateManagementSystem.Services
             _context = context;
         }
 
-        public async Task<int> Add(Document newDocument)
+        public async Task Add(Document newDocument)
         {
-            // Проверяем существует ли в базе такой документ
-            var isExist = _context.Documents.Any(c => c.DocumentNumber == newDocument.DocumentNumber);
-
-            if (!isExist)
-            {
-                _context.Documents.Add(newDocument);
-                var result = await _context.SaveChangesAsync();
-                return 0;
-            }
-            else
-            {
-                return 1; // 1 - свидетельство уже есть в базе
-            }
+            _context.Documents.Add(newDocument);
+            await _context.SaveChangesAsync();
         }
 
         public IEnumerable<Document> GetAll()
@@ -61,7 +49,7 @@ namespace CertificateManagementSystem.Services
         {
             return _context.Devices
                 .Include(d => d.Contract)
-                .ThenInclude(c=>c.Client)
+                .ThenInclude(c => c.Client)
                 .Include(d => d.VerificationMethodic)
                 .FirstOrDefault(d => d.SerialNumber == serialNumber &&
                     d.Name == deviceName &&
@@ -72,6 +60,11 @@ namespace CertificateManagementSystem.Services
         public VerificationMethodic GetVerificationMethodic(string registrationNumber)
         {
             return _context.VerificationMethodics.FirstOrDefault(m => m.RegistrationNumber == registrationNumber);
+        }
+
+        public bool IsDocumentExist(string documentNumber)
+        {
+            return _context.Documents.Any(c => c.DocumentNumber == documentNumber);
         }
     }
 }

@@ -1,63 +1,75 @@
 ﻿@model NewDocumentModel
 
-<div class="row">
-    <div class="col-md-5">
-        <form method="post" asp-action="Create" id="newDocumentForm">           
-            <div class="form-group">
-                <label asp-for="Year">Год</label>
-                <input class="form-control" asp-for="Year" />
-            </div>
-            <div class="form-group">
-                <label asp-for="RegistrationNumber">Номер в гос.реестре</label>
-                <input class="form-control" asp-for="RegistrationNumber" />
-            </div>
-            <div class="form-group">
-                <label asp-for="ContractNumber">Номер договора</label>
-                <input class="form-control" asp-for="ContractNumber" />
-            </div>
-            <div class="form-group">
-                <label asp-for="ClientName">Наименование организации заказчика</label>
-                <input class="form-control" asp-for="ClientName" />
-            </div>
-            <div class="form-group">
-                <label asp-for="ExploitationPlace">Место эксплуатации</label>
-                <input class="form-control" asp-for="ExploitationPlace" />
-            </div>
-            <div class="form-group">
-                <label asp-for="DocumentNumber">Номер документа</label>
-                <input class="form-control" asp-for="DocumentNumber" />
-            </div>
-            <div class="form-group">
-                <label asp-for="DeviceType">Группа СИ</label>
-                <input class="form-control" asp-for="DeviceType" />
-            </div>
-            <div class="form-group">
-                <label asp-for="DeviceName">Наименование СИ</label>
-                <input class="form-control" asp-for="DeviceName" />
-            </div>
-            <div class="form-group">
-                <label asp-for="SerialNumber">Заводской номер СИ</label>
-                <input class="form-control" asp-for="SerialNumber" />
-            </div>
-            <div class="form-group">
-                <label asp-for="CalibrationDate">Дата поверки</label>
-                <input class="form-control" asp-for="CalibrationDate" />
-            </div>
-            <div class="form-group">
-                <label asp-for="CalibrationExpireDate">Дата окончания срока поверки</label>
-                <input class="form-control" asp-for="CalibrationExpireDate" />
-            </div>
+<div class="row section no-gutters">
+    <div class="col-md-6">
+        <div class="half-section shadow">
+            <form method="post" asp-action="Create" id="newDocumentForm">
+                <div class="form-group">
+                    <label asp-for="Year">Год</label>
+                    <input class="form-control form-control-sm shadow-sm" asp-for="Year" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="ContractNumber">Номер договора</label>
+                    <input class="form-control form-control-sm shadow-sm" asp-for="ContractNumber" />
+                </div>
 
-            <div class="form-group">
-                <label asp-for="VerificationMethodic">Методика поверки</label>
-                <input class="form-control" asp-for="VerificationMethodic" />
-            </div>
+                <div class="form-group">
+                    <label asp-for="RegistrationNumber">Номер в гос.реестре</label>
+                    <input class="form-control form-control-sm shadow-sm" asp-for="RegistrationNumber" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="VerificationMethodic">Методика поверки</label>
+                    <input class="form-control form-control-sm shadow-sm" asp-for="VerificationMethodic" />
+                </div>
 
-        </form>
+                <div class="form-group">
+                    <label asp-for="ClientName">Наименование организации заказчика</label>
+                    <input class="form-control form-control-sm shadow-sm" asp-for="ClientName" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="ExploitationPlace">Место эксплуатации</label>
+                    <input class="form-control form-control-sm shadow-sm" asp-for="ExploitationPlace" />
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="DeviceType">Группа СИ</label>
+                    <input class="form-control form-control-sm shadow-sm" asp-for="DeviceType" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="DeviceName">Наименование СИ</label>
+                    <input class="form-control form-control-sm shadow-sm" asp-for="DeviceName" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="SerialNumber">Заводской номер СИ</label>
+                    <input class="form-control form-control-sm shadow-sm" asp-for="SerialNumber" />
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="DocumentNumber">Номер документа</label>
+                    <input class="form-control form-control-sm shadow-sm" asp-for="DocumentNumber" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="CalibrationDate">Дата поверки</label>
+                    <input type="date" class="form-control form-control-sm shadow-sm" asp-for="CalibrationDate" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="CalibrationExpireDate">Дата окончания срока поверки</label>
+                    <input type="date" class="form-control form-control-sm shadow-sm" asp-for="CalibrationExpireDate" />
+                </div>
+
+                <div class="text-danger" asp-validation-summary="ModelOnly"></div>
+                <div class="text-center">
+                    <button class="btn btn-success mb-1" type="submit" form="newDocumentForm">Добавить</button>
+                </div>
+            </form>
+        </div>
     </div>
-    <div class="col-md-5">
-        <div class="text-danger" asp-validation-summary="ModelOnly"></div>
-        <button class="btn btn-success" type="submit" form="newDocumentForm">Добавить</button>
+    <div class="col-md-6">
+        <div class="half-section">
+            <div class="pdfHolder">
+
+            </div>
+        </div>
     </div>
 </div>
 

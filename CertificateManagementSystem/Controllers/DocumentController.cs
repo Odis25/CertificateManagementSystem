@@ -1,6 +1,7 @@
 ﻿using CertificateManagementSystem.Data;
 using CertificateManagementSystem.Data.Models;
 using CertificateManagementSystem.Models.Document;
+using CertificateManagementSystem.Services.Components;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -41,34 +42,38 @@ namespace CertificateManagementSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(NewDocumentModel model)
         {
+            var newDocument = BuildNewDocument(model);
+            var client = newDocument.Device.Contract.Client;
+            var regNumber = newDocument.Device.VerificationMethodic.RegistrationNumber;
+            var documentExist = _documents.IsDocumentExist(model.DocumentNumber);
+
+            // Проверка корректности введенных данных
+            if (client.ExploitationPlace != model.ExploitationPlace)
+            {
+                // Место эксплуатации не совпадает
+                ModelState.AddModelError("", "Место эксплуатации отличается от указанного ранее для этого договора.");
+            }
+            if (client.Name != model.ClientName)
+            {
+                // Имя заказчика не совпадает
+                ModelState.AddModelError("", "Имя заказчика отличается от указанного ранее для этого договора.");
+            }
+            if (regNumber != model.RegistrationNumber)
+            {
+                // Номер в гос.реестре не совпадает
+                ModelState.AddModelError("", "За данным оборудованием закреплен другой номер в гос.реестре.");
+            }
+
+            if (documentExist)
+            {
+                // Документ с таким номером уже есть в базе
+                ModelState.AddModelError("", "Документ с таким номером уже есть в базе.");
+            }
+
             // Проверка правильности введенных данных
             if (ModelState.IsValid)
             {
-                var newDocument = BuildNewDocument(model);
-
-                // Проверка корректности введенных данных
-                if (newDocument.Device.Contract.Client.ExploitationPlace != model.ExploitationPlace)
-                {
-                    // Место эксплуатации не совпадает
-                    ModelState.AddModelError("", "Место эксплуатации отличается от указанного ранее для этого номера договора");
-                }
-                if (newDocument.Device.Contract.Client.Name != model.ClientName)
-                {
-                    // Имя заказчика не совпадает
-                    ModelState.AddModelError("", "Имя заказчика отличается от указанного ранее");
-                }
-                if (newDocument.Device.VerificationMethodic.RegistrationNumber != model.RegistrationNumber)
-                {
-                    // Номер в гос.реестре не совпадает
-                    ModelState.AddModelError("", "За данным оборудованием закреплен другой номер в гос.реестре.");
-                }
-
-                var result = await _documents.Add(newDocument);
-
-                if (result == 1)
-                {
-                    ModelState.AddModelError("", "Свидетельство с таким номером уже есть в базе.");
-                }
+                await _documents.Add(newDocument);
             }
 
             return View(model);
@@ -81,8 +86,8 @@ namespace CertificateManagementSystem.Controllers
 
             device ??= new Device
             {
-                Name = model.DeviceName,
-                Type = model.DeviceType,
+                Name = model.DeviceName.Capitalize(),
+                Type = model.DeviceType.Capitalize(),
                 SerialNumber = model.SerialNumber,
                 // Находим существующий договор, или создаем новый
                 Contract = _documents.GetContract(model.ContractNumber, model.Year) ??
@@ -94,8 +99,8 @@ namespace CertificateManagementSystem.Controllers
                     Client = _documents.GetClient(model.ClientName, model.ExploitationPlace) ??
                     new Client
                     {
-                        Name = model.ClientName,
-                        ExploitationPlace = model.ExploitationPlace
+                        Name = model.ClientName.Capitalize(),
+                        ExploitationPlace = model.ExploitationPlace.Capitalize()
                     }
                 },
                 // Находим существующую методику, или создаем новую
@@ -108,15 +113,29 @@ namespace CertificateManagementSystem.Controllers
                     // todo: продумать логику добавления методики поверки
                 }
             };
-           
-            // Создаем новое свидетельство
-            return new Certificate
+            
+            if (model.DocumentType == DocumentType.Certificate)
             {
-                Device = device,
-                DocumentNumber = model.DocumentNumber,
-                CalibrationDate = model.CalibrationDate,
-                CalibrationExpireDate = model.CalibrationExpireDate
-            };
+                // Создаем новое свидетельство
+                return new Certificate
+                {
+                    Device = device,
+                    DocumentNumber = model.DocumentNumber,
+                    CalibrationDate = model.CalibrationDate,
+                    CalibrationExpireDate = model.CalibrationExpireDate
+                };
+            }
+            else
+            {
+                // Создаем новое извещение о непригодности
+                return new FailureNotification
+                {
+                    Device = device,
+                    DocumentNumber = model.DocumentNumber,
+                    DocumentDate = model.DocumentDate
+                };
+            }
+            
         }
     }
 }
