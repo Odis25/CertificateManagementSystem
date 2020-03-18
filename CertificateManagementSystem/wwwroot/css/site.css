@@ -29,6 +29,26 @@ a {
     border-color: #1861ac;
 }
 
+.navLogo {
+    font-family: 'Roboto Mono';
+    font-weight: bold;
+    
+    font-size: 1.5em;
+    text-shadow: 2px 2px 4px #888;
+}
+
+    .navLogo .logoLeft {
+        color: #c7e571;
+    }
+
+    .navLogo .logoRight {
+        background: #c7e571;
+        border-radius: 5px;
+        padding: 5px;
+        color: #335;
+        margin-left: 2px;
+    }
+
 #mainHeader {
     min-width: 100%;
     position: fixed;

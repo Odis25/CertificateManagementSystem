@@ -19,21 +19,14 @@ namespace CertificateManagementSystem.Controllers
             _documents = documents;
         }
 
-        public IActionResult Create()
+        public IActionResult Create(DocumentType type)
         {
             var model = new NewDocumentModel
             {
-                DocumentNumber = "TestDocumentNumber",
-                ClientName = "TestClient",
-                ExploitationPlace = "TestPlace",
-                ContractNumber = "TestContractNumber",
-                DeviceName = "TestDeviceName",
-                DeviceType = "TestDeviceType",
-                RegistrationNumber = "TestRegNumber",
-                SerialNumber = "TestSerialNumber",
+                DocumentType = type,
                 Year = 2020,
                 CalibrationDate = DateTime.Now,
-                CalibrationExpireDate = DateTime.Now.AddDays(30)
+                CalibrationExpireDate = DateTime.Now.AddYears(1)
             };
 
             return View(model);
@@ -79,6 +72,20 @@ namespace CertificateManagementSystem.Controllers
             return View(model);
         }
 
+        
+        public JsonResult GetClient(string contractNumber, int year)
+        {
+            var contract = new Contract 
+            { 
+                ContractNumber = contractNumber, 
+                Year = year 
+            };
+            var result = _documents.GetClient(contract);
+            var data = Json(result);
+
+            return data;
+        }
+
         private Document BuildNewDocument(NewDocumentModel model)
         {
             // Находим существующее средство измерения, или создаем новое
@@ -113,7 +120,7 @@ namespace CertificateManagementSystem.Controllers
                     // todo: продумать логику добавления методики поверки
                 }
             };
-            
+
             if (model.DocumentType == DocumentType.Certificate)
             {
                 // Создаем новое свидетельство
@@ -135,7 +142,7 @@ namespace CertificateManagementSystem.Controllers
                     DocumentDate = model.DocumentDate
                 };
             }
-            
+
         }
     }
 }

@@ -13,6 +13,7 @@ namespace CertificateManagementSystem.Data
         Device GetDevice(string deviceName, string serialNumber, string contractNumber, int year);
         Contract GetContract(string contractNumber, int year);
         Client GetClient(string clientName, string exploitationPlace);
+        Client GetClient(Contract contract);
         VerificationMethodic GetVerificationMethodic(string registrationNumber);
         
         bool IsDocumentExist(string documentNumber);

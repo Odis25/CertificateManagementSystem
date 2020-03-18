@@ -38,6 +38,14 @@ namespace CertificateManagementSystem.Services
                 .FirstOrDefault(c => c.Name == clientName && c.ExploitationPlace == exploitationPlace);
         }
 
+        public Client GetClient(Contract contract)
+        {
+            var foundedContract = _context.Contracts
+                .Include(c=>c.Client)
+                .FirstOrDefault(c => c.ContractNumber == contract.ContractNumber && c.Year == contract.Year);
+            return foundedContract?.Client;
+        }
+
         public Contract GetContract(string contractNumber, int year)
         {
             return _context.Contracts
