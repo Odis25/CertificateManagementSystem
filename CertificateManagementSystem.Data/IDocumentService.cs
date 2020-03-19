@@ -6,8 +6,12 @@ namespace CertificateManagementSystem.Data
 {
     public interface IDocumentService
     {
-        IEnumerable<Document> GetAll();
-        Document GetById(int id);
+        IEnumerable<Document> GetAllDocuments();
+        IEnumerable<Contract> GetAllContracts();
+        IEnumerable<Client> GetAllClients();
+        IEnumerable<Device> GetAllDevices();
+
+        Document GetDocumentById(int id);
         Task Add(Document newDocument);
 
         Device GetDevice(string deviceName, string serialNumber, string contractNumber, int year);

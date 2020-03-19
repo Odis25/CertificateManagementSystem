@@ -22,14 +22,29 @@ namespace CertificateManagementSystem.Services
             await _context.SaveChangesAsync();
         }
 
-        public IEnumerable<Document> GetAll()
+        public IEnumerable<Client> GetAllClients()
+        {
+            return _context.Clients;
+        }
+
+        public IEnumerable<Contract> GetAllContracts()
+        {
+            return _context.Contracts;
+        }
+
+        public IEnumerable<Device> GetAllDevices()
+        {
+            return _context.Devices;
+        }
+
+        public IEnumerable<Document> GetAllDocuments()
         {
             return _context.Documents;
         }
 
-        public Document GetById(int id)
+        public Document GetDocumentById(int id)
         {
-            return GetAll().FirstOrDefault(d => d.Id == id);
+            return GetAllDocuments().FirstOrDefault(d => d.Id == id);
         }
 
         public Client GetClient(string clientName, string exploitationPlace)

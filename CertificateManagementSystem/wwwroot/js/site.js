@@ -2,33 +2,58 @@
 // for details on configuring this project to bundle and minify static web assets.
 
 // Write your JavaScript code.
-jQuery.ready(function () {
-    let availableTags = [
-        "ActionScript",
-        "AppleScript",
-        "Asp",
-        "BASIC",
-        "C",
-        "C++",
-        "Clojure",
-        "COBOL",
-        "ColdFusion",
-        "Erlang",
-        "Fortran",
-        "Groovy",
-        "Haskell",
-        "Java",
-        "JavaScript",
-        "Lisp",
-        "Perl",
-        "PHP",
-        "Python",
-        "Ruby",
-        "Scala",
-        "Scheme"
-    ];
-    $('#inputExploitationPlace').autocomplete({
-        source: availableTags
+$(function () {
+
+    $('#inputClientName').select2({
+        ajax: {
+            url: '/Document/GetAutocompleteData',
+            data: { dataType: 'clientName' },
+            processResults: function (data) {
+                return {
+                    results: data
+                };
+            }
+        },
+        tags: true
+    });
+
+    $('#inputExploitationPlace').select2({
+        ajax: {
+            url: '/Document/GetAutocompleteData',
+            data: { dataType: 'exploitationPlace' },
+            processResults: function (data) {
+                return {
+                    results: data
+                };
+            }
+        },
+        tags: true
+    });
+
+    $('#inputDeviceName').select2({
+        ajax: {
+            url: '/Document/GetAutocompleteData',
+            data: { dataType: 'deviceName' },
+            processResults: function (data) {
+                return {
+                    results: data
+                };
+            }
+        },
+        tags: true
+    });
+
+    $('#inputDeviceType').select2({
+        ajax: {
+            url: '/Document/GetAutocompleteData',
+            data: { dataType: 'deviceType' },
+            processResults: function (data) {
+                return {
+                    results: data
+                };
+            }
+        },
+        tags: true
     });
 });
 
@@ -39,9 +64,9 @@ function SetClient() {
     $.getJSON("/Document/GetClient", { contractNumber: contractNumber, year: year }, function (data) {
         let name = data.name;
         let place = data.exploitationPlace;
-        $('#inputClient').val(name);
+        $('#inputClientName').val(name);
         $('#inputExploitationPlace').val(place);
     });
 
-    
+
 }

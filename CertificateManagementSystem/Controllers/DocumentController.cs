@@ -72,18 +72,59 @@ namespace CertificateManagementSystem.Controllers
             return View(model);
         }
 
-        
+
         public JsonResult GetClient(string contractNumber, int year)
         {
-            var contract = new Contract 
-            { 
-                ContractNumber = contractNumber, 
-                Year = year 
+            var contract = new Contract
+            {
+                ContractNumber = contractNumber,
+                Year = year
             };
             var result = _documents.GetClient(contract);
             var data = Json(result);
 
             return data;
+        }
+
+        public JsonResult GetAutocompleteData(string dataType)
+        {
+            dynamic result = null;
+
+            switch (dataType)
+            {
+                case "contract":
+                    result = _documents.GetAllContracts()
+                        .Select(c => new { id = c.Id, text = c.ContractNumber }).Distinct();
+                    break;
+
+                case "clientName":
+                    result = _documents.GetAllClients()
+                        .Select(c => new { id = c.Id, text = c.Name }).Distinct();
+                    break;
+
+                case "exploitationPlace":
+                    result = _documents.GetAllClients()
+                        .Select(c => new { id = c.Id, text = c.ExploitationPlace }).Distinct();
+                    break;
+
+                case "deviceName":
+                    result = _documents.GetAllDevices()
+                        .Select(d => new { id = d.Id, text = d.Name }).Distinct();
+                    break;
+
+                case "deviceType":
+                    result = _documents.GetAllDevices()
+                        .Select(d => new { id = d.Id, text = d.Type }).Distinct();
+                    break;
+                case "verificationMethodic":
+                    break;
+
+                default:
+                    result = null;
+                    break;
+            }
+
+            return Json(result);
         }
 
         private Document BuildNewDocument(NewDocumentModel model)
