@@ -3,6 +3,7 @@ using CertificateManagementSystem.Data.Models;
 using CertificateManagementSystem.Models.Document;
 using CertificateManagementSystem.Services.Components;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,8 @@ namespace CertificateManagementSystem.Controllers
 
         public IActionResult Create(DocumentType type)
         {
+            CreateSelectLists();
+
             var model = new NewDocumentModel
             {
                 DocumentType = type,
@@ -69,62 +72,56 @@ namespace CertificateManagementSystem.Controllers
                 await _documents.Add(newDocument);
             }
 
+            CreateSelectLists();
+
             return View(model);
-        }
-
-
-        public JsonResult GetClient(string contractNumber, int year)
-        {
-            var contract = new Contract
-            {
-                ContractNumber = contractNumber,
-                Year = year
-            };
-            var result = _documents.GetClient(contract);
-            var data = Json(result);
-
-            return data;
         }
 
         public JsonResult GetAutocompleteData(string dataType)
         {
-            dynamic result = null;
+            dynamic results = null;
 
             switch (dataType)
             {
                 case "contract":
-                    result = _documents.GetAllContracts()
-                        .Select(c => new { id = c.Id, text = c.ContractNumber }).Distinct();
+                    results = _documents.GetAllContracts()
+                        .Select(c => new { id = c.ContractNumber, text = c.ContractNumber }).Distinct();
                     break;
 
                 case "clientName":
-                    result = _documents.GetAllClients()
-                        .Select(c => new { id = c.Id, text = c.Name }).Distinct();
+                    results = _documents.GetAllClients()
+                        .Select(c => new { id = c.Name, text = c.Name }).Distinct();
                     break;
 
                 case "exploitationPlace":
-                    result = _documents.GetAllClients()
-                        .Select(c => new { id = c.Id, text = c.ExploitationPlace }).Distinct();
+                    results = _documents.GetAllClients()
+                        .Select(c => new { id = c.ExploitationPlace, text = c.ExploitationPlace }).Distinct();
                     break;
 
                 case "deviceName":
-                    result = _documents.GetAllDevices()
-                        .Select(d => new { id = d.Id, text = d.Name }).Distinct();
+                    results = _documents.GetAllDevices()
+                        .Select(d => new { id = d.Name, text = d.Name }).Distinct();
                     break;
 
                 case "deviceType":
-                    result = _documents.GetAllDevices()
-                        .Select(d => new { id = d.Id, text = d.Type }).Distinct();
+                    results = _documents.GetAllDevices()
+                        .Select(d => new { id = d.Type, text = d.Type }).Distinct();
                     break;
                 case "verificationMethodic":
                     break;
 
                 default:
-                    result = null;
+                    results = null;
                     break;
             }
 
-            return Json(result);
+            return Json(results);
+        }
+
+        public IActionResult SetClient(Contract contract)
+        {
+            var client = _documents.GetClient(contract);
+            return Json(client);
         }
 
         private Document BuildNewDocument(NewDocumentModel model)
@@ -184,6 +181,23 @@ namespace CertificateManagementSystem.Controllers
                 };
             }
 
+        }
+        private void CreateSelectLists()
+        {
+            var clients = _documents.GetAllClients();
+            var devices = _documents.GetAllDevices();
+
+            var clientNames = clients.OrderBy(c => c.Name).Select(c => c.Name).Distinct();
+            var exploitationPlaces = clients.OrderBy(c => c.ExploitationPlace).Select(c => c.ExploitationPlace).Distinct();
+            var deviceNames = devices.OrderBy(d => d.Name).Select(d => d.Name).Distinct();
+            var deviceTypes = devices.OrderBy(d => d.Type).Select(d => d.Type).Distinct();
+            var verificationMethodics = devices.OrderBy(d => d.VerificationMethodic).Select(d => d.VerificationMethodic);
+
+            ViewBag.ClientNames = new SelectList(clientNames);
+            ViewBag.ExploitationPlaces = new SelectList(exploitationPlaces);
+            ViewBag.DeviceNames = new SelectList(deviceNames);
+            ViewBag.DeviceTypes = new SelectList(deviceTypes);
+            ViewBag.VerificationMethodics = new SelectList(verificationMethodics);
         }
     }
 }

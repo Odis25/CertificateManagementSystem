@@ -18,12 +18,12 @@
             <form method="post" asp-action="Create" id="newDocumentForm">
                 <div class="form-group">
                     <label asp-for="Year">Год</label>
-                    <input class="form-control form-control-sm shadow-sm" asp-for="Year" />
+                    <input class="form-control form-control-sm shadow-sm" asp-for="Year" id="inputYear"/>
                     <span class="text-danger" asp-validation-for="Year"></span>
                 </div>
                 <div class="form-group">
                     <label asp-for="ContractNumber">Номер договора</label>
-                    <input class="form-control form-control-sm shadow-sm" asp-for="ContractNumber" id="inputContractNumber" onchange="SetClient()" />
+                    <input class="form-control form-control-sm shadow-sm" asp-for="ContractNumber" id="inputContractNumber" onchange="SetClient()"/>
                     <span class="text-danger" asp-validation-for="ContractNumber"></span>
                 </div>
 
@@ -34,30 +34,32 @@
                 </div>
                 <div class="form-group">
                     <label asp-for="VerificationMethodic">Методика поверки</label>
-                    <input class="form-control form-control-sm shadow-sm" asp-for="VerificationMethodic" />
+                    <input class="form-control form-control-sm shadow-sm" asp-items="ViewBag.VerificationMethodic" asp-for="VerificationMethodic" />
                     <span class="text-danger" asp-validation-for="VerificationMethodic"></span>
                 </div>
 
                 <div class="form-group">
                     <label asp-for="ClientName">Эксплуатирующая организация</label>
-                    <select class="form-control form-control-sm shadow-sm" asp-for="ClientName" id="inputClientName"></select>
+                    <select class="form-control form-control-sm shadow-sm" asp-items="ViewBag.ClientNames" asp-for="ClientName" id="inputClientName">
+                        <option value=""></option>
+                    </select>
                     <span class="text-danger" asp-validation-for="ClientName"></span>
                 </div>
 
                 <div class="form-group">
                     <label asp-for="ExploitationPlace">Место эксплуатации</label>
-                    <select class="form-control form-control-sm shadow-sm" asp-for="ExploitationPlace" id="inputExploitationPlace"></select>
+                    <select class="form-control form-control-sm shadow-sm" asp-items="ViewBag.ExploitationPlaces" asp-for="ExploitationPlace" id="inputExploitationPlace"></select>
                     <span class="text-danger" asp-validation-for="ExploitationPlace"></span>
                 </div>
 
                 <div class="form-group">
                     <label asp-for="DeviceType">Группа СИ</label>
-                    <select class="form-control form-control-sm shadow-sm" asp-for="DeviceType" id="inputDeviceType"></select>
+                    <select class="form-control form-control-sm shadow-sm" asp-items="ViewBag.DeviceTypes" asp-for="DeviceType" id="inputDeviceType"></select>
                     <span class="text-danger" asp-validation-for="DeviceType"></span>
                 </div>
                 <div class="form-group">
                     <label asp-for="DeviceName">Наименование СИ</label>
-                    <select class="form-control form-control-sm shadow-sm" asp-for="DeviceName" id="inputDeviceName"></select>
+                    <select class="form-control form-control-sm shadow-sm" asp-items="ViewBag.DeviceNames" asp-for="DeviceName" id="inputDeviceName"></select>
                     <span class="text-danger" asp-validation-for="DeviceName"></span>
                 </div>
                 <div class="form-group">
