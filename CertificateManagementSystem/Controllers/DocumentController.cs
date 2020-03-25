@@ -2,10 +2,13 @@
 using CertificateManagementSystem.Data.Models;
 using CertificateManagementSystem.Models.Document;
 using CertificateManagementSystem.Services.Components;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,10 +17,14 @@ namespace CertificateManagementSystem.Controllers
     public class DocumentController : Controller
     {
         private readonly IDocumentService _documents;
+        private readonly IFileService _files;
+        private readonly IConfiguration _configuration;
 
-        public DocumentController(IDocumentService documents)
+        public DocumentController(IDocumentService documents, IFileService files, IConfiguration configuration)
         {
+            _configuration = configuration;
             _documents = documents;
+            _files = files;
         }
 
         public IActionResult Create(DocumentType type)
@@ -39,36 +46,36 @@ namespace CertificateManagementSystem.Controllers
         public async Task<IActionResult> Create(NewDocumentModel model)
         {
             var newDocument = BuildNewDocument(model);
+
             var client = newDocument.Device.Contract.Client;
             var regNumber = newDocument.Device.VerificationMethodic.RegistrationNumber;
             var documentExist = _documents.IsDocumentExist(model.DocumentNumber);
 
-            // Проверка корректности введенных данных
-            if (client.ExploitationPlace != model.ExploitationPlace)
-            {
-                // Место эксплуатации не совпадает
-                ModelState.AddModelError("", "Место эксплуатации отличается от указанного ранее для этого договора.");
-            }
-            if (client.Name != model.ClientName)
-            {
-                // Имя заказчика не совпадает
-                ModelState.AddModelError("", "Имя заказчика отличается от указанного ранее для этого договора.");
-            }
-            if (regNumber != model.RegistrationNumber)
-            {
-                // Номер в гос.реестре не совпадает
-                ModelState.AddModelError("", "За данным оборудованием закреплен другой номер в гос.реестре.");
-            }
-
+            // Валидация введенных данных
             if (documentExist)
             {
                 // Документ с таким номером уже есть в базе
                 ModelState.AddModelError("", "Документ с таким номером уже есть в базе.");
             }
+            if (client.ExploitationPlace.ToLower() != model.ExploitationPlace.ToLower())
+            {
+                // Место эксплуатации не совпадает
+                ModelState.AddModelError("", "Место эксплуатации отличается от указанного ранее для этого договора.");
+            }
+            if (client.Name.ToLower() != model.ClientName.ToLower())
+            {
+                // Имя заказчика не совпадает
+                ModelState.AddModelError("", "Имя заказчика отличается от указанного ранее для этого договора.");
+            }
+            if (regNumber.ToLower() != model.RegistrationNumber)
+            {
+                // Номер в гос.реестре не совпадает
+                ModelState.AddModelError("", "За данным оборудованием закреплен другой номер в гос.реестре.");
+            }
 
-            // Проверка правильности введенных данных
             if (ModelState.IsValid)
             {
+                //await _files.CreateFile(model.DocumentFile, newDocument.FilePath);
                 await _documents.Add(newDocument);
             }
 
@@ -127,7 +134,7 @@ namespace CertificateManagementSystem.Controllers
         private Document BuildNewDocument(NewDocumentModel model)
         {
             // Находим существующее средство измерения, или создаем новое
-            var device = _documents.GetDevice(model.DeviceName, model.SerialNumber, model.ContractNumber, model.Year);
+            var device = _documents.GetDevice(model.DeviceName, model.SerialNumber);
 
             device ??= new Device
             {
@@ -159,10 +166,11 @@ namespace CertificateManagementSystem.Controllers
                 }
             };
 
+            Document result;
             if (model.DocumentType == DocumentType.Certificate)
             {
                 // Создаем новое свидетельство
-                return new Certificate
+                result = new Certificate
                 {
                     Device = device,
                     DocumentNumber = model.DocumentNumber,
@@ -173,7 +181,7 @@ namespace CertificateManagementSystem.Controllers
             else
             {
                 // Создаем новое извещение о непригодности
-                return new FailureNotification
+                result = new FailureNotification
                 {
                     Device = device,
                     DocumentNumber = model.DocumentNumber,
@@ -181,23 +189,76 @@ namespace CertificateManagementSystem.Controllers
                 };
             }
 
+            return result;
         }
+
+        private Document BuildDocumentModel(NewDocumentModel model)
+        {
+            Document newDocument;
+
+            var contract = _documents.GetContract(model.ContractNumber, model.Year);
+            var client = _documents.GetClient(model.ClientName, model.ExploitationPlace);
+            var device = _documents.GetDevice(model.DeviceName, model.SerialNumber);
+
+            if (model.DocumentType == DocumentType.Certificate)
+            {
+                // Создаем новое свидетельство
+                newDocument = new Certificate
+                {
+                    CalibrationDate = model.CalibrationDate,
+                    CalibrationExpireDate = model.CalibrationExpireDate
+                };
+            }
+            else
+            {
+                // Создаем новое извещение о непригодности
+                newDocument = new FailureNotification
+                {
+                    DocumentDate = model.DocumentDate
+                };
+            }
+
+            var exploitationPlace = _documents.GetExploitationPlace(model.ClientName, model.ExploitationPlace);
+            var verificationMethodic = _documents.GetVerificationMethodic(model.VerificationMethodic);
+        }
+
+        private string CreateFilePath(Document document)
+        {
+            var isCertificate = document is Certificate;
+
+            var year = document.Device.Contract.Year.ToString();
+            var contract = document.Device.Contract.ContractNumber.ReplaceInvalidChars('-');
+            var deviceType = document.Device.Type.ReplaceInvalidChars('-');
+            var deviceName = document.Device.Name.ReplaceInvalidChars('-');
+            var type = isCertificate ? "Свидетельства" : "Извещения о непригодности";
+
+            var fileName = deviceType + "_" + deviceName;
+
+            return Path.Combine(year, contract, type, fileName);
+        }
+
         private void CreateSelectLists()
         {
             var clients = _documents.GetAllClients();
             var devices = _documents.GetAllDevices();
+            var methodics = _documents.GetAllVerificationMethodics();
+            var contracts = _documents.GetAllContracts();
 
-            var clientNames = clients.OrderBy(c => c.Name).Select(c => c.Name).Distinct();
+            var contractNumbers = contracts.Select(c => c.ContractNumber).Distinct();
+            var clientNames = clients.Select(c => c.Name).Distinct();
             var exploitationPlaces = clients.OrderBy(c => c.ExploitationPlace).Select(c => c.ExploitationPlace).Distinct();
-            var deviceNames = devices.OrderBy(d => d.Name).Select(d => d.Name).Distinct();
+            var deviceNames = devices.Select(d => d.Name).Distinct();
             var deviceTypes = devices.OrderBy(d => d.Type).Select(d => d.Type).Distinct();
-            var verificationMethodics = devices.OrderBy(d => d.VerificationMethodic).Select(d => d.VerificationMethodic);
+            var verificationMethodics = methodics.Select(vm => vm.Name).Distinct();
+            var registerNumbers = methodics.OrderBy(vm => vm.RegistrationNumber).Select(vm => vm.RegistrationNumber).Distinct();
 
+            ViewBag.Contracts = new SelectList(contracts);
             ViewBag.ClientNames = new SelectList(clientNames);
             ViewBag.ExploitationPlaces = new SelectList(exploitationPlaces);
             ViewBag.DeviceNames = new SelectList(deviceNames);
             ViewBag.DeviceTypes = new SelectList(deviceTypes);
             ViewBag.VerificationMethodics = new SelectList(verificationMethodics);
+            ViewBag.RegisterNumbers = new SelectList(registerNumbers);
         }
     }
 }

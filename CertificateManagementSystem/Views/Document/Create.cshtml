@@ -1,76 +1,132 @@
 ﻿@model NewDocumentModel
 @using CertificateManagementSystem.Services.Components
 
-<div class="sectionHeader bg-dark">
+<!--Заголовок-->
+<div class="row no-gutters sectionHeader">
+
     @if (Model.DocumentType == DocumentType.Certificate)
     {
-        <h4 class="text-center text-light p-2">Новое свидетельство</h4>
+        <h4 class="text-dark headingCustom">Свидетельство о поверке</h4>
     }
     else
     {
-        <h4 class="text-center text-light p-2">Новое извещение о непригодности</h4>
+        <h4 class="text-dark headingCustom">Извещение о непригодности</h4>
     }
+    <button class="btn btn-outline-secondary" type="submit" form="newDocumentForm">Добавить</button>
 </div>
 
+<!--Основной контент-->
 <div class="row section no-gutters">
     <div class="col-md-6">
-        <div class="half-section shadow">
-            <form method="post" asp-action="Create" id="newDocumentForm">
-                <div class="form-group">
-                    <label asp-for="Year">Год</label>
-                    <input class="form-control form-control-sm shadow-sm" asp-for="Year" id="inputYear"/>
-                    <span class="text-danger" asp-validation-for="Year"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="ContractNumber">Номер договора</label>
-                    <input class="form-control form-control-sm shadow-sm" asp-for="ContractNumber" id="inputContractNumber" onchange="SetClient()"/>
-                    <span class="text-danger" asp-validation-for="ContractNumber"></span>
+        <div class="p-1">
+            <form method="post" asp-action="Create" id="newDocumentForm" enctype="multipart/form-data">
+
+                <div class="form-row">
+                    <div class="form-group col-md-3">
+                        <label asp-for="Year">Год</label>
+                        <input class="form-control form-control-sm shadow-sm" asp-for="Year" id="inputYear" />
+                        <span class="text-danger" asp-validation-for="Year"></span>
+                    </div>
+
+                    <div class="form-group col-md-9">
+                        <label asp-for="ContractNumber">Номер договора</label>
+                        <input class="form-control form-control-sm shadow-sm" asp-for="ContractNumber" autocomplete="off" list="contractNumberList" placeholder="Укажите номер договора..." id="inputContractNumber" onchange="SetClient()" />
+                        <datalist id="contractNumberList">
+                            @foreach (var item in ViewBag.Contracts)
+                            {
+                                <option value="@item.Text">@item.Text</option>
+                            }
+                        </datalist>
+                        <span class="text-danger" asp-validation-for="ContractNumber"></span>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label asp-for="RegistrationNumber">Номер в гос.реестре</label>
-                    <input class="form-control form-control-sm shadow-sm" asp-for="RegistrationNumber" />
+                    <input class="form-control form-control-sm shadow-sm" asp-for="RegistrationNumber" autocomplete="off" list="registrationNumberList" placeholder="Укажите номер в гос. реестре..." />
+                    <datalist id="registrationNumberList">
+                        @foreach (var item in ViewBag.RegisterNumbers)
+                        {
+                            <option value="@item.Text">@item.Text</option>
+                        }
+                    </datalist>
                     <span class="text-danger" asp-validation-for="RegistrationNumber"></span>
                 </div>
+
                 <div class="form-group">
                     <label asp-for="VerificationMethodic">Методика поверки</label>
-                    <input class="form-control form-control-sm shadow-sm" asp-items="ViewBag.VerificationMethodic" asp-for="VerificationMethodic" />
+                    <input class="form-control form-control-sm shadow-sm" asp-for="VerificationMethodic" 
+                           autocomplete="off" list="verificationMethodicList" placeholder="Укажите методику поверки..." />
+                    <datalist id="verificationMethodicList">
+                        @foreach (var item in ViewBag.VerificationMethodics)
+                        {
+                            <option value="@item.Text">@item.Text</option>
+                        }
+                    </datalist>
                     <span class="text-danger" asp-validation-for="VerificationMethodic"></span>
                 </div>
 
                 <div class="form-group">
                     <label asp-for="ClientName">Эксплуатирующая организация</label>
-                    <select class="form-control form-control-sm shadow-sm" asp-items="ViewBag.ClientNames" asp-for="ClientName" id="inputClientName">
-                        <option value=""></option>
-                    </select>
+                    <input class="form-control form-control-sm shadow-sm" asp-for="ClientName" 
+                           autocomplete="off" list="clientNameList" placeholder="Укажите эксплуатирующую организацию..." id="inputClientName" />
+                    <datalist id="clientNameList">
+                        @foreach (var item in ViewBag.ClientNames)
+                        {
+                            <option value="@item.Text">@item.Text</option>
+                        }
+                    </datalist>
                     <span class="text-danger" asp-validation-for="ClientName"></span>
                 </div>
 
                 <div class="form-group">
                     <label asp-for="ExploitationPlace">Место эксплуатации</label>
-                    <select class="form-control form-control-sm shadow-sm" asp-items="ViewBag.ExploitationPlaces" asp-for="ExploitationPlace" id="inputExploitationPlace"></select>
+                    <input class="form-control form-control-sm shadow-sm" asp-for="ExploitationPlace" 
+                           autocomplete="off" list="exploitationPlaceList" placeholder="Укажите место эксплуатации..." id="inputExploitationPlace" />
+                    <datalist id="exploitationPlaceList">
+                        @foreach (var item in ViewBag.ExploitationPlaces)
+                        {
+                            <option value="@item.Text">@item.Text</option>
+                        }
+                    </datalist>
                     <span class="text-danger" asp-validation-for="ExploitationPlace"></span>
                 </div>
 
                 <div class="form-group">
                     <label asp-for="DeviceType">Группа СИ</label>
-                    <select class="form-control form-control-sm shadow-sm" asp-items="ViewBag.DeviceTypes" asp-for="DeviceType" id="inputDeviceType"></select>
+                    <input class="form-control form-control-sm shadow-sm" asp-for="DeviceType" 
+                           autocomplete="off" list="deviceTypeList" placeholder="Укажите группу СИ..." id="inputDeviceType" />
+                    <datalist id="deviceTypeList">
+                        @foreach (var item in ViewBag.DeviceTypes)
+                        {
+                            <option value="@item.Text">@item.Text</option>
+                        }
+                    </datalist>
                     <span class="text-danger" asp-validation-for="DeviceType"></span>
                 </div>
+
                 <div class="form-group">
                     <label asp-for="DeviceName">Наименование СИ</label>
-                    <select class="form-control form-control-sm shadow-sm" asp-items="ViewBag.DeviceNames" asp-for="DeviceName" id="inputDeviceName"></select>
+                    <input class="form-control form-control-sm shadow-sm" asp-for="DeviceName" 
+                           autocomplete="off" list="deviceNameList" placeholder="Укажите наименование СИ..." id="inputDeviceName"/>
+                    <datalist id="deviceNameList">
+                        @foreach (var item in ViewBag.DeviceNames)
+                        {
+                            <option value="@item.Text">@item.Text</option>
+                        }
+                    </datalist> 
                     <span class="text-danger" asp-validation-for="DeviceName"></span>
                 </div>
+
                 <div class="form-group">
                     <label asp-for="SerialNumber">Заводской номер СИ</label>
-                    <input class="form-control form-control-sm shadow-sm" asp-for="SerialNumber" />
+                    <input class="form-control form-control-sm shadow-sm" asp-for="SerialNumber" autocomplete="off" />
                     <span class="text-danger" asp-validation-for="SerialNumber"></span>
                 </div>
 
                 <div class="form-group">
                     <label asp-for="DocumentNumber">Номер документа</label>
-                    <input class="form-control form-control-sm shadow-sm" asp-for="DocumentNumber" />
+                    <input class="form-control form-control-sm shadow-sm" asp-for="DocumentNumber" autocomplete="off" />
                     <span class="text-danger" asp-validation-for="DocumentNumber"></span>
                 </div>
 
@@ -97,6 +153,7 @@
                         <span class="text-danger" asp-validation-for="DocumentDate"></span>
                     </div>
                 }
+                <input class="form-control-file" asp-for="DocumentFile" />
                 <input type="hidden" asp-for="DocumentType" />
                 <div class="text-danger" asp-validation-summary="ModelOnly"></div>
             </form>
@@ -104,12 +161,10 @@
     </div>
     <div class="col-md-6">
         <div class="half-section">
-            <iframe class="pdfHolder" src="file://d:/Stuff/PassportZ.pdf" frameborder="0">
+            <iframe class="pdfHolder" src="file://d:/Scan1.pdf" frameborder="0">
             </iframe>
         </div>
     </div>
 </div>
-<div class="row justify-content-center p-2">
-    <button class="btn btn-success mb-1" type="submit" form="newDocumentForm">Добавить</button>
-</div>
+
 

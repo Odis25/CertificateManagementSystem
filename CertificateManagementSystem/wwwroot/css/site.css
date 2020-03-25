@@ -29,6 +29,7 @@ a {
     border-color: #1861ac;
 }
 
+/*---- Логотип ----*/
 .navLogo {
     font-family: 'Roboto Mono';
     font-weight: bold;
@@ -45,7 +46,7 @@ a {
         border-radius: 5px;
         padding: 5px;
         color: #335;
-        margin-left: 2px;
+        margin-left: -12px;
     }
 
 #mainHeader {
@@ -59,11 +60,25 @@ a {
     padding-top: 80px;
 }
 
+/*---- Заголовок секции документов----*/
+.sectionHeader {
+    padding: 10px 0;
+}
+
+    .sectionHeader .headingCustom {
+        line-height: 1.6;
+        font-weight: bold;
+        margin: 0;
+        padding: 0 0px;
+        flex-grow: 1;
+        vertical-align: middle;
+    }
+
 .section {
-    background-color: #ddd;
-    border-radius: 6px;
+    background-color: #fff;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.5);
     font-size: 16px;
-    padding: 5px;
+    padding: 10px;
     overflow-y: auto;
 }
 
@@ -100,8 +115,13 @@ a {
         font-size: 14px;
     }
 
+.section input:focus {
+    border-color: #ccc;
+    box-shadow: 0px 0px 4px #111;
+}
+
 /*-----Fix select2 resizing bug------*/
 .select2 {
     width: 100% !important;
-    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;    
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
 }

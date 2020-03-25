@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Generic;
+
 namespace CertificateManagementSystem.Data.Models
 {
     public class Contract
@@ -9,5 +11,7 @@ namespace CertificateManagementSystem.Data.Models
         public string ContractNumber { get; set; }
 
         public virtual Client Client { get; set; }
+
+        public IEnumerable<Device> Devices { get; set; }
     }
 }

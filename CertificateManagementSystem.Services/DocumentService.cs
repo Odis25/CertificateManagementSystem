@@ -24,17 +24,22 @@ namespace CertificateManagementSystem.Services
 
         public IEnumerable<Client> GetAllClients()
         {
-            return _context.Clients;
+            return _context.Clients.OrderBy(c => c.Name);
         }
 
         public IEnumerable<Contract> GetAllContracts()
         {
-            return _context.Contracts;
+            return _context.Contracts.OrderBy(c => c.ContractNumber);
         }
 
         public IEnumerable<Device> GetAllDevices()
         {
-            return _context.Devices;
+            return _context.Devices.OrderBy(d => d.Name);
+        }
+
+        public IEnumerable<VerificationMethodic> GetAllVerificationMethodics()
+        {
+            return _context.VerificationMethodics.OrderBy(vm => vm.Name);
         }
 
         public IEnumerable<Document> GetAllDocuments()
@@ -56,7 +61,7 @@ namespace CertificateManagementSystem.Services
         public Client GetClient(Contract contract)
         {
             var foundedContract = _context.Contracts
-                .Include(c=>c.Client)
+                .Include(c => c.Client)
                 .FirstOrDefault(c => c.ContractNumber == contract.ContractNumber && c.Year == contract.Year);
             return foundedContract?.Client;
         }
@@ -65,19 +70,17 @@ namespace CertificateManagementSystem.Services
         {
             return _context.Contracts
                 .Include(c => c.Client)
+                .Include(c => c.Devices)
                 .FirstOrDefault(c => c.ContractNumber == contractNumber && c.Year == year);
         }
 
-        public Device GetDevice(string deviceName, string serialNumber, string contractNumber, int year)
+        public Device GetDevice(string deviceName, string serialNumber)
         {
             return _context.Devices
-                .Include(d => d.Contract)
+                .Include(d => d.Contracts)
                 .ThenInclude(c => c.Client)
                 .Include(d => d.VerificationMethodic)
-                .FirstOrDefault(d => d.SerialNumber == serialNumber &&
-                    d.Name == deviceName &&
-                    d.Contract.ContractNumber == contractNumber &&
-                    d.Contract.Year == year);
+                .FirstOrDefault(d => d.Name == deviceName && d.SerialNumber == serialNumber);
         }
 
         public VerificationMethodic GetVerificationMethodic(string registrationNumber)
@@ -89,5 +92,6 @@ namespace CertificateManagementSystem.Services
         {
             return _context.Documents.Any(c => c.DocumentNumber == documentNumber);
         }
+
     }
 }

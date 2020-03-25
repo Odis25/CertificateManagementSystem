@@ -11,8 +11,8 @@ namespace CertificateManagementSystem.Data.Models
         public string SerialNumber { get; set; }
 
         public virtual VerificationMethodic VerificationMethodic { get; set; }
-        public virtual Contract Contract { get; set; }
 
+        public IEnumerable<Contract> Contracts { get; set; }
         public IEnumerable<Document> Documents { get; set; }
     }
 }

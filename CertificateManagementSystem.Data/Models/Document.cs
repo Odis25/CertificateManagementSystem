@@ -5,7 +5,7 @@
         public int Id { get; set; }
 
         public string DocumentNumber { get; set; }
-        public string FilePath { get; set; }
+        public FileModel DocumentFile { get; set; }
         
         public virtual Device Device { get; set; }
     }

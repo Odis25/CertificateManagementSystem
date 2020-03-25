@@ -1,4 +1,5 @@
 ﻿using CertificateManagementSystem.Services.Components;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -34,6 +35,6 @@ namespace CertificateManagementSystem.Models.Document
         public DateTime CalibrationExpireDate { get; set; }
         public DateTime DocumentDate { get; set; }
 
-        public string FilePath { get; set; }
+        public IFormFile DocumentFile { get; set; }
     }
 }
