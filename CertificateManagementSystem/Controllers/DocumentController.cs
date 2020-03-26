@@ -45,33 +45,42 @@ namespace CertificateManagementSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(NewDocumentModel model)
         {
-            var newDocument = BuildNewDocument(model);
+            var newDocument = CreateDocument(model);
 
-            var client = newDocument.Device.Contract.Client;
-            var regNumber = newDocument.Device.VerificationMethodic.RegistrationNumber;
-            var documentExist = _documents.IsDocumentExist(model.DocumentNumber);
+            // ПРОВЕРИТЬ ПРАВИЛЬНОСТЬ ВВЕДЕННЫХ ДАННЫХ:
 
-            // Валидация введенных данных
-            if (documentExist)
-            {
-                // Документ с таким номером уже есть в базе
-                ModelState.AddModelError("", "Документ с таким номером уже есть в базе.");
-            }
-            if (client.ExploitationPlace.ToLower() != model.ExploitationPlace.ToLower())
-            {
-                // Место эксплуатации не совпадает
-                ModelState.AddModelError("", "Место эксплуатации отличается от указанного ранее для этого договора.");
-            }
-            if (client.Name.ToLower() != model.ClientName.ToLower())
-            {
-                // Имя заказчика не совпадает
-                ModelState.AddModelError("", "Имя заказчика отличается от указанного ранее для этого договора.");
-            }
-            if (regNumber.ToLower() != model.RegistrationNumber)
-            {
-                // Номер в гос.реестре не совпадает
-                ModelState.AddModelError("", "За данным оборудованием закреплен другой номер в гос.реестре.");
-            }
+            // Документ с таким номером уже есть в базе
+            // Имя заказчика у договора не совпадает с введенным пользователем
+            // Место эксплуатации у договора не совпадает с введенным пользователем
+            // Номер в гос.реестре не совпадает
+            // Название методики поверки не совпадает
+
+
+            //var client = newDocument.Device.Contract.Client;
+            //var regNumber = newDocument.Device.VerificationMethodic.RegistrationNumber;
+            //var documentExist = _documents.IsDocumentExist(model.DocumentNumber);
+
+            //// Валидация введенных данных
+            //if (documentExist)
+            //{
+            //    // Документ с таким номером уже есть в базе
+            //    ModelState.AddModelError("", "Документ с таким номером уже есть в базе.");
+            //}
+            //if (client.ExploitationPlace.ToLower() != model.ExploitationPlace.ToLower())
+            //{
+            //    // Место эксплуатации не совпадает
+            //    ModelState.AddModelError("", "Место эксплуатации отличается от указанного ранее для этого договора.");
+            //}
+            //if (client.Name.ToLower() != model.ClientName.ToLower())
+            //{
+            //    // Имя заказчика не совпадает
+            //    ModelState.AddModelError("", "Имя заказчика отличается от указанного ранее для этого договора.");
+            //}
+            //if (regNumber.ToLower() != model.RegistrationNumber)
+            //{
+            //    // Номер в гос.реестре не совпадает
+            //    ModelState.AddModelError("", "За данным оборудованием закреплен другой номер в гос.реестре.");
+            //}
 
             if (ModelState.IsValid)
             {
@@ -131,111 +140,20 @@ namespace CertificateManagementSystem.Controllers
             return Json(client);
         }
 
-        private Document BuildNewDocument(NewDocumentModel model)
-        {
-            // Находим существующее средство измерения, или создаем новое
-            var device = _documents.GetDevice(model.DeviceName, model.SerialNumber);
+        //private string CreateFilePath(Document document)
+        //{
+        //    var isCertificate = document is Certificate;
 
-            device ??= new Device
-            {
-                Name = model.DeviceName.Capitalize(),
-                Type = model.DeviceType.Capitalize(),
-                SerialNumber = model.SerialNumber,
-                // Находим существующий договор, или создаем новый
-                Contract = _documents.GetContract(model.ContractNumber, model.Year) ??
-                new Contract
-                {
-                    Year = model.Year,
-                    ContractNumber = model.ContractNumber,
-                    // Находим существующего заказчика, или создаем нового
-                    Client = _documents.GetClient(model.ClientName, model.ExploitationPlace) ??
-                    new Client
-                    {
-                        Name = model.ClientName.Capitalize(),
-                        ExploitationPlace = model.ExploitationPlace.Capitalize()
-                    }
-                },
-                // Находим существующую методику, или создаем новую
-                VerificationMethodic = _documents.GetVerificationMethodic(model.RegistrationNumber) ??
-                new VerificationMethodic
-                {
-                    RegistrationNumber = model.RegistrationNumber,
-                    Name = model.VerificationMethodic,
-                    FileName = ""
-                    // todo: продумать логику добавления методики поверки
-                }
-            };
+        //    var year = document.Device.Contract.Year.ToString();
+        //    var contract = document.Device.Contract.ContractNumber.ReplaceInvalidChars('-');
+        //    var deviceType = document.Device.Type.ReplaceInvalidChars('-');
+        //    var deviceName = document.Device.Name.ReplaceInvalidChars('-');
+        //    var type = isCertificate ? "Свидетельства" : "Извещения о непригодности";
 
-            Document result;
-            if (model.DocumentType == DocumentType.Certificate)
-            {
-                // Создаем новое свидетельство
-                result = new Certificate
-                {
-                    Device = device,
-                    DocumentNumber = model.DocumentNumber,
-                    CalibrationDate = model.CalibrationDate,
-                    CalibrationExpireDate = model.CalibrationExpireDate
-                };
-            }
-            else
-            {
-                // Создаем новое извещение о непригодности
-                result = new FailureNotification
-                {
-                    Device = device,
-                    DocumentNumber = model.DocumentNumber,
-                    DocumentDate = model.DocumentDate
-                };
-            }
+        //    var fileName = deviceType + "_" + deviceName;
 
-            return result;
-        }
-
-        private Document BuildDocumentModel(NewDocumentModel model)
-        {
-            Document newDocument;
-
-            var contract = _documents.GetContract(model.ContractNumber, model.Year);
-            var client = _documents.GetClient(model.ClientName, model.ExploitationPlace);
-            var device = _documents.GetDevice(model.DeviceName, model.SerialNumber);
-
-            if (model.DocumentType == DocumentType.Certificate)
-            {
-                // Создаем новое свидетельство
-                newDocument = new Certificate
-                {
-                    CalibrationDate = model.CalibrationDate,
-                    CalibrationExpireDate = model.CalibrationExpireDate
-                };
-            }
-            else
-            {
-                // Создаем новое извещение о непригодности
-                newDocument = new FailureNotification
-                {
-                    DocumentDate = model.DocumentDate
-                };
-            }
-
-            var exploitationPlace = _documents.GetExploitationPlace(model.ClientName, model.ExploitationPlace);
-            var verificationMethodic = _documents.GetVerificationMethodic(model.VerificationMethodic);
-        }
-
-        private string CreateFilePath(Document document)
-        {
-            var isCertificate = document is Certificate;
-
-            var year = document.Device.Contract.Year.ToString();
-            var contract = document.Device.Contract.ContractNumber.ReplaceInvalidChars('-');
-            var deviceType = document.Device.Type.ReplaceInvalidChars('-');
-            var deviceName = document.Device.Name.ReplaceInvalidChars('-');
-            var type = isCertificate ? "Свидетельства" : "Извещения о непригодности";
-
-            var fileName = deviceType + "_" + deviceName;
-
-            return Path.Combine(year, contract, type, fileName);
-        }
+        //    return Path.Combine(year, contract, type, fileName);
+        //}
 
         private void CreateSelectLists()
         {
@@ -259,6 +177,139 @@ namespace CertificateManagementSystem.Controllers
             ViewBag.DeviceTypes = new SelectList(deviceTypes);
             ViewBag.VerificationMethodics = new SelectList(verificationMethodics);
             ViewBag.RegisterNumbers = new SelectList(registerNumbers);
+        }
+
+        // Формируем нового заказчика
+        private Client CreateClient(NewDocumentModel model)
+        {
+            return _documents.GetClient(model.ClientName, model.ExploitationPlace) ??
+                new Client
+                {
+                    Name = model.ClientName.Trim().Capitalize(),
+                    ExploitationPlace = model.ExploitationPlace.Trim().Capitalize()
+                };
+        }
+        // Формируем новый договор
+        private Contract CreateContract(NewDocumentModel model)
+        {
+            var contract = _documents.GetContract(model.ContractNumber, model.Year);
+
+            if (contract == null)
+            {
+                contract = new Contract
+                {
+                    Year = model.Year,
+                    ContractNumber = model.ContractNumber.Trim(),
+                    Client = CreateClient(model)
+                };
+            }
+            else
+            {
+                if (contract.Client.Name.ToLower() != model.ClientName.ToLower())
+                {
+                    // Имя заказчика не совпадает
+                    ModelState.AddModelError("", "Имя заказчика отличается от указанного ранее для этого договора.");
+                }
+                if (contract.Client.ExploitationPlace.ToLower() != model.ExploitationPlace.ToLower())
+                {
+                    // Место эксплуатации не совпадает
+                    ModelState.AddModelError("", "Место эксплуатации отличается от указанного ранее для этого договора.");
+                }
+            }
+
+            return contract;
+        }
+        // Формируем новую метоздику поверки
+        private VerificationMethodic CreateVerificationMethodic(NewDocumentModel model)
+        {
+            var methodic = _documents.GetVerificationMethodic(model.RegistrationNumber);
+            if (methodic == null)
+            {
+                methodic = new VerificationMethodic
+                {
+                    Name = model.VerificationMethodic,
+                    RegistrationNumber = model.RegistrationNumber.Trim(),
+                    FileName = ""
+                };
+            }
+            else
+            {
+                //todo: Что если методика поверки и регистрационный номер отличаются от указанных ранее для этого устройства?
+
+                if (methodic.RegistrationNumber.ToLower() != model.RegistrationNumber.ToLower())
+                {
+                    // Номер в гос.реестре не совпадает
+                    ModelState.AddModelError("", "За данным оборудованием закреплен другой номер в гос.реестре.");
+                }
+                if (methodic.Name.ToLower() != model.VerificationMethodic.ToLower())
+                {
+                    // Название методики поверки не совпадает
+                    ModelState.AddModelError("", "За данным оборудованием закреплена другая методика поверки.");
+                }
+            }
+
+            return methodic;
+        }
+        // Формируем новое устройство
+        private Device CreateDevice(NewDocumentModel model)
+        {
+            var device = _documents.GetDevice(model.DeviceName, model.SerialNumber);
+            var contract = CreateContract(model);
+            var methodic = CreateVerificationMethodic(model);
+
+            if (device == null)
+            {
+                device = new Device
+                {
+                    Name = model.DeviceName.Trim(),
+                    Type = model.DeviceType.Trim(),
+                    SerialNumber = model.SerialNumber.Trim(),
+                    VerificationMethodic = methodic,
+                    Contracts = new List<Contract> { contract }
+                };
+            }
+            else
+            {
+                if (!device.Contracts.Contains(contract))
+                {
+                    device.Contracts.ToList().Add(contract);
+                }
+            }
+
+            return device;
+        }
+        // Формируем новый документ
+        private Document CreateDocument(NewDocumentModel model)
+        {
+            if (_documents.IsDocumentExist(model.DocumentNumber))
+            {
+                // Документ с таким номером уже есть в базе
+                ModelState.AddModelError("", "Документ с таким номером уже есть в базе.");
+            }
+
+            var device = CreateDevice(model);
+
+            if (model.DocumentType == DocumentType.Certificate)
+            {
+                // Создаем новое свидетельство
+                return new Certificate
+                {
+                    Device = device,
+                    DocumentNumber = model.DocumentNumber.Trim(),
+                    CalibrationDate = model.CalibrationDate,
+                    CalibrationExpireDate = model.CalibrationExpireDate
+                };
+            }
+            else
+            {
+                // Создаем новое извещение о непригодности
+                return new FailureNotification
+                {
+                    Device = device,
+                    DocumentNumber = model.DocumentNumber.Trim(),
+                    DocumentDate = model.DocumentDate
+                };
+            }
         }
     }
 }

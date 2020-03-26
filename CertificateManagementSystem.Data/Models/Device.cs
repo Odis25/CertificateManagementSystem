@@ -12,7 +12,7 @@ namespace CertificateManagementSystem.Data.Models
 
         public virtual VerificationMethodic VerificationMethodic { get; set; }
 
-        public IEnumerable<Contract> Contracts { get; set; }
+        public List<Contract> Contracts { get; set; }
         public IEnumerable<Document> Documents { get; set; }
     }
 }

@@ -12,6 +12,6 @@ namespace CertificateManagementSystem.Data.Models
 
         public virtual Client Client { get; set; }
 
-        public IEnumerable<Device> Devices { get; set; }
+        public List<Device> Devices { get; set; }
     }
 }
