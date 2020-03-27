@@ -70,14 +70,15 @@ namespace CertificateManagementSystem.Services
         {
             return _context.Contracts
                 .Include(c => c.Client)
-                .Include(c => c.Devices)
+                .Include(c => c.ContractDevices).ThenInclude(cd => cd.Device)
                 .FirstOrDefault(c => c.ContractNumber == contractNumber && c.Year == year);
         }
 
         public Device GetDevice(string deviceName, string serialNumber)
         {
             return _context.Devices
-                .Include(d => d.Contracts)
+                .Include(d => d.ContractDevices)
+                .ThenInclude(cd => cd.Contract)
                 .ThenInclude(c => c.Client)
                 .Include(d => d.VerificationMethodic)
                 .FirstOrDefault(d => d.Name == deviceName && d.SerialNumber == serialNumber);

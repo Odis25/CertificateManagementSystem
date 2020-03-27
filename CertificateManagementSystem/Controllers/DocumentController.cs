@@ -33,6 +33,10 @@ namespace CertificateManagementSystem.Controllers
 
             var model = new NewDocumentModel
             {
+                ClientName="",
+                ContractNumber="",
+                DeviceName="",
+
                 DocumentType = type,
                 Year = 2020,
                 CalibrationDate = DateTime.Now,
@@ -48,13 +52,6 @@ namespace CertificateManagementSystem.Controllers
             var newDocument = CreateDocument(model);
 
             // ПРОВЕРИТЬ ПРАВИЛЬНОСТЬ ВВЕДЕННЫХ ДАННЫХ:
-
-            // Документ с таким номером уже есть в базе
-            // Имя заказчика у договора не совпадает с введенным пользователем
-            // Место эксплуатации у договора не совпадает с введенным пользователем
-            // Номер в гос.реестре не совпадает
-            // Название методики поверки не совпадает
-
 
             //var client = newDocument.Device.Contract.Client;
             //var regNumber = newDocument.Device.VerificationMethodic.RegistrationNumber;
@@ -185,8 +182,8 @@ namespace CertificateManagementSystem.Controllers
             return _documents.GetClient(model.ClientName, model.ExploitationPlace) ??
                 new Client
                 {
-                    Name = model.ClientName.Trim().Capitalize(),
-                    ExploitationPlace = model.ExploitationPlace.Trim().Capitalize()
+                    Name = model.ClientName?.Trim().Capitalize(),
+                    ExploitationPlace = model.ExploitationPlace?.Trim().Capitalize()
                 };
         }
         // Формируем новый договор
@@ -199,7 +196,7 @@ namespace CertificateManagementSystem.Controllers
                 contract = new Contract
                 {
                     Year = model.Year,
-                    ContractNumber = model.ContractNumber.Trim(),
+                    ContractNumber = model.ContractNumber?.Trim(),
                     Client = CreateClient(model)
                 };
             }
@@ -210,7 +207,7 @@ namespace CertificateManagementSystem.Controllers
                     // Имя заказчика не совпадает
                     ModelState.AddModelError("", "Имя заказчика отличается от указанного ранее для этого договора.");
                 }
-                if (contract.Client.ExploitationPlace.ToLower() != model.ExploitationPlace.ToLower())
+                if (contract.Client.ExploitationPlace?.ToLower() != model.ExploitationPlace?.ToLower())
                 {
                     // Место эксплуатации не совпадает
                     ModelState.AddModelError("", "Место эксплуатации отличается от указанного ранее для этого договора.");
@@ -225,23 +222,26 @@ namespace CertificateManagementSystem.Controllers
             var methodic = _documents.GetVerificationMethodic(model.RegistrationNumber);
             if (methodic == null)
             {
-                methodic = new VerificationMethodic
+                if (model.VerificationMethodic != null)
                 {
-                    Name = model.VerificationMethodic,
-                    RegistrationNumber = model.RegistrationNumber.Trim(),
-                    FileName = ""
-                };
+                    methodic = new VerificationMethodic
+                    {
+                        Name = model.VerificationMethodic,
+                        RegistrationNumber = model.RegistrationNumber?.Trim(),
+                        FileName = ""
+                    };
+                }               
             }
             else
             {
                 //todo: Что если методика поверки и регистрационный номер отличаются от указанных ранее для этого устройства?
 
-                if (methodic.RegistrationNumber.ToLower() != model.RegistrationNumber.ToLower())
+                if (methodic.RegistrationNumber.ToLower() != model.RegistrationNumber?.ToLower())
                 {
                     // Номер в гос.реестре не совпадает
                     ModelState.AddModelError("", "За данным оборудованием закреплен другой номер в гос.реестре.");
                 }
-                if (methodic.Name.ToLower() != model.VerificationMethodic.ToLower())
+                if (methodic.Name.ToLower() != model.VerificationMethodic?.ToLower())
                 {
                     // Название методики поверки не совпадает
                     ModelState.AddModelError("", "За данным оборудованием закреплена другая методика поверки.");
@@ -261,18 +261,30 @@ namespace CertificateManagementSystem.Controllers
             {
                 device = new Device
                 {
-                    Name = model.DeviceName.Trim(),
-                    Type = model.DeviceType.Trim(),
-                    SerialNumber = model.SerialNumber.Trim(),
+                    Name = model.DeviceName?.Trim(),
+                    Type = model.DeviceType?.Trim(),
+                    SerialNumber = model.SerialNumber?.Trim(),
                     VerificationMethodic = methodic,
-                    Contracts = new List<Contract> { contract }
+                    ContractDevices = new List<ContractDevice>
+                    {
+                        new ContractDevice
+                        {
+                            Contract = contract,
+                            Device = device
+                        }
+                    }
                 };
             }
             else
             {
-                if (!device.Contracts.Contains(contract))
+                if (!device.ContractDevices.Any(cd => cd.Contract == contract))
                 {
-                    device.Contracts.ToList().Add(contract);
+                    device.ContractDevices.Add(
+                        new ContractDevice
+                        {
+                            Contract = contract,
+                            Device = device
+                        });
                 }
             }
 
@@ -295,7 +307,7 @@ namespace CertificateManagementSystem.Controllers
                 return new Certificate
                 {
                     Device = device,
-                    DocumentNumber = model.DocumentNumber.Trim(),
+                    DocumentNumber = model.DocumentNumber?.Trim(),
                     CalibrationDate = model.CalibrationDate,
                     CalibrationExpireDate = model.CalibrationExpireDate
                 };
@@ -306,7 +318,7 @@ namespace CertificateManagementSystem.Controllers
                 return new FailureNotification
                 {
                     Device = device,
-                    DocumentNumber = model.DocumentNumber.Trim(),
+                    DocumentNumber = model.DocumentNumber?.Trim(),
                     DocumentDate = model.DocumentDate
                 };
             }
