@@ -33,14 +33,11 @@ namespace CertificateManagementSystem.Controllers
 
             var model = new NewDocumentModel
             {
-                ClientName="",
-                ContractNumber="",
-                DeviceName="",
-
                 DocumentType = type,
                 Year = 2020,
                 CalibrationDate = DateTime.Now,
-                CalibrationExpireDate = DateTime.Now.AddYears(1)
+                CalibrationExpireDate = DateTime.Now.AddYears(1),
+                DocumentDate = DateTime.Now
             };
 
             return View(model);
@@ -51,34 +48,6 @@ namespace CertificateManagementSystem.Controllers
         {
             var newDocument = CreateDocument(model);
 
-            // ПРОВЕРИТЬ ПРАВИЛЬНОСТЬ ВВЕДЕННЫХ ДАННЫХ:
-
-            //var client = newDocument.Device.Contract.Client;
-            //var regNumber = newDocument.Device.VerificationMethodic.RegistrationNumber;
-            //var documentExist = _documents.IsDocumentExist(model.DocumentNumber);
-
-            //// Валидация введенных данных
-            //if (documentExist)
-            //{
-            //    // Документ с таким номером уже есть в базе
-            //    ModelState.AddModelError("", "Документ с таким номером уже есть в базе.");
-            //}
-            //if (client.ExploitationPlace.ToLower() != model.ExploitationPlace.ToLower())
-            //{
-            //    // Место эксплуатации не совпадает
-            //    ModelState.AddModelError("", "Место эксплуатации отличается от указанного ранее для этого договора.");
-            //}
-            //if (client.Name.ToLower() != model.ClientName.ToLower())
-            //{
-            //    // Имя заказчика не совпадает
-            //    ModelState.AddModelError("", "Имя заказчика отличается от указанного ранее для этого договора.");
-            //}
-            //if (regNumber.ToLower() != model.RegistrationNumber)
-            //{
-            //    // Номер в гос.реестре не совпадает
-            //    ModelState.AddModelError("", "За данным оборудованием закреплен другой номер в гос.реестре.");
-            //}
-
             if (ModelState.IsValid)
             {
                 //await _files.CreateFile(model.DocumentFile, newDocument.FilePath);
@@ -88,47 +57,6 @@ namespace CertificateManagementSystem.Controllers
             CreateSelectLists();
 
             return View(model);
-        }
-
-        public JsonResult GetAutocompleteData(string dataType)
-        {
-            dynamic results = null;
-
-            switch (dataType)
-            {
-                case "contract":
-                    results = _documents.GetAllContracts()
-                        .Select(c => new { id = c.ContractNumber, text = c.ContractNumber }).Distinct();
-                    break;
-
-                case "clientName":
-                    results = _documents.GetAllClients()
-                        .Select(c => new { id = c.Name, text = c.Name }).Distinct();
-                    break;
-
-                case "exploitationPlace":
-                    results = _documents.GetAllClients()
-                        .Select(c => new { id = c.ExploitationPlace, text = c.ExploitationPlace }).Distinct();
-                    break;
-
-                case "deviceName":
-                    results = _documents.GetAllDevices()
-                        .Select(d => new { id = d.Name, text = d.Name }).Distinct();
-                    break;
-
-                case "deviceType":
-                    results = _documents.GetAllDevices()
-                        .Select(d => new { id = d.Type, text = d.Type }).Distinct();
-                    break;
-                case "verificationMethodic":
-                    break;
-
-                default:
-                    results = null;
-                    break;
-            }
-
-            return Json(results);
         }
 
         public IActionResult SetClient(Contract contract)
@@ -152,6 +80,7 @@ namespace CertificateManagementSystem.Controllers
         //    return Path.Combine(year, contract, type, fileName);
         //}
 
+        // Формируем списки автозаполнения 
         private void CreateSelectLists()
         {
             var clients = _documents.GetAllClients();
@@ -167,7 +96,7 @@ namespace CertificateManagementSystem.Controllers
             var verificationMethodics = methodics.Select(vm => vm.Name).Distinct();
             var registerNumbers = methodics.OrderBy(vm => vm.RegistrationNumber).Select(vm => vm.RegistrationNumber).Distinct();
 
-            ViewBag.Contracts = new SelectList(contracts);
+            ViewBag.Contracts = new SelectList(contractNumbers);
             ViewBag.ClientNames = new SelectList(clientNames);
             ViewBag.ExploitationPlaces = new SelectList(exploitationPlaces);
             ViewBag.DeviceNames = new SelectList(deviceNames);
@@ -230,7 +159,7 @@ namespace CertificateManagementSystem.Controllers
                         RegistrationNumber = model.RegistrationNumber?.Trim(),
                         FileName = ""
                     };
-                }               
+                }
             }
             else
             {
@@ -289,6 +218,26 @@ namespace CertificateManagementSystem.Controllers
             }
 
             return device;
+        }     
+        // Формируем файл свидетельства и путь к нему
+        private FileModel CreateFile(NewDocumentModel model)
+        {
+            var year = model.Year.ToString();
+            var contract = model.ContractNumber.ReplaceInvalidChars('-');
+            var deviceType = model.DeviceType.ReplaceInvalidChars('-');
+            var deviceName = model.DeviceName.ReplaceInvalidChars('-');
+            var type = model.DocumentType == DocumentType.Certificate ? "Свидетельства" : "Извещения о непригодности";
+
+            var extension = ".pdf";
+            var fileName = deviceType + "_" + deviceName + extension;
+            var filePath = Path.Combine(year, contract, type, fileName);
+
+            var file = new FileModel
+            {
+                Size = model.DocumentFile.Length,
+                ContentType = model.DocumentFile.ContentType,
+                Path = filePath
+            };
         }
         // Формируем новый документ
         private Document CreateDocument(NewDocumentModel model)
@@ -309,7 +258,8 @@ namespace CertificateManagementSystem.Controllers
                     Device = device,
                     DocumentNumber = model.DocumentNumber?.Trim(),
                     CalibrationDate = model.CalibrationDate,
-                    CalibrationExpireDate = model.CalibrationExpireDate
+                    CalibrationExpireDate = model.CalibrationExpireDate,
+                    DocumentFile = CreateFile(model)
                 };
             }
             else
@@ -319,7 +269,8 @@ namespace CertificateManagementSystem.Controllers
                 {
                     Device = device,
                     DocumentNumber = model.DocumentNumber?.Trim(),
-                    DocumentDate = model.DocumentDate
+                    DocumentDate = model.DocumentDate,
+                    DocumentFile = CreateFile(model)
                 };
             }
         }
