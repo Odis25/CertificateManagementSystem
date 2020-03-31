@@ -219,26 +219,31 @@ namespace CertificateManagementSystem.Controllers
 
             return device;
         }     
+        
         // Формируем файл свидетельства и путь к нему
         private FileModel CreateFile(NewDocumentModel model)
         {
+            
             var year = model.Year.ToString();
-            var contract = model.ContractNumber.ReplaceInvalidChars('-');
+            var contract = model.ContractNumber.ReplaceInvalidChars('-') ?? "";
             var deviceType = model.DeviceType.ReplaceInvalidChars('-');
             var deviceName = model.DeviceName.ReplaceInvalidChars('-');
             var type = model.DocumentType == DocumentType.Certificate ? "Свидетельства" : "Извещения о непригодности";
 
-            var extension = ".pdf";
+            var extension = Path.GetExtension(model.DocumentFile?.FileName);
             var fileName = deviceType + "_" + deviceName + extension;
             var filePath = Path.Combine(year, contract, type, fileName);
 
             var file = new FileModel
             {
-                Size = model.DocumentFile.Length,
-                ContentType = model.DocumentFile.ContentType,
+                Size = model.DocumentFile?.Length ?? 0,
+                ContentType = model.DocumentFile?.ContentType,
                 Path = filePath
             };
+
+            return file;
         }
+
         // Формируем новый документ
         private Document CreateDocument(NewDocumentModel model)
         {

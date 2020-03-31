@@ -18,7 +18,7 @@ namespace CertificateManagementSystem.Services.Components
 
         public static string ReplaceInvalidChars(this string inputString, char replaceChar)
         {
-            if (string.IsNullOrEmpty(inputString))
+            if (!string.IsNullOrEmpty(inputString))
             {
                 foreach (char badChar in Path.GetInvalidPathChars())
                 {
