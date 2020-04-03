@@ -2,6 +2,7 @@
 using CertificateManagementSystem.Data.Models;
 using CertificateManagementSystem.Models.Document;
 using CertificateManagementSystem.Services.Components;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -19,12 +20,14 @@ namespace CertificateManagementSystem.Controllers
         private readonly IDocumentService _documents;
         private readonly IFileService _files;
         private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _appEnvironment;
 
-        public DocumentController(IDocumentService documents, IFileService files, IConfiguration configuration)
+        public DocumentController(IDocumentService documents, IFileService files, IConfiguration configuration, IWebHostEnvironment appEnvironment)
         {
             _configuration = configuration;
             _documents = documents;
             _files = files;
+            _appEnvironment = appEnvironment;
         }
 
         public IActionResult Create(DocumentType type)
@@ -63,6 +66,24 @@ namespace CertificateManagementSystem.Controllers
         {
             var client = _documents.GetClient(contract);
             return Json(client);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadFile(IFormFile uploadedFile)
+        {
+            if (uploadedFile != null)
+            {
+                string path = Path.Combine(_appEnvironment.WebRootPath, "files", uploadedFile.FileName);
+
+                using (var fileStream = new FileStream(path, FileMode.Create))
+                {
+                    await uploadedFile.CopyToAsync(fileStream);
+                }
+                path = "/files/" + uploadedFile.FileName;
+                return Json(path);
+            }
+
+            return null;         
         }
 
         //private string CreateFilePath(Document document)

@@ -15,5 +15,23 @@ function SetClient() {
     });
 }
 
+function LoadFile() {
+
+    let file = $('#newDocumentFileInput').get(0);
+    let files = file.files;
+    let formData = new FormData();
+    formData.append('uploadedFile', files[0]);
+
+    $.ajax({
+        url: '/Document/UploadFile',
+        data: formData,
+        contentType: false,
+        processData: false,
+        type: 'post',
+        success: function (result) {
+            $('.pdfHolder').attr('src', result);
+        }
+    });
+}
 
 
