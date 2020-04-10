@@ -26,6 +26,6 @@ namespace CertificateManagementSystem.Services.Components
                 }
             }           
             return inputString;
-        } 
+        }
     }
 }

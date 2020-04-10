@@ -156,7 +156,11 @@
                             <span class="text-danger" asp-validation-for="DocumentDate"></span>
                         </div>
                     }
-                    <input class="form-control-file" asp-for="DocumentFile" onchange="LoadFile()" id="newDocumentFileInput"/>
+                    <div class="form-group text-center">
+                        <label class="btn btn-danger" for="newDocumentFileInput"><img src="~/icons/add_file_24px.png" /> Выберите документ...</label>
+                        <input class="inputFile" asp-for="DocumentFile" onchange="LoadFile()" id="newDocumentFileInput" />
+                    </div>
+
                     <input type="hidden" asp-for="DocumentType" />
                     <div class="text-danger" asp-validation-summary="ModelOnly"></div>
                 </form>

@@ -2,6 +2,7 @@
 using CertificateManagementSystem.Data.Models;
 using CertificateManagementSystem.Models.Document;
 using CertificateManagementSystem.Services.Components;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +31,7 @@ namespace CertificateManagementSystem.Controllers
             _appEnvironment = appEnvironment;
         }
 
+        [Authorize]
         public IActionResult Create(DocumentType type)
         {
             CreateSelectLists();

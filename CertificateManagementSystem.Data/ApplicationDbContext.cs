@@ -1,9 +1,10 @@
 ﻿using CertificateManagementSystem.Data.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace CertificateManagementSystem.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions options) : base(options)
         {
@@ -12,6 +13,8 @@ namespace CertificateManagementSystem.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<ContractDevice>()
                 .HasKey(k => new { k.ContractId, k.DeviceId });
         }
@@ -24,5 +27,6 @@ namespace CertificateManagementSystem.Data
         public DbSet<Document> Documents { get; set; }
         public DbSet<FailureNotification> FailureNotifications { get; set; }
         public DbSet<VerificationMethodic> VerificationMethodics { get; set; }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     }
 }
