@@ -4,10 +4,6 @@ namespace CertificateManagementSystem.Data.Models
 {
     public class Device
     {
-        public Device()
-        {
-            ContractDevices = new List<ContractDevice>();
-        }
         public int Id { get; set; }
 
         public string Name { get; set; }
@@ -16,7 +12,6 @@ namespace CertificateManagementSystem.Data.Models
 
         public virtual VerificationMethodic VerificationMethodic { get; set; }
 
-        public List<ContractDevice> ContractDevices { get; set; }
         public IEnumerable<Document> Documents { get; set; }
     }
 }

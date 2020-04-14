@@ -23,7 +23,8 @@ namespace CertificateManagementSystem.Controllers
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _appEnvironment;
 
-        public DocumentController(IDocumentService documents, IFileService files, IConfiguration configuration, IWebHostEnvironment appEnvironment)
+        public DocumentController(IDocumentService documents, IFileService files,
+            IConfiguration configuration, IWebHostEnvironment appEnvironment)
         {
             _configuration = configuration;
             _documents = documents;
@@ -31,7 +32,60 @@ namespace CertificateManagementSystem.Controllers
             _appEnvironment = appEnvironment;
         }
 
-        [Authorize]
+        // Вывод на экран всех документов
+        public IActionResult Index()
+        {
+            var documents = _documents.GetDocuments().Select(d => new DocumentListingModel
+            {
+                Id = d.Id,
+                Year = d.Contract.Year,
+                ContractId = d.Contract.Id,
+                ContractNumber = d.Contract.ContractNumber,
+                ClientId = d.Contract.Client.Id,
+                ClientName = d.Contract.Client.Name,
+                ExploitationPlace = d.Contract.Client.ExploitationPlace,
+                DeviceId = d.Device.Id,
+                DeviceType = d.Device.Type,
+                DeviceName = d.Device.Name,
+                SerialNumber = d.Device.SerialNumber,
+                RegistrationNumber = d.Device.VerificationMethodic?.RegistrationNumber,
+                VerificationMethodic = d.Device.VerificationMethodic?.Name,
+                DocumentNumber = d.DocumentNumber,
+                CalibrationDate = (d as Certificate)?.CalibrationDate.ToString(),
+                CalibrationExpireDate = (d as Certificate)?.CalibrationExpireDate.ToString(),
+                FilePath = d.DocumentFile.Path,
+                DocumentType = (d is Certificate) ? "Свидетельство" : "Извещение о непригодности",
+                DocumentDate = (d as FailureNotification)?.DocumentDate.ToString()
+            });
+
+            var years = documents.Select(d => d.Year).Distinct().OrderBy(y=>y);
+            var yearModels = new List<YearModel>();
+
+            foreach (var year in years)
+            {
+                var yearModel = new YearModel
+                {
+                    Year = year,
+                    Contracts = _documents.GetContracts(year)
+                    .Select(c => new ContractModel
+                    {
+                        Id = c.Id,
+                        ContractNumber = c.ContractNumber
+                    })
+                };
+                yearModels.Add(yearModel);
+            }
+
+            var model = new DocumentIndexModel
+            {
+                Documents = documents,
+                Years = yearModels
+            };
+
+            return View(model);
+        }
+
+        // Создание нового документа
         public IActionResult Create(DocumentType type)
         {
             CreateSelectLists();
@@ -39,7 +93,7 @@ namespace CertificateManagementSystem.Controllers
             var model = new NewDocumentModel
             {
                 DocumentType = type,
-                Year = 2020,
+                Year = DateTime.Now.Year,
                 CalibrationDate = DateTime.Now,
                 CalibrationExpireDate = DateTime.Now.AddYears(1),
                 DocumentDate = DateTime.Now
@@ -48,6 +102,7 @@ namespace CertificateManagementSystem.Controllers
             return View(model);
         }
 
+        // Создание нового документа
         [HttpPost]
         public async Task<IActionResult> Create(NewDocumentModel model)
         {
@@ -55,8 +110,16 @@ namespace CertificateManagementSystem.Controllers
 
             if (ModelState.IsValid)
             {
-                //await _files.CreateFile(model.DocumentFile, newDocument.FilePath);
-                await _documents.Add(newDocument);
+                var fileSource = Path.Combine(_appEnvironment.WebRootPath, "files", model.DocumentFile.FileName);
+                try
+                {
+                    _files.CreateFile(fileSource, newDocument.DocumentFile.Path);
+                    await _documents.Add(newDocument);
+                }
+                catch (Exception e)
+                {
+                    ModelState.AddModelError("", e.Message);
+                }
             }
 
             CreateSelectLists();
@@ -64,12 +127,7 @@ namespace CertificateManagementSystem.Controllers
             return View(model);
         }
 
-        public IActionResult SetClient(Contract contract)
-        {
-            var client = _documents.GetClient(contract);
-            return Json(client);
-        }
-
+        // Загрузка файла
         [HttpPost]
         public async Task<IActionResult> UploadFile(IFormFile uploadedFile)
         {
@@ -84,32 +142,23 @@ namespace CertificateManagementSystem.Controllers
                 path = "/files/" + uploadedFile.FileName;
                 return Json(path);
             }
-
-            return null;         
+            return null;
         }
 
-        //private string CreateFilePath(Document document)
-        //{
-        //    var isCertificate = document is Certificate;
-
-        //    var year = document.Device.Contract.Year.ToString();
-        //    var contract = document.Device.Contract.ContractNumber.ReplaceInvalidChars('-');
-        //    var deviceType = document.Device.Type.ReplaceInvalidChars('-');
-        //    var deviceName = document.Device.Name.ReplaceInvalidChars('-');
-        //    var type = isCertificate ? "Свидетельства" : "Извещения о непригодности";
-
-        //    var fileName = deviceType + "_" + deviceName;
-
-        //    return Path.Combine(year, contract, type, fileName);
-        //}
+        // Автоматическая подстановка заказчика при заполнении поля номера договора
+        public IActionResult SetClient(Contract contract)
+        {
+            var client = _documents.GetClient(contract);
+            return Json(client);
+        }
 
         // Формируем списки автозаполнения 
         private void CreateSelectLists()
         {
-            var clients = _documents.GetAllClients();
-            var devices = _documents.GetAllDevices();
-            var methodics = _documents.GetAllVerificationMethodics();
-            var contracts = _documents.GetAllContracts();
+            var clients = _documents.GetClients();
+            var devices = _documents.GetDevices();
+            var methodics = _documents.GetVerificationMethodics();
+            var contracts = _documents.GetContracts();
 
             var contractNumbers = contracts.Select(c => c.ContractNumber).Distinct();
             var clientNames = clients.Select(c => c.Name).Distinct();
@@ -138,6 +187,7 @@ namespace CertificateManagementSystem.Controllers
                     ExploitationPlace = model.ExploitationPlace?.Trim().Capitalize()
                 };
         }
+
         // Формируем новый договор
         private Contract CreateContract(NewDocumentModel model)
         {
@@ -168,6 +218,7 @@ namespace CertificateManagementSystem.Controllers
 
             return contract;
         }
+
         // Формируем новую метоздику поверки
         private VerificationMethodic CreateVerificationMethodic(NewDocumentModel model)
         {
@@ -202,51 +253,26 @@ namespace CertificateManagementSystem.Controllers
 
             return methodic;
         }
+
         // Формируем новое устройство
         private Device CreateDevice(NewDocumentModel model)
         {
             var device = _documents.GetDevice(model.DeviceName, model.SerialNumber);
-            var contract = CreateContract(model);
             var methodic = CreateVerificationMethodic(model);
 
-            if (device == null)
+            device ??= new Device
             {
-                device = new Device
-                {
-                    Name = model.DeviceName?.Trim(),
-                    Type = model.DeviceType?.Trim(),
-                    SerialNumber = model.SerialNumber?.Trim(),
-                    VerificationMethodic = methodic,
-                    ContractDevices = new List<ContractDevice>
-                    {
-                        new ContractDevice
-                        {
-                            Contract = contract,
-                            Device = device
-                        }
-                    }
-                };
-            }
-            else
-            {
-                if (!device.ContractDevices.Any(cd => cd.Contract == contract))
-                {
-                    device.ContractDevices.Add(
-                        new ContractDevice
-                        {
-                            Contract = contract,
-                            Device = device
-                        });
-                }
-            }
-
+                Name = model.DeviceName?.Trim(),
+                Type = model.DeviceType?.Trim(),
+                SerialNumber = model.SerialNumber?.Trim(),
+                VerificationMethodic = methodic
+            };
             return device;
-        }     
-        
+        }
+
         // Формируем файл свидетельства и путь к нему
         private FileModel CreateFile(NewDocumentModel model)
         {
-            
             var year = model.Year.ToString();
             var contract = model.ContractNumber.ReplaceInvalidChars('-') ?? "";
             var deviceType = model.DeviceType.ReplaceInvalidChars('-');
@@ -277,6 +303,7 @@ namespace CertificateManagementSystem.Controllers
             }
 
             var device = CreateDevice(model);
+            var contract = CreateContract(model);
 
             if (model.DocumentType == DocumentType.Certificate)
             {
@@ -284,6 +311,7 @@ namespace CertificateManagementSystem.Controllers
                 return new Certificate
                 {
                     Device = device,
+                    Contract = contract,
                     DocumentNumber = model.DocumentNumber?.Trim(),
                     CalibrationDate = model.CalibrationDate,
                     CalibrationExpireDate = model.CalibrationExpireDate,
@@ -296,6 +324,7 @@ namespace CertificateManagementSystem.Controllers
                 return new FailureNotification
                 {
                     Device = device,
+                    Contract = contract,
                     DocumentNumber = model.DocumentNumber?.Trim(),
                     DocumentDate = model.DocumentDate,
                     DocumentFile = CreateFile(model)

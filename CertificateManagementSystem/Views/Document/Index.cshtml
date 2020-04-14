@@ -1,0 +1,70 @@
+﻿@model DocumentIndexModel
+
+<div class="row no-gutters section">
+    <div class="col-md-2">
+        <div class="sidebar-left">
+            <div class="sidebar-left-top">
+                <div class="panel">
+                    Левая верхняя панель
+                </div>
+            </div>
+            <div class="sidebar-left-bottom">
+                <div class="panel">
+                    <ul class="treeView" id="treeView">
+                        @foreach (var year in Model.Years)
+                        {
+                            <li class="collapsable">
+                                <div class="hitarea expandable-hitarea"></div>
+                                <span class="folder">
+                                    <a href="#year-@year.Year" data-toggle="collapse">@year.Year</a>
+                                </span>
+                                <ul class="collapse" id="year-@year.Year">
+                                    @foreach (var contract in year.Contracts)
+                                    {
+                                        <li>
+                                            <span class="file">
+                                                <a href="#" title="@contract.ContractNumber">@contract.ContractNumber</a>
+                                            </span>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="panel">
+            <div class="overflow-auto">
+                <table class="table table-dark table-sm table-hover">
+                    @foreach (var item in Model.Documents)
+                    {
+                        <tr>
+                            <td>@item.Year</td>
+                            <td>@item.ContractNumber</td>
+                            <td>@item.ClientName</td>
+                            <td>@item.ExploitationPlace</td>
+                            <td>@item.DeviceType</td>
+                            <td>@item.DeviceName</td>
+                            <td>@item.SerialNumber</td>
+                            <td>@item.CalibrationDate</td>
+                            <td>@item.CalibrationExpireDate</td>
+                            <td>@item.RegistrationNumber</td>
+                            <td>@item.VerificationMethodic</td>
+                            <td>@item.DocumentType</td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="sidebar-right">
+            <div class="panel">
+                Правая панель
+            </div>
+        </div>
+    </div>
+</div>

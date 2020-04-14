@@ -11,21 +11,21 @@ namespace CertificateManagementSystem.Models.Document
 
         public DocumentType DocumentType { get; set; }
 
-        [Required(ErrorMessage = "Укажите номер договора")]
+        [Required(ErrorMessage = "Нужно указать номер договора")]
         public string ContractNumber { get; set; }
 
-        [Required(ErrorMessage = "Укажите номер документа")]
+        [Required(ErrorMessage = "Нужно указать номер документа")]
         public string DocumentNumber { get; set; }
 
-        [Required(ErrorMessage = "Укажите название организации заказчика")]
+        [Required(ErrorMessage = "Нужно указать название организации заказчика")]
         public string ClientName { get; set; }
         public string ExploitationPlace { get; set; }
 
-        [Required(ErrorMessage = "Укажите название средства измерения")]
+        [Required(ErrorMessage = "Нужно указать название средства измерения")]
         public string DeviceName { get; set; }
-        [Required(ErrorMessage = "Укажите тип средства измерения")]
+        [Required(ErrorMessage = "Нужно указать тип средства измерения")]
         public string DeviceType { get; set; }
-        [Required(ErrorMessage = "Укажите заводской номер средства измерения")]
+        [Required(ErrorMessage = "Нужно указать заводской номер средства измерения")]
         public string SerialNumber { get; set; }
 
         public string RegistrationNumber { get; set; }
@@ -35,6 +35,7 @@ namespace CertificateManagementSystem.Models.Document
         public DateTime CalibrationExpireDate { get; set; }
         public DateTime DocumentDate { get; set; }
 
+        [Required(ErrorMessage = "Нужно выбрать файл документа")]
         public IFormFile DocumentFile { get; set; }
     }
 }

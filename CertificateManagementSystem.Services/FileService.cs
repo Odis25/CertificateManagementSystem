@@ -1,12 +1,6 @@
 ﻿using CertificateManagementSystem.Data;
-using CertificateManagementSystem.Data.Models;
 using Microsoft.Extensions.Configuration;
-using CertificateManagementSystem.Services.Components;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CertificateManagementSystem.Services
 {
@@ -19,9 +13,17 @@ namespace CertificateManagementSystem.Services
             _configuration = configuration;
         }
 
-        public async Task CreateFile(Document document)
+        // Создать файл документа
+        public void CreateFile(string sourcePath, string destinationPath)
         {
-          
+            var documentsFolderPath = _configuration.GetSection("Paths").GetSection("DocumentFolder").Value;
+            destinationPath = Path.Combine(documentsFolderPath, destinationPath);
+
+            var folder = Path.GetDirectoryName(destinationPath); 
+            if (!Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
+
+            File.Copy(sourcePath, destinationPath);
         }
     }
 }

@@ -6,11 +6,12 @@ namespace CertificateManagementSystem.Data
 {
     public interface IDocumentService
     {
-        IEnumerable<Document> GetAllDocuments();
-        IEnumerable<Contract> GetAllContracts();
-        IEnumerable<Client> GetAllClients();
-        IEnumerable<Device> GetAllDevices();
-        IEnumerable<VerificationMethodic> GetAllVerificationMethodics();
+        IEnumerable<Document> GetDocuments();
+        IEnumerable<Contract> GetContracts();
+        IEnumerable<Contract> GetContracts(int year);
+        IEnumerable<Client> GetClients();
+        IEnumerable<Device> GetDevices();
+        IEnumerable<VerificationMethodic> GetVerificationMethodics();
 
         Document GetDocumentById(int id);
         Task Add(Document newDocument);
@@ -22,5 +23,6 @@ namespace CertificateManagementSystem.Data
         VerificationMethodic GetVerificationMethodic(string registrationNumber);
         
         bool IsDocumentExist(string documentNumber);
+
     }
 }

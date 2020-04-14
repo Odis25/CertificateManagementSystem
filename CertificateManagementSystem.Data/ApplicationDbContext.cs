@@ -14,15 +14,11 @@ namespace CertificateManagementSystem.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            modelBuilder.Entity<ContractDevice>()
-                .HasKey(k => new { k.ContractId, k.DeviceId });
         }
 
         public DbSet<Client> Clients { get; set; }
         public DbSet<Certificate> Certificates { get; set; }
         public DbSet<Contract> Contracts { get; set; }
-        public DbSet<ContractDevice> ContractDevices { get; set; }
         public DbSet<Device> Devices { get; set; }
         public DbSet<Document> Documents { get; set; }
         public DbSet<FailureNotification> FailureNotifications { get; set; }

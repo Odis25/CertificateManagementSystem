@@ -1,5 +1,19 @@
 ﻿
 // Write your JavaScript code.
+$(document).ready(function () {
+    $('#treeView .collapsable span.folder a').on('click', function (e) {
+        let parent = $(this).parent();
+        let hitarea = parent.prev();
+        parent.toggleClass('opened');
+        hitarea.toggleClass('expandable-hitarea');
+    });
+
+    $('#treeView .hitarea').on('click', function (e) {
+        $(this).next().children('a').click();
+    });
+});
+
+
 
 function SetClient() {
     let year = $('#inputYear').val();

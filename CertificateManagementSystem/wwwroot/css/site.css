@@ -119,9 +119,91 @@ a {
     height: 100%
 }
 
+/*---- Страница каталога свидетельств ----*/
+
+.treeView {
+    height:100%;
+    list-style: none;
+    font-size: 16px;
+    background-color: #eee;
+    border-radius: 3px;
+    border: double;
+}
+    .treeView li {
+        background: url('../img/sprites2.png') 2px -208px no-repeat;
+        background-position: 2px -384px;
+        position: relative;
+        padding-left: 16px;
+    }
+    .treeView > li:last-child {
+        background-position: -90px -113px;
+    }
+        .treeView > li:last-child.lastExpandable {
+            background-position: -122px -69px;
+        }
+
+.hitarea {
+    background: url('../img/sprites2.png') -154px -26px no-repeat;
+    color: #000;
+    text-align: center;
+    height: 16px;
+    width: 16px;
+    margin-left: -16px;
+    float: left;
+    cursor: pointer;
+}
+
+.expandable-hitarea {
+    background-position: -170px -4px;
+}
+
+.treeView > li:last-child > .hitarea {
+    background-position: -90px -113px;
+}
+
+.treeView > li:last-child > .expandable-hitarea {
+    background-position: -122px -69px;
+}
+
+.treeView ul {
+    transition: all ease-in 0.1s;
+    list-style: none;
+    font-size: 14px;
+}
+    .treeView ul li {
+        background: transparent;
+    }
+        .treeView ul li:hover {
+            background-color: #ddd;
+        }
+
+.treeView a {
+    color: #000;
+    display: block;
+    width: 100%;
+    text-decoration: none;
+}
+
+span.folder,
+span.file {
+    display: block;
+    padding-left: 20px;
+    cursor: pointer;
+}
+
+span.folder {
+    background: url('../img/sprites2.png') -25px -187px no-repeat;
+}
+
+span.opened {
+    background: url('../img/sprites2.png') -68px -148px no-repeat;
+}
+
+span.file {
+    background: url('../img/sprites2.png') -48px -167px no-repeat;
+}
 
 /*---- Страница Создать Новый документ ----*/
-
 #newDocumentSection {
     color: #000;
     height: 100%;
