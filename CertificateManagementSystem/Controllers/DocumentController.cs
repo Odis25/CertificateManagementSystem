@@ -35,30 +35,8 @@ namespace CertificateManagementSystem.Controllers
         // Вывод на экран всех документов
         public IActionResult Index()
         {
-            var documents = _documents.GetDocuments().Select(d => new DocumentListingModel
-            {
-                Id = d.Id,
-                Year = d.Contract.Year,
-                ContractId = d.Contract.Id,
-                ContractNumber = d.Contract.ContractNumber,
-                ClientId = d.Contract.Client.Id,
-                ClientName = d.Contract.Client.Name,
-                ExploitationPlace = d.Contract.Client.ExploitationPlace,
-                DeviceId = d.Device.Id,
-                DeviceType = d.Device.Type,
-                DeviceName = d.Device.Name,
-                SerialNumber = d.Device.SerialNumber,
-                RegistrationNumber = d.Device.VerificationMethodic?.RegistrationNumber,
-                VerificationMethodic = d.Device.VerificationMethodic?.Name,
-                DocumentNumber = d.DocumentNumber,
-                CalibrationDate = (d as Certificate)?.CalibrationDate.ToString(),
-                CalibrationExpireDate = (d as Certificate)?.CalibrationExpireDate.ToString(),
-                FilePath = d.DocumentFile.Path,
-                DocumentType = (d is Certificate) ? "Свидетельство" : "Извещение о непригодности",
-                DocumentDate = (d as FailureNotification)?.DocumentDate.ToString()
-            });
-
-            var years = documents.Select(d => d.Year).Distinct().OrderBy(y=>y);
+            var documentsCount = _documents.GetDocuments().Count();
+            var years = _documents.GetYears();
             var yearModels = new List<YearModel>();
 
             foreach (var year in years)
@@ -78,7 +56,6 @@ namespace CertificateManagementSystem.Controllers
 
             var model = new DocumentIndexModel
             {
-                Documents = documents,
                 Years = yearModels
             };
 
@@ -131,7 +108,7 @@ namespace CertificateManagementSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> UploadFile(IFormFile uploadedFile)
         {
-            if (uploadedFile != null)
+            if (uploadedFile != null && (uploadedFile.ContentType =="application/pdf" || uploadedFile.ContentType == "image/jpeg"))
             {
                 string path = Path.Combine(_appEnvironment.WebRootPath, "files", uploadedFile.FileName);
 
@@ -146,10 +123,42 @@ namespace CertificateManagementSystem.Controllers
         }
 
         // Автоматическая подстановка заказчика при заполнении поля номера договора
-        public IActionResult SetClient(Contract contract)
+        public IActionResult GetClient(Contract contract)
         {
             var client = _documents.GetClient(contract);
             return Json(client);
+        }
+
+        // Отобразить на странице документы соответствующие году и номеру договора
+        public IActionResult LoadDocuments(int contractId)
+        {
+            var result = _documents.GetContractById(contractId).Documents?.Select(d =>
+            new DocumentListingModel
+            {
+                Id = d.Id,
+                Year = d.Contract.Year,
+                ContractId = d.Contract.Id,
+                ContractNumber = d.Contract.ContractNumber,
+                ClientId = d.Contract.Client.Id,
+                ClientName = d.Contract.Client.Name,
+                ExploitationPlace = d.Contract.Client.ExploitationPlace,
+                DeviceId = d.Device.Id,
+                DeviceType = d.Device.Type,
+                DeviceName = d.Device.Name,
+                SerialNumber = d.Device.SerialNumber,
+                RegistrationNumber = d.Device.VerificationMethodic?.RegistrationNumber,
+                VerificationMethodic = d.Device.VerificationMethodic?.Name,
+                DocumentNumber = d.DocumentNumber,
+                CalibrationDate = (d as Certificate)?.CalibrationDate.ToString(),
+                CalibrationExpireDate = (d as Certificate)?.CalibrationExpireDate.ToString(),
+                FilePath = d.DocumentFile.Path,
+                DocumentType = (d is Certificate) ? "Свидетельство" : "Извещение о непригодности",
+                DocumentDate = (d as FailureNotification)?.DocumentDate.ToString()
+            });
+
+            var model = new DocumentIndexModel { Documents = result };
+
+            return PartialView("_DocumentsTable", model);
         }
 
         // Формируем списки автозаполнения 

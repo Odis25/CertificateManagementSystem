@@ -26,14 +26,22 @@ namespace CertificateManagementSystem.Services
         {
             return _context.Clients.OrderBy(c => c.Name);
         }
+
         public IEnumerable<Contract> GetContracts()
         {
-            return _context.Contracts.OrderBy(c => c.ContractNumber);
+            return _context.Contracts
+                .OrderBy(c => c.ContractNumber)
+                .Include(c => c.Client)
+                .Include(c => c.Documents).ThenInclude(doc => doc.Device)
+                .Include(c => c.Documents).ThenInclude(doc => doc.DocumentFile); ;
         }
-
         public IEnumerable<Contract> GetContracts(int year)
         {
-            return _context.Contracts.Where(c=>c.Year == year).OrderBy(c => c.ContractNumber);
+            return GetContracts().Where(c => c.Year == year);
+        }
+        public Contract GetContractById(int id)
+        {
+            return GetContracts().FirstOrDefault(c => c.Id == id);
         }
 
         public IEnumerable<Device> GetDevices()
@@ -52,6 +60,11 @@ namespace CertificateManagementSystem.Services
                 .Include(d => d.Device)
                     .ThenInclude(d => d.VerificationMethodic)
                 .Include(d => d.DocumentFile);
+        }
+
+        public IEnumerable<Document> GetDocuments(int year)
+        {
+            return GetDocuments().Where(d => d.Contract.Year == year);
         }
 
         public Document GetDocumentById(int id)
@@ -92,6 +105,11 @@ namespace CertificateManagementSystem.Services
         public bool IsDocumentExist(string documentNumber)
         {
             return _context.Documents.Any(c => c.DocumentNumber == documentNumber);
-        }      
+        }
+
+        public IEnumerable<int> GetYears()
+        {
+            return _context.Contracts.Select(c => c.Year).Distinct().OrderBy(y => y);
+        }
     }
 }

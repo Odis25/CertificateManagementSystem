@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace CertificateManagementSystem
 {
@@ -20,6 +15,10 @@ namespace CertificateManagementSystem
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    webBuilder.ConfigureAppConfiguration(config =>
+                    {
+                        config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                    });
                     webBuilder.UseStartup<Startup>();
                 });
     }

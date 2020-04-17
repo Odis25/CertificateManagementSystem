@@ -33,6 +33,8 @@ namespace CertificateManagementSystem
             services.AddControllersWithViews()
                     .AddRazorRuntimeCompilation();
 
+            services.Configure<ApplicationOptions>(Configuration.GetSection("Paths"));
+
             services.AddScoped<IDocumentService, DocumentService>();
             services.AddScoped<ILDAPService, LDAPService>();
             services.AddScoped<DataSeeder>();

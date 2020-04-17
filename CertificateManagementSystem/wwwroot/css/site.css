@@ -122,22 +122,29 @@ a {
 /*---- Страница каталога свидетельств ----*/
 
 .treeView {
-    height:100%;
+    height: 100%;
     list-style: none;
     font-size: 16px;
     background-color: #eee;
     border-radius: 3px;
     border: double;
 }
+
     .treeView li {
         background: url('../img/sprites2.png') 2px -208px no-repeat;
         background-position: 2px -384px;
         position: relative;
         padding-left: 16px;
     }
+
+        .treeView li a:hover {
+            background-color: #ddd;
+        }
+
     .treeView > li:last-child {
         background-position: -90px -113px;
     }
+
         .treeView > li:last-child.lastExpandable {
             background-position: -122px -69px;
         }
@@ -169,10 +176,13 @@ a {
     transition: all ease-in 0.1s;
     list-style: none;
     font-size: 14px;
+    background-color: #eee;
 }
+
     .treeView ul li {
         background: transparent;
     }
+
         .treeView ul li:hover {
             background-color: #ddd;
         }
@@ -201,6 +211,11 @@ span.opened {
 
 span.file {
     background: url('../img/sprites2.png') -48px -167px no-repeat;
+}
+
+.customTable{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
 }
 
 /*---- Страница Создать Новый документ ----*/

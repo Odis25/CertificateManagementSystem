@@ -13,13 +13,18 @@ $(document).ready(function () {
     });
 });
 
-
+function LoadDocuments(contractId) {
+    $.get("/Document/LoadDocuments", { contractId: contractId },
+        function (result) {
+            $('.dataHolder').html(result);
+        });
+}
 
 function SetClient() {
     let year = $('#inputYear').val();
     let contractNumber = $('#inputContractNumber').val();
 
-    $.getJSON('/Document/SetClient', {
+    $.getJSON('/Document/GetClient', {
             contractNumber: contractNumber,
             year: year
         },

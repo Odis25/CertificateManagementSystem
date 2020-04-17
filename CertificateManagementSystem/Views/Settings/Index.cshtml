@@ -1,0 +1,31 @@
+﻿@model SettingsModel
+
+<div class="row no-gutters section">
+    <div class="col-md-3">
+
+    </div>
+    <div class="col-md-6">
+        <div class="panel">
+            <form class="p-3" asp-controller="Settings" asp-action="SaveSettings" method="post">
+                <div class="form-group">
+                    <label>Каталог хранения документов</label>
+                    <input asp-for="DocumentsFolder" class="form-control" type="text" />
+                </div>
+                <div class="form-group">
+                    <label>Резервный каталог хранения документов</label>
+                    <input asp-for="ReserveFolder" class="form-control" type="text" />
+                </div>
+                <div class="form-group">
+                    <label>Каталог хранения методик поверки</label>
+                    <input asp-for="MethodicsFolder" class="form-control" type="text" />
+                </div>
+                <div class="text-center">
+                    <button class="btn btn-danger" type="submit">Сохранить изменения</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-md-3">
+
+    </div>
+</div>

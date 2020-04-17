@@ -33,7 +33,8 @@
 
                         <div class="form-group col-md-9">
                             <label asp-for="ContractNumber">Номер договора</label>
-                            <input class="form-control form-control-sm shadow-sm" asp-for="ContractNumber" autocomplete="off" list="contractNumberList" placeholder="Укажите номер договора..." id="inputContractNumber" onchange="SetClient()" />
+                            <input class="form-control form-control-sm shadow-sm" asp-for="ContractNumber" 
+                                   autocomplete="off" list="contractNumberList" placeholder="Укажите номер договора..." id="inputContractNumber" onchange="SetClient()" />
                             <datalist id="contractNumberList">
                                 @foreach (var item in ViewBag.Contracts)
                                 {
@@ -46,7 +47,8 @@
 
                     <div class="form-group">
                         <label asp-for="RegistrationNumber">Номер в гос.реестре</label>
-                        <input class="form-control form-control-sm shadow-sm" asp-for="RegistrationNumber" autocomplete="off" list="registrationNumberList" placeholder="Укажите номер в гос. реестре..." />
+                        <input class="form-control form-control-sm shadow-sm" asp-for="RegistrationNumber" 
+                               autocomplete="off" list="registrationNumberList" placeholder="Укажите номер в гос. реестре..." />
                         <datalist id="registrationNumberList">
                             @foreach (var item in ViewBag.RegisterNumbers)
                             {
@@ -157,8 +159,8 @@
                         </div>
                     }
                     <div class="form-group text-center">
-                        <label class="btn btn-danger" for="newDocumentFileInput"><img src="~/icons/add_file_24px.png" /> Выберите документ...</label>
-                        <input class="inputFile" asp-for="DocumentFile" onchange="LoadFile()" id="newDocumentFileInput" />
+                        <label class="btn btn-danger" for="newDocumentFileInput"><img src="~/icons/add_file_24px.png" />Выберите документ...</label>
+                        <input class="inputFile" accept="image/png,image/jpeg,application/pdf" asp-for="DocumentFile" onchange="LoadFile()" id="newDocumentFileInput" />
                     </div>
 
                     <input type="hidden" asp-for="DocumentType" />
