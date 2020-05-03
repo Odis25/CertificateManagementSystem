@@ -30,5 +30,9 @@ namespace CertificateManagementSystem.Data
         Task Add(Document newDocument);
        
         bool IsDocumentExist(string documentNumber);
+
+        Task<int> DocumentsCount();
+        Task<int> CertificatesCount();
+        Task<int> FailureNotificationsCount();
     }
 }

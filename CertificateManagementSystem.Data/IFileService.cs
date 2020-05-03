@@ -4,6 +4,6 @@ namespace CertificateManagementSystem.Data
 {
     public interface IFileService
     {
-        void CreateFile(string sourcePath, string destinationPath);
+        void CreateFile(string sourceFilePath, ref string destinationFilePath);
     }
 }

@@ -18,7 +18,12 @@ html {
 body {
     font-family: 'Roboto';
     height: 100%;
-    background-color: black;
+    background-image: url('../img/Themes/clouds.jpg');
+    background-color: #eee;
+    background-size: auto;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
 }
 
 a {
@@ -31,15 +36,30 @@ a {
     border-color: #1861ac;
 }
 
+/*---- Скроллер ----*/
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: #d4d4d4;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #808080;
+    border: 2px solid #d4d4d4;
+    border-radius: 8px;
+}
+
 /*---- Секции и контейнеры ----*/
 #header {
-    min-width: 100%;
-    z-index: 10;
+    height: 10vh;
     padding: 5px;
 }
 
 #main {
     padding: 5px;
+    height: 90vh;
 }
 
 .mainContainer {
@@ -76,18 +96,44 @@ a {
 
 #header .nav-link {
     padding: 10px 20px;
+    font-weight: bold;
+    font-family: 'Roboto mono'
 }
 
     #header .nav-link:hover {
         background-color: #666;
     }
 
+#userMenu {
+    color: white;
+    padding: 5px;
+    padding-right: 5px;
+    height: 100%;
+}
 
-/*---- Панели Главной страницы ----*/
+    #userMenu a {
+        font-style: normal;
+        color: white;
+        background: url('../icons/icons8_male_user_36px.png') no-repeat;
+        background-position: left;
+        padding: 5px 10px 5px 40px;
+        height: 36px;
+        display: inline-block;
+        border-radius: 3px;
+    }
+
+        #userMenu a:hover {
+            transition: all ease-in 0.1s;
+            background-color: #555;
+        }
+
+/*---- Панели ----*/
 .section {
     color: #aaa;
-    height: 91vh;
+    height: 100%;
     position: relative;
+    padding-bottom: 10px;
+    overflow-y: auto;
 }
 
 .panel {
@@ -99,19 +145,34 @@ a {
     position: relative;
 }
 
+.panel-2 {
+    border-radius: 3px;
+    background-color: #eee;
+    box-shadow: 5px 5px 5px rgba(0,0,0,0.5);
+    padding: 10px;
+    height: 100%;
+    position: relative;
+}
+
+.mainMenuBar {
+    background-color: rgba(10, 11, 14, 0.80);
+    overflow: visible;
+}
+
 .sidebar-left {
-    margin-right: 10px;
+    margin-right: 20px;
     height: 100%;
 }
 
 .sidebar-left-top {
     height: 20%;
-    padding-bottom: 5px;
+    padding-bottom: 10px;
+    color: #000;
 }
 
 .sidebar-left-bottom {
     height: 80%;
-    padding-top: 5px;
+    padding-top: 10px;
 }
 
 .sidebar-right {
@@ -121,31 +182,48 @@ a {
 
 /*---- Страница каталога свидетельств ----*/
 
-.treeView {
+.sidebar-left-top .panel-2 h5 {
+    font-weight: bold;
+}
+
+.sidebar-left-top .panel-2 {
+    font-weight: bold;
+    padding: 10px 15px;
+}
+
+    .sidebar-left-top .panel-2 span {
+        font-size: 0.97em;
+        color: #333;
+    }
+
+#treeView {
     height: 100%;
     list-style: none;
     font-size: 16px;
     background-color: #eee;
     border-radius: 3px;
     border: double;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin: 0;
 }
 
-    .treeView li {
+    #treeView li {
         background: url('../img/sprites2.png') 2px -208px no-repeat;
         background-position: 2px -384px;
         position: relative;
         padding-left: 16px;
     }
 
-        .treeView li a:hover {
+        #treeView li a:hover {
             background-color: #ddd;
         }
 
-    .treeView > li:last-child {
+    #treeView > li:last-child {
         background-position: -90px -113px;
     }
 
-        .treeView > li:last-child.lastExpandable {
+        #treeView > li:last-child.lastExpandable {
             background-position: -122px -69px;
         }
 
@@ -164,30 +242,30 @@ a {
     background-position: -170px -4px;
 }
 
-.treeView > li:last-child > .hitarea {
+#treeView > li:last-child > .hitarea {
     background-position: -90px -113px;
 }
 
-.treeView > li:last-child > .expandable-hitarea {
+#treeView > li:last-child > .expandable-hitarea {
     background-position: -122px -69px;
 }
 
-.treeView ul {
+#treeView ul {
     transition: all ease-in 0.1s;
     list-style: none;
     font-size: 14px;
     background-color: #eee;
 }
 
-    .treeView ul li {
+    #treeView ul li {
         background: transparent;
     }
 
-        .treeView ul li:hover {
+        #treeView ul li:hover {
             background-color: #ddd;
         }
 
-.treeView a {
+#treeView a {
     color: #000;
     display: block;
     width: 100%;
@@ -213,36 +291,120 @@ span.file {
     background: url('../img/sprites2.png') -48px -167px no-repeat;
 }
 
-.customTable{
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 12px;
+#data-holder {
+    height: 100%;
+}
+
+    #data-holder #document-details {
+        padding: 10px 0px;
+        background: #bbb;
+        box-shadow: 2px 2px 3px rgba(0,0,0,0.9);
+        margin-bottom: 5px;
+        color: #000;
+    }
+
+        #data-holder #document-details td {
+            padding: 5px 20px;
+        }
+
+            #data-holder #document-details td:last-child {
+                font-weight: bold;
+            }
+
+    #data-holder .customTable {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 12px;
+    }
+
+#document-preview-modal .modal-dialog {
+    max-width: 70vw;
+}
+
+#document-preview-modal .modal-content {
+    height: 90vh;
+}
+
+#document-preview-modal .custom-modal-body .row {
+    height: 100%;
+}
+
+#document-preview-modal .custom-modal-body iframe {
+    height: 100%;
+    width: 100%;
+}
+
+#document-details-table td {
+    padding: 10px 0px 10px 10px;
+}
+
+    #document-details-table td:first-child {
+        font-weight: bold;
+        width: 45%;
+    }
+
+    #document-details-table td:last-child {
+        font-style: italic;
+    }
+#document-preview-modal .custom-modal-footer {
+    margin:auto;;
 }
 
 /*---- Страница Создать Новый документ ----*/
+.alerts-container {
+    float: right;
+    position: absolute;
+    right: 20px;
+    z-index: 1000;
+}
+
+    .alerts-container #inner-alert {
+    }
+
 #newDocumentSection {
+    font-size: 14px;
+    font-weight: bold;
     color: #000;
     height: 100%;
 }
 
-.sectionHeader {
-    padding: 10px 0 25px 0px;
-    display: flex;
-    flex-direction: row;
+    #newDocumentSection .panel-2 {
+        padding: 20px;
+    }
+
+#newDocumentForm {
+    height: 100%;
 }
 
-    .sectionHeader .sectionHeading {
-        line-height: 1.6;
+    #newDocumentForm .form-group {
+        padding-top: 0px;
+    }
+
+        #newDocumentForm .form-group label {
+            margin: 2px;
+        }
+
+        #newDocumentForm .form-group .field-validation-error {
+            /*display:block;
+            float:left;*/
+        }
+
+.section-header {
+    padding: 0px 0 15px 0px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: row;
+    border-bottom: 2px solid #000;
+}
+
+    .section-header > .section-heading {
+        line-height: 1.4;
         font-weight: bold;
         margin: 0;
         flex-grow: 1;
         vertical-align: middle;
     }
 
-.half-section form {
-    width: 100%
-}
-
-.inputFile {
+.input-file {
     width: 0.1px;
     height: 0.1px;
     opacity: 0;
@@ -251,37 +413,38 @@ span.file {
     z-index: -1;
 }
 
-
-.pdfHolder {
-    display: flex;
-    border: 1px dashed #ccc;
-    width: 100%;
+.control-panel {
     height: 100%;
 }
 
-/*---- страница авторизации ----*/
+    .control-panel .pdf-holder {
+        border: 1px solid rgba(0,0,0,0.2);
+        width: 100%;
+        height: 90%;
+        background-color: #aaa;
+    }
 
+#newDocumentForm .control-panel .form-group {
+    height: 9%;
+    padding-top: 20px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+    #newDocumentForm .control-panel .form-group label {
+        cursor: pointer;
+    }
+
+        #newDocumentForm .control-panel .form-group label img {
+            margin-right: 5px;
+        }
+
+
+/*---- страница авторизации ----*/
 .validationSummary ul {
     list-style: none;
 }
 
-
-/*.section label {
-    margin: 0px;
-}
-
-.section .form-group {
-    margin: 5px 0;
-}
-
-    .section .form-group span {
-        font-size: 14px;
-    }
-
-.section input:focus {
-    border-color: #ccc;
-    box-shadow: 0px 0px 4px #111;
-}*/
 /*-----Fix select2 resizing bug------*/
 .select2 {
     width: 100% !important;

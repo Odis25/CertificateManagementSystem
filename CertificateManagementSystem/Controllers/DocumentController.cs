@@ -1,5 +1,6 @@
 ﻿using CertificateManagementSystem.Data;
 using CertificateManagementSystem.Data.Models;
+using CertificateManagementSystem.Extensions;
 using CertificateManagementSystem.Models.Document;
 using CertificateManagementSystem.Services.Components;
 using Microsoft.AspNetCore.Authorization;
@@ -8,6 +9,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.FileProviders.Physical;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -33,9 +36,9 @@ namespace CertificateManagementSystem.Controllers
         }
 
         // Вывод на экран всех документов
-        public IActionResult Index()
+        [HttpGet]
+        public async Task<IActionResult> Index()
         {
-            var documentsCount = _documents.GetDocuments().Count();
             var years = _documents.GetYears();
             var yearModels = new List<YearModel>();
 
@@ -56,13 +59,47 @@ namespace CertificateManagementSystem.Controllers
 
             var model = new DocumentIndexModel
             {
+                DocumentsCount = await _documents.DocumentsCount(),
+                CertificatesCount = await _documents.CertificatesCount(),
+                FailureNotificationsCount = await _documents.FailureNotificationsCount(),
                 Years = yearModels
             };
 
             return View(model);
         }
 
+        // Детализированная информация о документе
+        [HttpGet]
+        public IActionResult Details(int id)
+        {
+            var document = _documents.GetDocumentById(id);
+
+            var filePath = Path.Combine("/fileserver", document.DocumentFile.Path);
+
+            var model = new DocumentListingModel
+            {
+                Year = document.Contract.Year,
+                ContractNumber = document.Contract.ContractNumber,
+                ClientName = document.Contract.Client.Name,
+                ExploitationPlace = document.Contract.Client.ExploitationPlace,
+                DeviceName = document.Device.Name,
+                DeviceType = document.Device.Type,
+                SerialNumber = document.Device.SerialNumber,
+                RegistrationNumber = document.Device.VerificationMethodic.RegistrationNumber,
+                VerificationMethodic = document.Device.VerificationMethodic.Name,                
+                DocumentNumber = document.DocumentNumber,
+                DocumentType = (document is Certificate) ? "Свидетельство о поверке" : "Извещение о непригодности",
+                CalibrationDate = (document as Certificate)?.CalibrationDate.ToString("dd.MM.yyyy"),
+                CalibrationExpireDate = (document as Certificate)?.CalibrationExpireDate.ToString("dd.MM.yyyy"),
+                DocumentDate = (document as FailureNotification)?.DocumentDate.ToString("dd.MM.yyyy"),
+                FilePath = filePath
+            };
+
+            return PartialView("_DocumentPreview", model);
+        }
+
         // Создание нового документа
+        [HttpGet]
         public IActionResult Create(DocumentType type)
         {
             CreateSelectLists();
@@ -75,7 +112,7 @@ namespace CertificateManagementSystem.Controllers
                 CalibrationExpireDate = DateTime.Now.AddYears(1),
                 DocumentDate = DateTime.Now
             };
-
+            
             return View(model);
         }
 
@@ -86,12 +123,15 @@ namespace CertificateManagementSystem.Controllers
             var newDocument = CreateDocument(model);
 
             if (ModelState.IsValid)
-            {
-                var fileSource = Path.Combine(_appEnvironment.WebRootPath, "files", model.DocumentFile.FileName);
+            {               
+                var destinationFilePath = newDocument.DocumentFile.Path;
+                //todo: реализовать запись в модель актуального пути к файлу
                 try
                 {
-                    _files.CreateFile(fileSource, newDocument.DocumentFile.Path);
+                    var sourceFilePath = UploadFile(model.DocumentFile);
+                    _files.CreateFile(sourceFilePath, ref destinationFilePath);
                     await _documents.Add(newDocument);
+                    this.AddAlertSuccess("Свидетельство успешно добавленно в базу!");
                 }
                 catch (Exception e)
                 {
@@ -101,25 +141,25 @@ namespace CertificateManagementSystem.Controllers
 
             CreateSelectLists();
 
+            foreach (var state in ModelState.Values)
+            {
+                foreach (var error in state.Errors)
+                {
+                    this.AddAlertDanger(error.ErrorMessage);
+                }
+            }
+
             return View(model);
         }
 
-        // Загрузка файла
-        [HttpPost]
-        public async Task<IActionResult> UploadFile(IFormFile uploadedFile)
+        private string UploadFile(IFormFile documentFile)
         {
-            if (uploadedFile != null && (uploadedFile.ContentType =="application/pdf" || uploadedFile.ContentType == "image/jpeg"))
+            var filePath = Path.Combine(_appEnvironment.WebRootPath, "files", documentFile.FileName);
+            using(var file = new FileStream(filePath, FileMode.Create))
             {
-                string path = Path.Combine(_appEnvironment.WebRootPath, "files", uploadedFile.FileName);
-
-                using (var fileStream = new FileStream(path, FileMode.Create))
-                {
-                    await uploadedFile.CopyToAsync(fileStream);
-                }
-                path = "/files/" + uploadedFile.FileName;
-                return Json(path);
+                documentFile.CopyTo(file);
             }
-            return null;
+            return filePath;
         }
 
         // Автоматическая подстановка заказчика при заполнении поля номера договора
@@ -149,11 +189,11 @@ namespace CertificateManagementSystem.Controllers
                 RegistrationNumber = d.Device.VerificationMethodic?.RegistrationNumber,
                 VerificationMethodic = d.Device.VerificationMethodic?.Name,
                 DocumentNumber = d.DocumentNumber,
-                CalibrationDate = (d as Certificate)?.CalibrationDate.ToString(),
-                CalibrationExpireDate = (d as Certificate)?.CalibrationExpireDate.ToString(),
+                CalibrationDate = (d as Certificate)?.CalibrationDate.ToString("dd.MM.yyyy"),
+                CalibrationExpireDate = (d as Certificate)?.CalibrationExpireDate.ToString("dd.MM.yyyy"),
                 FilePath = d.DocumentFile.Path,
                 DocumentType = (d is Certificate) ? "Свидетельство" : "Извещение о непригодности",
-                DocumentDate = (d as FailureNotification)?.DocumentDate.ToString()
+                DocumentDate = (d as FailureNotification)?.DocumentDate.ToString("dd.MM.yyyy")
             });
 
             var model = new DocumentIndexModel { Documents = result };
@@ -279,8 +319,8 @@ namespace CertificateManagementSystem.Controllers
             return device;
         }
 
-        // Формируем файл свидетельства и путь к нему
-        private FileModel CreateFile(NewDocumentModel model)
+        // Формируем модель файла документа
+        private FileModel CreateFilePath(NewDocumentModel model)
         {
             var year = model.Year.ToString();
             var contract = model.ContractNumber.ReplaceInvalidChars('-') ?? "";
@@ -324,7 +364,7 @@ namespace CertificateManagementSystem.Controllers
                     DocumentNumber = model.DocumentNumber?.Trim(),
                     CalibrationDate = model.CalibrationDate,
                     CalibrationExpireDate = model.CalibrationExpireDate,
-                    DocumentFile = CreateFile(model)
+                    DocumentFile = CreateFilePath(model)
                 };
             }
             else
@@ -336,7 +376,7 @@ namespace CertificateManagementSystem.Controllers
                     Contract = contract,
                     DocumentNumber = model.DocumentNumber?.Trim(),
                     DocumentDate = model.DocumentDate,
-                    DocumentFile = CreateFile(model)
+                    DocumentFile = CreateFilePath(model)
                 };
             }
         }

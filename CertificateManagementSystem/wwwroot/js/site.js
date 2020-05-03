@@ -1,22 +1,47 @@
 ﻿
 // Write your JavaScript code.
 $(document).ready(function () {
-    $('#treeView .collapsable span.folder a').on('click', function (e) {
-        let parent = $(this).parent();
-        let hitarea = parent.prev();
-        parent.toggleClass('opened');
+
+    // Смена иконок при раскрытии ветви дерева документов
+    $('#treeView .collapsable span.folder').on('click', function (e) {
+        let hitarea = $(this).prev();
+        $(this).toggleClass('opened');
         hitarea.toggleClass('expandable-hitarea');
     });
 
     $('#treeView .hitarea').on('click', function (e) {
-        $(this).next().children('a').click();
+        $(this).next().click();
     });
+
+    // Автозакрытие всплывающих оповещений
+    window.setTimeout(function () {
+        $('.alerts-container #inner-alert').fadeOut(3500, function () {
+            $(this).remove();
+        });
+    }, 7000);
+
 });
 
+function OpenDocument(id) {
+    $.get('/Document/Details', { id },
+        function (result) {
+            document.querySelector('.modal .modal-dialog').innerHTML = result;
+            $('#document-preview-modal').modal('show');
+        });
+}
+
+
+// Загрузка документов при выборе договора
 function LoadDocuments(contractId) {
     $.get("/Document/LoadDocuments", { contractId: contractId },
         function (result) {
-            $('.dataHolder').html(result);
+            $('#data-holder').html(result);
+            $('#documents-table').DataTable({
+                paging: false,
+                searching: false,
+                info: false,
+                scrollY: '66.5vh'
+            });
         });
 }
 
@@ -34,23 +59,18 @@ function SetClient() {
     });
 }
 
-function LoadFile() {
+// Загрузка файла для предпросмотра
+function UploadFile() {
 
-    let file = $('#newDocumentFileInput').get(0);
-    let files = file.files;
-    let formData = new FormData();
-    formData.append('uploadedFile', files[0]);
+    let file = document.querySelector('#newDocumentFileInput').files[0];
+    let fileReader = new FileReader();
 
-    $.ajax({
-        url: '/Document/UploadFile',
-        data: formData,
-        contentType: false,
-        processData: false,
-        type: 'post',
-        success: function (result) {
-            $('.pdfHolder').attr('src', result);
-        }
-    });
+    fileReader.onload = function (event) {
+        let content = event.target.result;
+        document.querySelector('.pdf-holder').setAttribute('src',`${content}`)
+    };
+
+    fileReader.readAsDataURL(file);
 }
 
 

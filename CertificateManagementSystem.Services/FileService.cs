@@ -14,16 +14,19 @@ namespace CertificateManagementSystem.Services
         }
 
         // Создать файл документа
-        public void CreateFile(string sourcePath, string destinationPath)
+        public void CreateFile(string sourceFilePath, ref string destinationFilePath)
         {
-            var documentsFolderPath = _configuration.GetSection("Paths").GetSection("DocumentFolder").Value;
-            destinationPath = Path.Combine(documentsFolderPath, destinationPath);
+            var documentsFolderPath = _configuration.GetSection("Paths").GetSection("DocumentsFolder").Value;
+            destinationFilePath = Path.Combine(documentsFolderPath, destinationFilePath);
 
-            var folder = Path.GetDirectoryName(destinationPath); 
+            var folder = Path.GetDirectoryName(destinationFilePath);
+
+            // Директория не существует?
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
-
-            File.Copy(sourcePath, destinationPath);
+            
+            File.Copy(sourceFilePath, destinationFilePath);
         }
+
     }
 }

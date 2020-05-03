@@ -1,22 +1,37 @@
 ﻿@model DocumentIndexModel
 
+
+<!-- Модальное окно -->
+<div class="modal fade" role="dialog" id="document-preview-modal">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+
+    </div>
+</div>
+
 <div class="row no-gutters section">
-    <div class="col-md-2">
+    <div class="col-md-2 h-100">
+
+        <!-- Левая панель -->
         <div class="sidebar-left">
+            <!-- Левая верхняя панель -->
             <div class="sidebar-left-top">
-                <div class="panel">
-                    Левая верхняя панель
+                <div class="panel-2">
+                    <h5 class="text-center mb-3">Документов в базе:</h5>
+                    <div class="text-success mb-2"><span>Свидетельств: </span>@Model.CertificatesCount</div>
+                    <div class="text-danger mb-2 pb-2 border-bottom"><span>Извещений о непригодности: </span>@Model.FailureNotificationsCount</div>
+                    <div class="text-success"><span>Итого: </span>@Model.DocumentsCount</div>
                 </div>
             </div>
+            <!-- Левая нижняя панель -->
             <div class="sidebar-left-bottom">
-                <div class="panel">
+                <div class="panel-2">
                     <ul class="treeView" id="treeView">
                         @foreach (var year in Model.Years)
                         {
                             <li class="collapsable">
                                 <div class="hitarea expandable-hitarea"></div>
-                                <span class="folder">
-                                    <a href="#year-@year.Year" data-toggle="collapse">@year.Year</a>
+                                <span class="folder" data-toggle="collapse" data-target="#year-@year.Year">
+                                    <a href="#">@year.Year</a>
                                 </span>
                                 <ul class="collapse" id="year-@year.Year">
                                     @foreach (var contract in year.Contracts)
@@ -35,57 +50,13 @@
             </div>
         </div>
     </div>
-    <div class="col-md-10">
-        <div class="panel">
-            
-            <div class="overflow-auto dataHolder">
-                @*<table class="table table-dark table-sm table-hover customTable">
-            <thead>
-                <tr>
-                    <th class="align-middle">Год</th>
-                    <th class="align-middle">Номер договора</th>
-                    <th class="align-middle">Заказчик</th>
-                    <th class="align-middle">Место эксплуатации</th>
-                    <th class="align-middle">Группа СИ</th>
-                    <th class="align-middle">Наименование СИ</th>
-                    <th class="align-middle">Заводской номер</th>
-                    <th class="align-middle">Дата поверки</th>
-                    <th class="align-middle">Дата истечения поверки</th>
-                    <th class="align-middle">Номер в гос.реестре</th>
-                    <th class="align-middle">Методика поверки</th>
-                    <th class="align-middle">Тип документа</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Documents)
-                {
-                    <tr>
-                        <td>@item.Year</td>
-                        <td>@item.ContractNumber</td>
-                        <td>@item.ClientName</td>
-                        <td>@item.ExploitationPlace</td>
-                        <td>@item.DeviceType</td>
-                        <td>@item.DeviceName</td>
-                        <td>@item.SerialNumber</td>
-                        <td>@item.CalibrationDate</td>
-                        <td>@item.CalibrationExpireDate</td>
-                        <td>@item.RegistrationNumber</td>
-                        <td>@item.VerificationMethodic</td>
-                        <td>@item.DocumentType</td>
-                    </tr>
-                }
-            </tbody>
-        </table>*@
-            </div>
+
+    <div class="col-md-10 h-100">
+        <!-- Основной контент -->
+        <div class="panel-2">            
+            <div id="data-holder"></div>
         </div>
     </div>
-    @*<div class="col-md-4">
-        <div class="sidebar-right">
-            <div class="panel">
-                <ul class="treeView">
-                    
-                </ul>
-            </div>
-        </div>
-    </div>*@
+
 </div>
+

@@ -3,10 +3,12 @@ using CertificateManagementSystem.Data.Models;
 using CertificateManagementSystem.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 
 namespace CertificateManagementSystem
@@ -29,6 +31,8 @@ namespace CertificateManagementSystem
             services.AddIdentity<ApplicationUser, IdentityRole>()
                     .AddEntityFrameworkStores<ApplicationDbContext>()
                     .AddDefaultTokenProviders();
+
+            services.AddSession();
 
             services.AddControllersWithViews()
                     .AddRazorRuntimeCompilation();
@@ -57,7 +61,14 @@ namespace CertificateManagementSystem
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
+
             app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Configuration.GetSection("Paths").GetSection("DocumentsFolder").Value),
+                RequestPath = new PathString("/fileserver")
+            });
+
             app.UseRouting();
 
             // Первичное заполнение базы данных

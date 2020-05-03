@@ -1,5 +1,4 @@
 ﻿using CertificateManagementSystem.Models.Settings;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -59,12 +58,6 @@ namespace CertificateManagementSystem.Controllers
             System.IO.File.WriteAllText("appsettings.json", jsonString);
 
             return RedirectToAction("Index", "Home");
-        }
-
-        public string GetFolderPath()
-        {
-             
-            return "hello";
         }
     }
 }

@@ -81,7 +81,9 @@ namespace CertificateManagementSystem.Services
         {
             var foundedContract = _context.Contracts
                 .Include(c => c.Client)
+                .OrderByDescending(c => c.Id)
                 .FirstOrDefault(c => c.ContractNumber == contract.ContractNumber && c.Year == contract.Year);
+
             return foundedContract?.Client;
         }
         public Contract GetContract(string contractNumber, int year)
@@ -110,6 +112,19 @@ namespace CertificateManagementSystem.Services
         public IEnumerable<int> GetYears()
         {
             return _context.Contracts.Select(c => c.Year).Distinct().OrderBy(y => y);
+        }
+
+        public async Task<int> DocumentsCount()
+        {
+            return await _context.Documents.CountAsync();
+        }
+        public async Task<int> CertificatesCount()
+        {
+            return await _context.Documents.OfType<Certificate>().CountAsync();
+        }
+        public async Task<int> FailureNotificationsCount()
+        {
+            return await _context.Documents.OfType<FailureNotification>().CountAsync();
         }
     }
 }
