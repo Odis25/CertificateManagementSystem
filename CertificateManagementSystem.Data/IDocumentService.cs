@@ -8,24 +8,21 @@ namespace CertificateManagementSystem.Data
     {
         IEnumerable<int> GetYears();
 
-        IEnumerable<Document> GetDocuments();
-        IEnumerable<Document> GetDocuments(int year);
         Document GetDocumentById(int id);
+        IEnumerable<Document> GetDocumentsByContractId(int contractId);
 
         IEnumerable<Contract> GetContracts();
         IEnumerable<Contract> GetContracts(int year);
-        Contract GetContractById(int id);
-        Contract GetContract(string contractNumber, int year);
+        Contract FindContract(string contractNumber, int year);
 
         IEnumerable<Client> GetClients();
-        Client GetClient(Contract contract);
-        Client GetClient(string clientName, string exploitationPlace);
+        Client FindClient(string clientName, string exploitationPlace);
 
         IEnumerable<Device> GetDevices();
-        Device GetDevice(string deviceName, string serialNumber);
+        Device FindDevice(string deviceName, string serialNumber);
 
         IEnumerable<VerificationMethodic> GetVerificationMethodics();
-        VerificationMethodic GetVerificationMethodic(string registrationNumber);
+        VerificationMethodic FindVerificationMethodic(string registrationNumber);
 
         Task Add(Document newDocument);
        

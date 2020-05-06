@@ -27,6 +27,12 @@
         public string CalibrationDate { get; set; }
         public string CalibrationExpireDate { get; set; }
 
+        public string CreatedOn { get; set; }
+        public string UpdatedOn { get; set; }
+
+        public string CreatedBy { get; set; }
+        public string UpdatedBy { get; set; }
+
         public string FilePath { get; set; }
     }
 }

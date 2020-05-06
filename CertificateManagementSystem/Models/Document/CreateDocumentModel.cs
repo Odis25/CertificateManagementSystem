@@ -5,27 +5,27 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CertificateManagementSystem.Models.Document
 {
-    public class NewDocumentModel
+    public class CreateDocumentModel
     {
         public int Year { get; set; }
 
         public DocumentType DocumentType { get; set; }
 
-        [Required(ErrorMessage = "Нужно указать номер договора")]
+        [Required(ErrorMessage = "Не указан номер договора")]
         public string ContractNumber { get; set; }
 
-        [Required(ErrorMessage = "Нужно указать номер документа")]
+        [Required(ErrorMessage = "Не указан номер документа")]
         public string DocumentNumber { get; set; }
 
-        [Required(ErrorMessage = "Нужно указать название организации заказчика")]
+        [Required(ErrorMessage = "Не указано название организации заказчика")]
         public string ClientName { get; set; }
         public string ExploitationPlace { get; set; }
 
-        [Required(ErrorMessage = "Нужно указать название средства измерения")]
+        [Required(ErrorMessage = "Не указано название средства измерения")]
         public string DeviceName { get; set; }
-        [Required(ErrorMessage = "Нужно указать тип средства измерения")]
+        [Required(ErrorMessage = "Не указан тип средства измерения")]
         public string DeviceType { get; set; }
-        [Required(ErrorMessage = "Нужно указать заводской номер средства измерения")]
+        [Required(ErrorMessage = "Не указан заводской номер средства измерения")]
         public string SerialNumber { get; set; }
 
         public string RegistrationNumber { get; set; }
@@ -35,7 +35,12 @@ namespace CertificateManagementSystem.Models.Document
         public DateTime CalibrationExpireDate { get; set; }
         public DateTime DocumentDate { get; set; }
 
-        [Required(ErrorMessage = "Нужно выбрать файл документа")]
+        public DateTime CreatedOn { get; set; }
+        public DateTime UpdatedOn { get; set; }
+        public string CreatedBy { get; set; }
+        public string UpdatedBy { get; set; }
+
+        [Required(ErrorMessage = "Не выбран файл документа")]
         public IFormFile DocumentFile { get; set; }
     }
 }

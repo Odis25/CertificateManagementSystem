@@ -9,8 +9,6 @@ namespace CertificateManagementSystem.Data.Models
         public int Year { get; set; }
         public string ContractNumber { get; set; }
 
-        public virtual Client Client { get; set; }
-
         public IEnumerable<Document> Documents { get; set; }
     }
 }

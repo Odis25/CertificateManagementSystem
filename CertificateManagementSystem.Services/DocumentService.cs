@@ -16,102 +16,88 @@ namespace CertificateManagementSystem.Services
             _context = context;
         }
 
-        public async Task Add(Document newDocument)
+        public IEnumerable<int> GetYears()
         {
-            _context.Documents.Add(newDocument);
-            await _context.SaveChangesAsync();
+            return _context.Contracts.Select(c => c.Year).Distinct().OrderBy(y => y);
         }
 
-        public IEnumerable<Client> GetClients()
+        public Document GetDocumentById(int id)
         {
-            return _context.Clients.OrderBy(c => c.Name);
+            return _context.Documents
+                .Include(d => d.Contract)
+                .Include(d => d.Client)
+                .Include(d => d.Device)
+                    .ThenInclude(d => d.VerificationMethodic)
+                .Include(d => d.DocumentFile)
+                .FirstOrDefault(d => d.Id == id);
+        }
+        public IEnumerable<Document> GetDocumentsByContractId(int contractId)
+        {
+            return _context.Documents.Where(d => d.Contract.Id == contractId)
+                .Include(d => d.Contract)
+                .Include(d => d.Client)
+                .Include(d => d.Device)
+                    .ThenInclude(d => d.VerificationMethodic)
+                .Include(d => d.DocumentFile);
         }
 
         public IEnumerable<Contract> GetContracts()
         {
             return _context.Contracts
                 .OrderBy(c => c.ContractNumber)
-                .Include(c => c.Client)
+                .Include(c => c.Documents).ThenInclude(doc => doc.Client)
                 .Include(c => c.Documents).ThenInclude(doc => doc.Device)
                 .Include(c => c.Documents).ThenInclude(doc => doc.DocumentFile); ;
         }
         public IEnumerable<Contract> GetContracts(int year)
         {
-            return GetContracts().Where(c => c.Year == year);
+            return _context.Contracts.Where(c => c.Year == year).OrderBy(c => c.ContractNumber);
         }
-        public Contract GetContractById(int id)
+        public Contract FindContract(string contractNumber, int year)
         {
-            return GetContracts().FirstOrDefault(c => c.Id == id);
+            return GetContracts()
+                .FirstOrDefault(c => c.ContractNumber == contractNumber && c.Year == year);
+        }
+
+        public IEnumerable<Client> GetClients()
+        {
+            return _context.Clients.OrderBy(c => c.Name);
+        }
+        public Client FindClient(string clientName, string exploitationPlace)
+        {
+            return _context.Clients
+                .FirstOrDefault(c => c.Name == clientName && c.ExploitationPlace == exploitationPlace);
         }
 
         public IEnumerable<Device> GetDevices()
         {
             return _context.Devices.OrderBy(d => d.Name);
         }
-        public IEnumerable<VerificationMethodic> GetVerificationMethodics()
-        {
-            return _context.VerificationMethodics.OrderBy(vm => vm.Name);
-        }
-        public IEnumerable<Document> GetDocuments()
-        {
-            return _context.Documents
-                .Include(d => d.Contract)
-                    .ThenInclude(c => c.Client)
-                .Include(d => d.Device)
-                    .ThenInclude(d => d.VerificationMethodic)
-                .Include(d => d.DocumentFile);
-        }
-
-        public IEnumerable<Document> GetDocuments(int year)
-        {
-            return GetDocuments().Where(d => d.Contract.Year == year);
-        }
-
-        public Document GetDocumentById(int id)
-        {
-            return GetDocuments().FirstOrDefault(d => d.Id == id);
-        }
-
-        public Client GetClient(string clientName, string exploitationPlace)
-        {
-            return _context.Clients
-                .FirstOrDefault(c => c.Name == clientName && c.ExploitationPlace == exploitationPlace);
-        }
-        public Client GetClient(Contract contract)
-        {
-            var foundedContract = _context.Contracts
-                .Include(c => c.Client)
-                .OrderByDescending(c => c.Id)
-                .FirstOrDefault(c => c.ContractNumber == contract.ContractNumber && c.Year == contract.Year);
-
-            return foundedContract?.Client;
-        }
-        public Contract GetContract(string contractNumber, int year)
-        {
-            return _context.Contracts
-                .Include(c => c.Client)
-                .Include(c => c.Documents).ThenInclude(cd => cd.Device)
-                .FirstOrDefault(c => c.ContractNumber == contractNumber && c.Year == year);
-        }
-        public Device GetDevice(string deviceName, string serialNumber)
+        public Device FindDevice(string deviceName, string serialNumber)
         {
             return _context.Devices
                 .Include(d => d.VerificationMethodic)
                 .FirstOrDefault(d => d.Name == deviceName && d.SerialNumber == serialNumber);
         }
-        public VerificationMethodic GetVerificationMethodic(string registrationNumber)
+
+        public IEnumerable<VerificationMethodic> GetVerificationMethodics()
+        {
+            return _context.VerificationMethodics.OrderBy(vm => vm.Name);
+        }
+        public VerificationMethodic FindVerificationMethodic(string registrationNumber)
         {
             return _context.VerificationMethodics.FirstOrDefault(m => m.RegistrationNumber == registrationNumber);
+        }
+
+        public async Task Add(Document newDocument)
+        {
+            _context.Documents.Add(newDocument);
+            await _context.SaveChangesAsync();
         }
 
         public bool IsDocumentExist(string documentNumber)
         {
             return _context.Documents.Any(c => c.DocumentNumber == documentNumber);
-        }
-
-        public IEnumerable<int> GetYears()
-        {
-            return _context.Contracts.Select(c => c.Year).Distinct().OrderBy(y => y);
         }
 
         public async Task<int> DocumentsCount()

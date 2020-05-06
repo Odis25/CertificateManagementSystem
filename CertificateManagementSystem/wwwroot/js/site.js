@@ -46,17 +46,17 @@ function LoadDocuments(contractId) {
 }
 
 function SetClient() {
-    let year = $('#inputYear').val();
-    let contractNumber = $('#inputContractNumber').val();
+    //let year = $('#inputYear').val();
+    //let contractNumber = $('#inputContractNumber').val();
 
-    $.getJSON('/Document/GetClient', {
-            contractNumber: contractNumber,
-            year: year
-        },
-        function (result) {
-            $('#inputClientName').val(result.name).trigger('change');
-            $('#inputExploitationPlace').val(result.exploitationPlace).trigger('change');
-    });
+    //$.getJSON('/Document/GetClient', {
+    //        contractNumber: contractNumber,
+    //        year: year
+    //    },
+    //    function (result) {
+    //        $('#inputClientName').val(result.name).trigger('change');
+    //        $('#inputExploitationPlace').val(result.exploitationPlace).trigger('change');
+    //});
 }
 
 // Загрузка файла для предпросмотра

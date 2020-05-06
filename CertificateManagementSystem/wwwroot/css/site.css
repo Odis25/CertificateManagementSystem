@@ -316,12 +316,13 @@ span.file {
         font-size: 12px;
     }
 
+/*---- Модальное окно детализации ----*/
 #document-preview-modal .modal-dialog {
     max-width: 70vw;
 }
 
 #document-preview-modal .modal-content {
-    height: 90vh;
+    height: 100%;
 }
 
 #document-preview-modal .custom-modal-body .row {
@@ -346,7 +347,7 @@ span.file {
         font-style: italic;
     }
 #document-preview-modal .custom-modal-footer {
-    margin:auto;;
+    margin:auto;
 }
 
 /*---- Страница Создать Новый документ ----*/
