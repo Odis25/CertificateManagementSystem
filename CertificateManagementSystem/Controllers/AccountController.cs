@@ -50,6 +50,7 @@ namespace CertificateManagementSystem.Controllers
                     }
 
                     await _signInManager.SignInAsync(user, model.RememberMe);
+                    return RedirectToAction("Index", "Home");
                 }
                 catch(Exception e)
                 {

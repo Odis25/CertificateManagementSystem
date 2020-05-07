@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace CertificateManagementSystem.Data.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class InitialMigrations : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -246,7 +246,7 @@ namespace CertificateManagementSystem.Data.Migrations
                     DeviceId = table.Column<int>(nullable: true),
                     DocumentFileId = table.Column<int>(nullable: true),
                     CreatedOn = table.Column<DateTime>(nullable: false),
-                    UpdatedOn = table.Column<DateTime>(nullable: false),
+                    UpdatedOn = table.Column<DateTime>(nullable: true),
                     CreatedBy = table.Column<string>(nullable: true),
                     UpdatedBy = table.Column<string>(nullable: true),
                     Discriminator = table.Column<string>(nullable: false),

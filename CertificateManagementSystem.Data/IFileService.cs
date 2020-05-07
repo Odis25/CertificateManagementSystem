@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using CertificateManagementSystem.Data.Models;
 
 namespace CertificateManagementSystem.Data
 {
     public interface IFileService
     {
-        void CreateFile(string sourceFilePath, ref string destinationFilePath);
+        void CreateFile(string sourceFilePath, string destinationFilePath);
+        string GetRealFilePath(FileModel file);
     }
 }

@@ -91,17 +91,17 @@ namespace CertificateManagementSystem.Controllers
                 DeviceName = document.Device.Name,
                 DeviceType = document.Device.Type,
                 SerialNumber = document.Device.SerialNumber,
-                RegistrationNumber = document.Device.VerificationMethodic.RegistrationNumber,
-                VerificationMethodic = document.Device.VerificationMethodic.Name,
+                RegistrationNumber = document.Device.VerificationMethodic?.RegistrationNumber,
+                VerificationMethodic = document.Device.VerificationMethodic?.Name,
                 DocumentNumber = document.DocumentNumber,
                 DocumentType = (document is Certificate) ? "Свидетельство о поверке" : "Извещение о непригодности",
                 CalibrationDate = (document as Certificate)?.CalibrationDate.ToString("dd-MM-yyyy"),
                 CalibrationExpireDate = (document as Certificate)?.CalibrationExpireDate.ToString("dd-MM-yyyy"),
                 DocumentDate = (document as FailureNotification)?.DocumentDate.ToString("dd-MM-yyyy"),
                 CreatedOn = document.CreatedOn.ToString("dd-MM-yyyy hh:mm"),
-                UpdatedOn = document.UpdatedOn.ToString("dd-MM-yyyy hh:mm"),
+                UpdatedOn = document.UpdatedOn?.ToString("dd-MM-yyyy hh:mm") ?? document.CreatedOn.ToString("dd-MM-yyyy hh:mm"),
                 CreatedBy = document.CreatedBy,
-                UpdatedBy = document.UpdatedBy,
+                UpdatedBy = document.UpdatedBy ?? document.CreatedBy,
                 FilePath = filePath
             };
 
@@ -135,9 +135,9 @@ namespace CertificateManagementSystem.Controllers
                 DocumentType = (d is Certificate) ? "Свидетельство" : "Извещение о непригодности",
                 DocumentDate = (d as FailureNotification)?.DocumentDate.ToString("dd-MM-yyyy"),
                 CreatedOn = d.CreatedOn.ToString("dd-MM-yyyy hh:mm"),
-                UpdatedOn = d.UpdatedOn.ToString("dd-MM-yyyy hh:mm"),
+                UpdatedOn = d.UpdatedOn?.ToString("dd-MM-yyyy hh:mm") ?? d.CreatedOn.ToString("dd-MM-yyyy hh:mm"),
                 CreatedBy = d.CreatedBy,
-                UpdatedBy = d.UpdatedBy,
+                UpdatedBy = d.UpdatedBy ?? d.CreatedBy,
             });
 
             var model = new DocumentIndexModel { Documents = result };
@@ -173,9 +173,9 @@ namespace CertificateManagementSystem.Controllers
             {
                 var user = await _userManager.GetUserAsync(User);
                 var destinationFilePath = newDocument.DocumentFile.Path;
-                //todo: реализовать запись в модель актуального пути к файлу
 
-                newDocument.CreatedBy = user.FullName;
+                //todo: не забыть раскоментировать
+                //newDocument.CreatedBy = user.FullName;
                 newDocument.CreatedOn = DateTime.Now;
 
                 try
@@ -183,9 +183,7 @@ namespace CertificateManagementSystem.Controllers
                     // Загружаем файл на сервер
                     var sourceFilePath = UploadFile(model.DocumentFile);
                     // Создаем файл по месту хранения
-                    _files.CreateFile(sourceFilePath, ref destinationFilePath);
-                    // Актуализируем путь к файлу документа
-                    newDocument.DocumentFile.Path = destinationFilePath;
+                    _files.CreateFile(sourceFilePath, destinationFilePath);
                     // Добавляем запись в базу
                     await _documents.Add(newDocument);
                     // Уведомляем пользователя об успешном добавлении
@@ -269,6 +267,7 @@ namespace CertificateManagementSystem.Controllers
                     {
                         Name = model.VerificationMethodic,
                         RegistrationNumber = model.RegistrationNumber?.Trim(),
+                        //todo: продумать как добавлять методику поверки
                         FileName = ""
                     };
                 }
@@ -276,7 +275,6 @@ namespace CertificateManagementSystem.Controllers
             else
             {
                 //todo: Что если методика поверки и регистрационный номер отличаются от указанных ранее для этого устройства?
-
                 if (methodic.RegistrationNumber.ToLower() != model.RegistrationNumber?.ToLower())
                 {
                     // Номер в гос.реестре не совпадает
@@ -315,11 +313,11 @@ namespace CertificateManagementSystem.Controllers
             var contract = model.ContractNumber.ReplaceInvalidChars('-') ?? "";
             var deviceType = model.DeviceType.ReplaceInvalidChars('-');
             var deviceName = model.DeviceName.ReplaceInvalidChars('-');
-            var type = model.DocumentType == DocumentType.Certificate ? "Свидетельства" : "Извещения о непригодности";
+            var docType = model.DocumentType == DocumentType.Certificate ? "Свидетельства" : "Извещения о непригодности";
 
             var extension = Path.GetExtension(model.DocumentFile?.FileName);
             var fileName = deviceType + "_" + deviceName + extension;
-            var filePath = Path.Combine(year, contract, type, fileName);
+            var filePath = Path.Combine(year, contract, docType, fileName);
 
             var file = new FileModel
             {
@@ -327,6 +325,8 @@ namespace CertificateManagementSystem.Controllers
                 ContentType = model.DocumentFile?.ContentType,
                 Path = filePath
             };
+            // Актуализируем путь к файлу
+            file.Path = _files.GetRealFilePath(file);
 
             return file;
         }
