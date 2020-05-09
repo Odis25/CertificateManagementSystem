@@ -295,7 +295,8 @@ span.file {
     height: 100%;
 }
 
-    #data-holder #document-details {
+    /*#data-holder*/ 
+    #document-details {
         padding: 10px 0px;
         background: #bbb;
         box-shadow: 2px 2px 3px rgba(0,0,0,0.9);
@@ -303,15 +304,18 @@ span.file {
         color: #000;
     }
 
-        #data-holder #document-details td {
+        /*#data-holder*/ 
+        #document-details td {
             padding: 5px 20px;
         }
 
-            #data-holder #document-details td:last-child {
+            /*#data-holder*/ 
+            #document-details td:last-child {
                 font-weight: bold;
             }
 
-    #data-holder .customTable {
+    /*#data-holder*/ 
+    .customTable {
         font-family: Arial, Helvetica, sans-serif;
         font-size: 12px;
     }
@@ -440,6 +444,36 @@ span.file {
             margin-right: 5px;
         }
 
+/*---- страница поиска ----*/
+.search-header{
+    /*background: rgba(0,0,0,0.7);*/
+    background: #fafafa;
+    padding: 15px 15px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+.search-header .form-group{
+    margin-bottom: 0;
+}
+.search-filter-bar {
+    color: #000;
+    background: #fafafa;
+    border-radius: 10px;
+    padding: 20px 30px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+.search-filter-bar h5{
+    text-align:center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #333;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+    .search-filter-bar p {
+        font-weight: bold;
+        font-style: italic;
+        text-align: center;
+    }
 
 /*---- страница авторизации ----*/
 .validationSummary ul {

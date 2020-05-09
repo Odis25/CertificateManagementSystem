@@ -1,0 +1,124 @@
+﻿@model DocumentIndexModel
+
+<div class="container-fluid h-100">
+    <div class="row section ">
+        <div class="col-md-2 mh-100">
+            <div class="search-filter-bar">
+                <h5>Настройки поиска:</h5>
+                <p>Область поиска:</p>
+                <div class="form-group form-check">
+                    <input class="form-check-input" type="checkbox" />
+                    <label class="form-check-label">номер договора</label>
+                </div>
+                <div class="form-group form-check">
+                    <input class="form-check-input" type="checkbox" />
+                    <label class="form-check-label">номер документа</label>
+                </div>
+                <div class="form-group form-check">
+                    <input class="form-check-input" type="checkbox" />
+                    <label class="form-check-label">эксплуатирующая организация</label>
+                </div>
+                <div class="form-group form-check">
+                    <input class="form-check-input" type="checkbox" />
+                    <label class="form-check-label">место эксплуатации</label>
+                </div>
+                <div class="form-group form-check">
+                    <input class="form-check-input" type="checkbox" />
+                    <label class="form-check-label">группа СИ</label>
+                </div>
+                <div class="form-group form-check">
+                    <input class="form-check-input" type="checkbox" />
+                    <label class="form-check-label">наименование СИ</label>
+                </div>
+                <div class="form-group form-check">
+                    <input class="form-check-input" type="checkbox" />
+                    <label class="form-check-label">заводской номер СИ</label>
+                </div>
+                <div class="form-group form-check">
+                    <input class="form-check-input" type="checkbox" />
+                    <label class="form-check-label">методика поверки</label>
+                </div>
+                <div class="form-group form-check">
+                    <input class="form-check-input" type="checkbox" />
+                    <label class="form-check-label">номер в гос.реестре</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-10 bg-light">
+            <div class="search-header">
+                <form asp-action="Find" asp-controller="Search">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input class="form-control" type="text" name="name" placeholder="Найти..." />
+                            <div class="input-group-append">
+                                <button type="submit" class="input-group-text">
+                                    <img src="~/icons/icons8_search_24px.png" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="">
+                <h5>Результаты поиска:</h5>
+                
+                <table id="documents-table" class="table table-hover customTable">
+                    <thead>
+                        <tr>
+                            <th class="align-middle">Год договора</th>
+                            <th class="align-middle">Номер договора</th>
+                            <th class="align-middle">Номер документа</th>
+                            <th class="align-middle">Тип документа</th>
+                            <th class="align-middle">Эксплуатирующая организация</th>
+                            <th class="align-middle">Место эксплуатации</th>
+                            <th class="align-middle">Группа СИ</th>
+                            <th class="align-middle">Наименование СИ</th>
+                            <th class="align-middle">Заводской номер</th>
+                            <th class="align-middle">Дата поверки</th>
+                            <th class="align-middle">Дата истечения поверки</th>
+                            <th class="align-middle">Дата документа</th>
+                            <th class="align-middle">Номер в гос.реестре</th>
+                            <th class="align-middle">Методика поверки</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                            <tr>
+                                <td>item.Document</td>
+                                <td>item.DocumentNumber</td>
+                                <td>item.DocumentNumber</td>
+                                <td>item.DocumentType</td>
+                                <td>item.ExploitationPlace</td>
+                                <td>item.ExploitationPlace</td>
+                                <td>item.DeviceType</td>
+                                <td>item.DeviceName</td>
+                                <td>item.SerialNumber</td>
+                                <td>item.CalibrationDate</td>
+                                <td>item.CalibrationExpireDate</td>
+                                <td>item.DocumentDate</td>
+                                <td>item.RegistrationNumber</td>
+                                <td>item.VerificationMethodic</td>
+                            </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        $('#documents-table').DataTable({
+            paging: false,
+            searching: false,
+            info: false,
+            scrollY: '66.5vh',
+            scrollX: true
+        });
+
+    </script>
+}

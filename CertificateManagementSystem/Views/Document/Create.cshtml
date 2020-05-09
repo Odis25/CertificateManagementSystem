@@ -36,7 +36,7 @@
                         <div class="form-group col-md-9">
                             <label asp-for="ContractNumber">Номер договора</label>
                             <input class="form-control form-control-sm shadow-sm" asp-for="ContractNumber"
-                                   autocomplete="off" list="contractNumberList" id="inputContractNumber" onchange="SetClient()" />
+                                   autocomplete="off" list="contractNumberList" id="inputContractNumber" />
                             <datalist id="contractNumberList">
                                 @foreach (var item in ViewBag.Contracts)
                                 {
@@ -174,7 +174,7 @@
 
                     <!-- Кнопка выбора файла -->
                     <div class="form-group text-center">
-                        <label class="btn btn-danger" for="newDocumentFileInput"><img src="~/icons/add_file_24px.png" />Выберите документ...</label>
+                        <label class="btn btn-danger" for="newDocumentFileInput"><img src="~/icons/icons8_attach_24px.png" />Выберите файл...</label>
                         <input class="input-file" accept="image/png,image/jpeg,application/pdf" asp-for="DocumentFile" onchange="UploadFile()" id="newDocumentFileInput" />
                     </div>
                 </div>

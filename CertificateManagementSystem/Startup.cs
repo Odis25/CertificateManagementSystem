@@ -40,10 +40,10 @@ namespace CertificateManagementSystem
             services.Configure<ApplicationOptions>(Configuration.GetSection("Paths"));
 
             services.AddScoped<IDocumentService, DocumentService>();
+            services.AddScoped<IFileService, FileService>();
             services.AddScoped<ILDAPService, LDAPService>();
+            services.AddScoped<ISearchService, SearchService>();
             services.AddScoped<DataSeeder>();
-
-            services.AddTransient<IFileService, FileService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
