@@ -1,0 +1,38 @@
+﻿@model CertificateManagementSystem.Models.Search.SearchModel 
+
+
+<div class="search-bar">
+    <form class="form-inline">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text">
+                    <img src="~/icons/icons8_search_24px.png" alt="Поиск" />
+                </div>
+
+            </div>
+            <input class="form-control" type="search" autocomplete="off" asp-for="SearchQuery" />
+        </div>
+        <div class="search-bar-filter">
+            <div class="form-group">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" />
+                    <label class="form-check-label">в номере договора</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" />
+                    <label class="form-check-label">в номере документа</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" />
+                    <label class="form-check-label">в названии эксплуатирующей организации</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" />
+                    <label class="form-check-label">в месте эксплуатации</label>
+                </div>
+            </div>
+            
+        </div>
+    </form>
+</div>
+

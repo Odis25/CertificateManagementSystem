@@ -295,30 +295,30 @@ span.file {
     height: 100%;
 }
 
-    /*#data-holder*/ 
-    #document-details {
-        padding: 10px 0px;
-        background: #bbb;
-        box-shadow: 2px 2px 3px rgba(0,0,0,0.9);
-        margin-bottom: 5px;
-        color: #000;
+/*#data-holder*/
+#document-details {
+    padding: 10px 0px;
+    background: #bbb;
+    box-shadow: 2px 2px 3px rgba(0,0,0,0.9);
+    margin-bottom: 5px;
+    color: #000;
+}
+
+    /*#data-holder*/
+    #document-details td {
+        padding: 5px 20px;
     }
 
-        /*#data-holder*/ 
-        #document-details td {
-            padding: 5px 20px;
+        /*#data-holder*/
+        #document-details td:last-child {
+            font-weight: bold;
         }
 
-            /*#data-holder*/ 
-            #document-details td:last-child {
-                font-weight: bold;
-            }
-
-    /*#data-holder*/ 
-    .customTable {
-        font-family: Arial, Helvetica, sans-serif;
-        font-size: 12px;
-    }
+/*#data-holder*/
+.customTable {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+}
 
 /*---- Модальное окно детализации ----*/
 #document-preview-modal .modal-dialog {
@@ -350,8 +350,9 @@ span.file {
     #document-details-table td:last-child {
         font-style: italic;
     }
+
 #document-preview-modal .custom-modal-footer {
-    margin:auto;
+    margin: auto;
 }
 
 /*---- Страница Создать Новый документ ----*/
@@ -444,17 +445,49 @@ span.file {
             margin-right: 5px;
         }
 
+/*---- панель поиска ----*/
+.search-bar {
+    margin-right: 80px;
+    position: relative;
+}
+
+    .search-bar input {
+        border-radius: 0 20px 20px 0;
+    }
+
+    .search-bar .input-group-text {
+        border-radius: 20px 0 0 20px;
+        background: #fafafa;
+    }
+
+    .search-bar .search-bar-filter {
+        display: none;
+        position: absolute;
+        background: rgba(255,255,255,0.7);
+        z-index: 1000;
+        bottom: -169px;
+        padding: 10px;
+        border: 1px solid #000;
+        border-radius: 5px;
+    }
+    .search-bar .active{
+        display: block;
+    }
+    
 /*---- страница поиска ----*/
-.search-header{
+.search-header {
     /*background: rgba(0,0,0,0.7);*/
-    background: #fafafa;
+    background: #e0e0e0;
     padding: 15px 15px;
     margin-bottom: 20px;
+    margin-top: 10px;
     border-radius: 10px;
 }
-.search-header .form-group{
-    margin-bottom: 0;
-}
+
+    .search-header .form-group {
+        margin-bottom: 0;
+    }
+
 .search-filter-bar {
     color: #000;
     background: #fafafa;
@@ -462,13 +495,15 @@ span.file {
     padding: 20px 30px;
     box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
-.search-filter-bar h5{
-    text-align:center;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #333;
-    font-weight: bold;
-    margin-bottom: 20px;
-}
+
+    .search-filter-bar h5 {
+        text-align: center;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #333;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
     .search-filter-bar p {
         font-weight: bold;
         font-style: italic;

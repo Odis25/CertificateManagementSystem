@@ -20,6 +20,17 @@ $(document).ready(function () {
         });
     }, 7000);
 
+    document.querySelector('.search-bar input').addEventListener('click', function () {
+        let div = document.querySelector('.search-bar .search-bar-filter');
+        div.classList.toggle('active');
+        //if (div.style.display == 'block') {
+        //    div.style.display = 'none'
+        //}
+        //else {
+        //    div.style.display = 'block'
+        //}
+        
+    })
 });
 
 function OpenDocument(id) {
