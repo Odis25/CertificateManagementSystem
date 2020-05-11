@@ -20,19 +20,29 @@ $(document).ready(function () {
         });
     }, 7000);
 
-    document.querySelector('.search-bar input').addEventListener('click', function () {
+    // Показать или скрыть меню фильтрации поиска
+    document.querySelector('#search-bar-settings').addEventListener('click', function () {
         let div = document.querySelector('.search-bar .search-bar-filter');
         div.classList.toggle('active');
-        //if (div.style.display == 'block') {
-        //    div.style.display = 'none'
-        //}
-        //else {
-        //    div.style.display = 'block'
-        //}
-        
     })
+
+    // Выбор или снятие всех чекбоксов в меню фильтрации поиска
+    document.querySelector('#select-all-checkbox').addEventListener('change', function () {
+        let checkboxes = document.querySelectorAll('.search-bar-filter input[type="checkbox"]');
+        if (this.checked) {
+            checkboxes.forEach(function (checkbox) {
+                checkbox.checked = true;
+            })
+        }
+        else {
+            checkboxes.forEach(function (checkbox) {
+                checkbox.checked = false;
+            })
+        }
+    });
 });
 
+// Открыть окно просмотра документа
 function OpenDocument(id) {
     $.get('/Document/Details', { id },
         function (result) {
@@ -40,7 +50,6 @@ function OpenDocument(id) {
             $('#document-preview-modal').modal('show');
         });
 }
-
 
 // Загрузка документов при выборе договора
 function LoadDocuments(contractId) {
@@ -54,20 +63,6 @@ function LoadDocuments(contractId) {
                 scrollY: '66.5vh'
             });
         });
-}
-
-function SetClient() {
-    //let year = $('#inputYear').val();
-    //let contractNumber = $('#inputContractNumber').val();
-
-    //$.getJSON('/Document/GetClient', {
-    //        contractNumber: contractNumber,
-    //        year: year
-    //    },
-    //    function (result) {
-    //        $('#inputClientName').val(result.name).trigger('change');
-    //        $('#inputExploitationPlace').val(result.exploitationPlace).trigger('change');
-    //});
 }
 
 // Загрузка файла для предпросмотра
