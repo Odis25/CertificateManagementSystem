@@ -40,6 +40,26 @@ $(document).ready(function () {
             })
         }
     });
+
+    document.querySelector('.search-bar').addEventListener('focus', function (e) {
+        let searchbar = document.querySelector('.search-bar');
+        let filter = document.querySelector('.search-bar-filter');
+
+        searchbar.style.width = '350px';
+
+    }, true);
+
+    document.querySelector('.search-bar').addEventListener('focusout', function (e) {
+        let searchbar = document.querySelector('.search-bar');
+        let filter = document.querySelector('.search-bar-filter');
+
+        if (filter.classList.contains('active'))
+            filter.classList.remove('active');
+
+        searchbar.style.width = '200px';
+
+    }, true);
+
 });
 
 // Открыть окно просмотра документа
@@ -73,7 +93,7 @@ function UploadFile() {
 
     fileReader.onload = function (event) {
         let content = event.target.result;
-        document.querySelector('.pdf-holder').setAttribute('src',`${content}`)
+        document.querySelector('.pdf-holder').setAttribute('src', `${content}`)
     };
 
     fileReader.readAsDataURL(file);
