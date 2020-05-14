@@ -481,22 +481,21 @@ span.file {
     }
 
     .search-bar input {
-        border-radius: 0 20px 20px 0;
         border-right: none;
         border-left: none;
+        border-bottom: none;
     }
 
         .search-bar input:focus {
             background-color: #fff;
             box-shadow: none;
-
         }
 
     .search-bar .input-group-text {
         border-radius: 5px 0 0 5px;
         background: url('../icons/icons8_search_24px.png') no-repeat center;
         background-color: #fff;
-        padding: 0 15px;
+        padding: 0px 15px;
     }
 
 #search-bar-settings {

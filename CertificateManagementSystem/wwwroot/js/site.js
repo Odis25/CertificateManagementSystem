@@ -3,14 +3,17 @@
 $(document).ready(function () {
 
     // Смена иконок при раскрытии ветви дерева документов
-    $('#treeView .collapsable span.folder').on('click', function (e) {
-        let hitarea = $(this).prev();
-        $(this).toggleClass('opened');
-        hitarea.toggleClass('expandable-hitarea');
+    document.querySelectorAll('#treeView .collapsable span.folder').forEach(element => {
+        element.addEventListener('click', e => {
+            element.classList.toggle('opened');
+            console.log(element.previousElementSibling);
+            element.previousElementSibling.classList.toggle('expandable-hitarea');
+        });
     });
-
-    $('#treeView .hitarea').on('click', function (e) {
-        $(this).next().click();
+    document.querySelectorAll('#treeView .hitarea').forEach(hitarea => {
+        hitarea.addEventListener('click', function () {
+            hitarea.nextElementSibling.click();
+        });
     });
 
     // Автозакрытие всплывающих оповещений
@@ -22,45 +25,57 @@ $(document).ready(function () {
 
     // Показать или скрыть меню фильтрации поиска
     document.querySelector('#search-bar-settings').addEventListener('click', function () {
-        let div = document.querySelector('.search-bar .search-bar-filter');
-        div.classList.toggle('active');
+
+        const filter = document.querySelector('.search-bar .search-bar-filter');
+        const searchbar = document.querySelector('.search-bar');
+        const searchbarCss = getComputedStyle(searchbar);
+        const width = searchbarCss.width;
+
+        if (width == '200px') {
+            searchbar.style.width = '350px';
+        }
+
+        document.addEventListener('mouseup', LostFocus);
+        filter.classList.toggle('active');
     })
 
     // Выбор или снятие всех чекбоксов в меню фильтрации поиска
     document.querySelector('#select-all-checkbox').addEventListener('change', function () {
-        let checkboxes = document.querySelectorAll('.search-bar-filter input[type="checkbox"]');
+        const checkboxes = document.querySelectorAll('.search-bar-filter input[type="checkbox"]');
+
         if (this.checked) {
             checkboxes.forEach(function (checkbox) {
                 checkbox.checked = true;
-            })
+            });
         }
         else {
             checkboxes.forEach(function (checkbox) {
                 checkbox.checked = false;
-            })
+            });
         }
     });
 
+    // Фокус на панели поиска
     document.querySelector('.search-bar').addEventListener('focus', function (e) {
-        let searchbar = document.querySelector('.search-bar');
-        let filter = document.querySelector('.search-bar-filter');
+        const searchbar = document.querySelector('.search-bar');
 
         searchbar.style.width = '350px';
-
+        document.addEventListener('mouseup', LostFocus);
     }, true);
-
-    document.querySelector('.search-bar').addEventListener('focusout', function (e) {
-        let searchbar = document.querySelector('.search-bar');
-        let filter = document.querySelector('.search-bar-filter');
-
-        if (filter.classList.contains('active'))
-            filter.classList.remove('active');
-
-        searchbar.style.width = '200px';
-
-    }, true);
-
 });
+
+// Снятие фокуса с панели поиска
+function LostFocus(e) {
+    const searchbar = document.querySelector('.search-bar');
+    const filter = document.querySelector('.search-bar-filter');
+
+    if (!searchbar.isSameNode(e.target) && !searchbar.contains(e.target)) {
+        searchbar.style.width = '200px';
+        filter.classList.remove('active');
+        document.removeEventListener('mouseup', LostFocus);
+    }
+}
+
 
 // Открыть окно просмотра документа
 function OpenDocument(id) {
@@ -88,8 +103,8 @@ function LoadDocuments(contractId) {
 // Загрузка файла для предпросмотра
 function UploadFile() {
 
-    let file = document.querySelector('#newDocumentFileInput').files[0];
-    let fileReader = new FileReader();
+    const file = document.querySelector('#newDocumentFileInput').files[0];
+    const fileReader = new FileReader();
 
     fileReader.onload = function (event) {
         let content = event.target.result;
