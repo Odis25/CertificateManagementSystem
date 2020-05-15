@@ -1,4 +1,5 @@
 ﻿using CertificateManagementSystem.Data;
+using CertificateManagementSystem.Models.Search;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -16,15 +17,16 @@ namespace CertificateManagementSystem.Controllers
             _search = search;
         }
 
-        public IActionResult Index()
-        {
-            return View();
+        public IActionResult Index(SearchModel model)
+        {            
+            return View(model);
         }
 
-        public IActionResult Find(string searchQuery)
+        [HttpPost]
+        public IActionResult Find(SearchModel model)
         {
-            
-            return View();
+          
+            return RedirectToAction("Index", model);
         }
     }
 }

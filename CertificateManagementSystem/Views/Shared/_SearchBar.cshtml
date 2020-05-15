@@ -1,127 +1,133 @@
 ﻿@model CertificateManagementSystem.Models.Search.SearchModel
 
 
-<div class="search-bar">
-    <form class="">
+<form class="search-bar" asp-action="Find" asp-controller="Search">
 
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <div class="input-group-text"></div>
+    <div class="input-group">
+        <div class="input-group-prepend">
+            <div class="input-group-text"></div>
+        </div>
+        <input class="form-control" type="search" autocomplete="off" asp-for="SearchQuery"  placeholder="Найти..."/>
+        <div class="input-group-append">
+            <div class="input-group-text" id="search-bar-settings"></div>
+        </div>
+    </div>
+
+    <div class="search-bar-filter">
+        <div class="form-group">
+
+            <h6 class="">Область поиска:</h6>
+
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" id="select-all-checkbox" checked/>
+                    везде
+                </label>
             </div>
-            <input class="form-control" type="search" autocomplete="off" asp-for="SearchQuery" />
-            <div class="input-group-append">
-                <div class="input-group-text" id="search-bar-settings"></div>
+            <hr />
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" asp-for="IsYear" checked/>
+                    год заключения договора
+                </label>
+            </div>
+            <hr />
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" asp-for="IsContractNumber" checked/>
+                    номер договора
+                </label>
+            </div>
+
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" asp-for="IsDocumentNumber" checked/>
+                    номер документа
+                </label>
+            </div>
+            <hr />
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" asp-for="IsClientName" checked/>
+                    эксплуатирующая организация
+                </label>
+            </div>
+
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" asp-for="IsExploitationPlace" checked/>
+                    место эксплуатации
+                </label>
+            </div>
+
+            <hr />
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" asp-for="IsRegisterNumber" checked/>
+                    номер в гос.реестре
+                </label>
+            </div>
+
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" asp-for="IsVerificationMethodic" checked/>
+                    методика поверки
+                </label>
+            </div>
+
+            <hr />
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" asp-for="IsDeviceType" checked/>
+                    группа СИ
+                </label>
+            </div>
+
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" asp-for="IsDeviceName" checked/>
+                    название СИ
+                </label>
+            </div>
+
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" asp-for="IsSerialNumber" checked/>
+                    заводской номер СИ
+                </label>
+            </div>
+
+            <hr />
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" asp-for="IsCalibrationDate" checked/>
+                    дата поверки
+                </label>
+            </div>
+
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" asp-for="IsCalibrationExpireDate" checked/>
+                    дата окончания поверки
+                </label>
+            </div>
+
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" asp-for="IsDocumentDate" checked/>
+                    дата документа
+                </label>
+            </div>
+
+            <hr />
+            <div class="form-check">
+                <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" asp-for="IsDocumentType" checked/>
+                    тип документа
+                </label>
             </div>
         </div>
+    </div>
+</form>
 
-        <div class="search-bar-filter">
-            <div class="form-group">
-
-                <h6 class="">Область поиска:</h6>
-
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" id="select-all-checkbox" />
-                        везде
-                    </label>
-                </div>
-                <hr />
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" />
-                        номер договора
-                    </label>
-                </div>
-
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" />
-                        номер документа
-                    </label>
-                </div>
-                <hr />
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" />
-                        эксплуатирующая организация
-                    </label>
-                </div>
-
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" />
-                        место эксплуатации
-                    </label>
-                </div>
-
-                <hr />
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" />
-                        номер в гос.реестре
-                    </label>
-                </div>
-
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" />
-                        методика поверки
-                    </label>
-                </div>
-
-                <hr />
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" />
-                        группа СИ
-                    </label>
-                </div>
-
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" />
-                        название СИ
-                    </label>
-                </div>
-
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" />
-                        заводской номер СИ
-                    </label>
-                </div>
-
-                <hr />
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" />
-                        дата поверки
-                    </label>
-                </div>
-
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" />
-                        дата окончания поверки
-                    </label>
-                </div>
-
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" />
-                        дата документа
-                    </label>
-                </div>
-
-                <hr />
-                <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="checkbox" class="form-check-input" />
-                        тип документа
-                    </label>
-                </div>
-            </div>
-        </div>
-    </form>
-</div>
 

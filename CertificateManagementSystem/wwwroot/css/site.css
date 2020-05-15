@@ -295,7 +295,6 @@ span.file {
     height: 100%;
 }
 
-/*#data-holder*/
 #document-details {
     padding: 10px 0px;
     background: #bbb;
@@ -304,17 +303,14 @@ span.file {
     color: #000;
 }
 
-    /*#data-holder*/
     #document-details td {
         padding: 5px 20px;
     }
 
-        /*#data-holder*/
         #document-details td:last-child {
             font-weight: bold;
         }
 
-/*#data-holder*/
 .customTable {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 12px;
@@ -387,11 +383,6 @@ span.file {
 
         #newDocumentForm .form-group label {
             margin: 2px;
-        }
-
-        #newDocumentForm .form-group .field-validation-error {
-            /*display:block;
-            float:left;*/
         }
 
 .section-header {

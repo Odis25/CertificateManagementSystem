@@ -1,4 +1,4 @@
-﻿@model DocumentIndexModel
+﻿@model SearchModel
 
 <div class="container-fluid h-100">
     <div class="row section ">
@@ -6,51 +6,111 @@
             <div class="search-filter-bar">
                 <h5>Настройки поиска:</h5>
                 <p>Область поиска:</p>
-                <div class="form-group form-check">
-                    <input class="form-check-input" type="checkbox" />
-                    <label class="form-check-label">номер договора</label>
+
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" asp-for="IsYear" />
+                        год заключения договора
+                    </label>
                 </div>
-                <div class="form-group form-check">
-                    <input class="form-check-input" type="checkbox" />
-                    <label class="form-check-label">номер документа</label>
+                <div class="form-check form-group">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" asp-for="IsContractNumber" />
+                        номер договора
+                    </label>
                 </div>
-                <div class="form-group form-check">
-                    <input class="form-check-input" type="checkbox" />
-                    <label class="form-check-label">эксплуатирующая организация</label>
+                <hr />
+
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" asp-for="IsDocumentNumber" />
+                        номер документа
+                    </label>
                 </div>
-                <div class="form-group form-check">
-                    <input class="form-check-input" type="checkbox" />
-                    <label class="form-check-label">место эксплуатации</label>
+                <div class="form-check form-group">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" asp-for="IsDocumentType" />
+                        тип документа
+                    </label>
                 </div>
-                <div class="form-group form-check">
-                    <input class="form-check-input" type="checkbox" />
-                    <label class="form-check-label">группа СИ</label>
+                <hr />
+
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" asp-for="IsClientName" />
+                        эксплуатирующая организация
+                    </label>
                 </div>
-                <div class="form-group form-check">
-                    <input class="form-check-input" type="checkbox" />
-                    <label class="form-check-label">наименование СИ</label>
+                <div class="form-check form-group">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" asp-for="IsExploitationPlace" />
+                        место эксплуатации
+                    </label>
                 </div>
-                <div class="form-group form-check">
-                    <input class="form-check-input" type="checkbox" />
-                    <label class="form-check-label">заводской номер СИ</label>
+                <hr />
+
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" asp-for="IsRegisterNumber" />
+                        номер в гос.реестре
+                    </label>
                 </div>
-                <div class="form-group form-check">
-                    <input class="form-check-input" type="checkbox" />
-                    <label class="form-check-label">методика поверки</label>
+                <div class="form-check form-group">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" asp-for="IsVerificationMethodic" />
+                        методика поверки
+                    </label>
                 </div>
-                <div class="form-group form-check">
-                    <input class="form-check-input" type="checkbox" />
-                    <label class="form-check-label">номер в гос.реестре</label>
+                <hr />
+
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" asp-for="IsDeviceType" />
+                        группа СИ
+                    </label>
                 </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" asp-for="IsDeviceName" />
+                        название СИ
+                    </label>
+                </div>
+                <div class="form-check form-group">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" asp-for="IsSerialNumber" />
+                        заводской номер СИ
+                    </label>
+                </div>
+                <hr />
+
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" asp-for="IsCalibrationDate" />
+                        дата поверки
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" asp-for="IsCalibrationExpireDate" />
+                        дата окончания поверки
+                    </label>
+                </div>
+                <div class="form-check form-group">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" asp-for="IsDocumentDate" />
+                        дата документа
+                    </label>
+                </div>
+
             </div>
         </div>
 
         <div class="col-md-10 bg-light">
             <div class="search-header">
-                <form asp-action="Find" asp-controller="Search">
+                <form asp-action="Find" asp-controller="Search" >
                     <div class="form-group">
                         <div class="input-group">
-                            <input class="form-control" type="text" name="name" placeholder="Найти..." />
+                            <input class="form-control" type="text" asp-for="SearchQuery" placeholder="Найти..." />
                             <div class="input-group-append">
                                 <button type="submit" class="input-group-text">
                                     <img src="~/icons/icons8_search_24px.png" />
