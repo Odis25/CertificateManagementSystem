@@ -1,0 +1,45 @@
+﻿@model IEnumerable<DocumentListingModel>
+
+    <div class="overflow-hidden">
+        <table id="documents-table" class="table table-hover customTable">
+            <thead>
+                <tr>
+                    <th class="align-middle">Номер документа</th>
+                    <th class="align-middle">Тип документа</th>
+                    <th class="align-middle">Год договора</th>
+                    <th class="align-middle">Номер договора</th>
+                    <th class="align-middle">Эксплуатирующая организация</th>
+                    <th class="align-middle">Место эксплуатации</th>
+                    <th class="align-middle">Группа СИ</th>
+                    <th class="align-middle">Наименование СИ</th>
+                    <th class="align-middle">Заводской номер</th>
+                    <th class="align-middle">Дата поверки</th>
+                    <th class="align-middle">Дата истечения поверки</th>
+                    <th class="align-middle">Дата документа</th>
+                    <th class="align-middle">Номер в гос.реестре</th>
+                    <th class="align-middle">Методика поверки</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr onclick="OpenDocument(@item.Id)">
+                        <td>@item.DocumentNumber</td>
+                        <td>@item.DocumentType</td>
+                        <td>@item.Year</td>
+                        <td>@item.ContractNumber</td>
+                        <td>@item.ClientName</td>
+                        <td>@item.ExploitationPlace</td>
+                        <td>@item.DeviceType</td>
+                        <td>@item.DeviceName</td>
+                        <td>@item.SerialNumber</td>
+                        <td>@item.CalibrationDate</td>
+                        <td>@item.CalibrationExpireDate</td>
+                        <td>@item.DocumentDate</td>
+                        <td>@item.RegistrationNumber</td>
+                        <td>@item.VerificationMethodic</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
