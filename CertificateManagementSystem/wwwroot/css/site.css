@@ -39,6 +39,7 @@ a {
 /*---- Скроллер ----*/
 ::-webkit-scrollbar {
     width: 10px;
+    height: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -133,7 +134,7 @@ a {
     height: 100%;
     position: relative;
     padding-bottom: 10px;
-    overflow-y: auto;
+    overflow-y: hidden;
 }
 
 .panel {
@@ -441,7 +442,7 @@ span.file {
     width: 200px;
     margin-right: 80px;
     position: relative;
-    transition: all ease-in 0.2s;
+    transition: all linear 0.2s;
 }
 
     .search-bar h6 {
@@ -451,7 +452,7 @@ span.file {
     }
 
     .search-bar .search-bar-filter {
-        transition: all ease-in 0.3s;
+        transition: all linear 0.2s;
         font-size: 14px;
         visibility: hidden;
         opacity: 0;
@@ -497,13 +498,13 @@ span.file {
 }
 
 
-/*---- страница поиска ----*/
+/*---- страница результатов поиска ----*/
 .search-header {
-    background: #e0e0e0;
+    /*background: #e0e0e0;*/
+    background: rgba(0,0,0,0.7);
     padding: 15px 15px;
-    margin-bottom: 20px;
-    margin-top: 10px;
-    border-radius: 10px;
+    margin-bottom: 10px;
+    border-radius: 3px;
 }
 
     .search-header .form-group {
@@ -511,10 +512,11 @@ span.file {
     }
 
 .search-filter-bar {
+    font-size: 0.9rem;
     color: #000;
     background: #fafafa;
-    border-radius: 10px;
-    padding: 20px 30px;
+    border-radius: 3px;
+    padding: 20px 20px;
     box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 
@@ -529,16 +531,16 @@ span.file {
     .search-filter-bar p {
         font-weight: bold;
         font-style: italic;
-        text-align: center;
+        text-align: left;
     }
+#search-result-holder{
+    background: #e8e8e8;
+    padding: 10px 20px;
+    height: 91%;
+    border-radius: 3px;
+}
 
 /*---- страница авторизации ----*/
 .validationSummary ul {
     list-style: none;
-}
-
-/*-----Fix select2 resizing bug------*/
-.select2 {
-    width: 100% !important;
-    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
 }

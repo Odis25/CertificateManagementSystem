@@ -3,10 +3,7 @@ using CertificateManagementSystem.Data.Models;
 using CertificateManagementSystem.Models.Document;
 using CertificateManagementSystem.Models.Search;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace CertificateManagementSystem.Controllers
 {
@@ -71,7 +68,7 @@ namespace CertificateManagementSystem.Controllers
                 CreatedOn = d.CreatedOn.ToString("dd-MM-yyyy hh:mm"),
                 UpdatedOn = d.UpdatedOn?.ToString("dd-MM-yyyy hh:mm") ?? d.CreatedOn.ToString("dd-MM-yyyy hh:mm"),
                 CreatedBy = d.CreatedBy,
-                UpdatedBy = d.UpdatedBy ?? d.CreatedBy,
+                UpdatedBy = d.UpdatedBy ?? d.CreatedBy
             });
 
             var model = new SearchResultModel
@@ -82,5 +79,6 @@ namespace CertificateManagementSystem.Controllers
 
             return View("Index", model);
         }
+
     }
 }

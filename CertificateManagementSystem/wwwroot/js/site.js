@@ -58,9 +58,11 @@ $(document).ready(function () {
     // Фокус на панели поиска
     document.querySelector('.search-bar').addEventListener('focus', function (e) {
         const searchbar = document.querySelector('.search-bar');
+        const filter = document.querySelector('.search-bar .search-bar-filter');
 
         searchbar.style.width = '350px';
         document.addEventListener('mouseup', LostFocus);
+        filter.classList.add('active');
     }, true);
 });
 

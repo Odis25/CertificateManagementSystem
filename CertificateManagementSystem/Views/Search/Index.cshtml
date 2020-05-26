@@ -5,154 +5,211 @@
     <div class="modal-dialog modal-dialog-centered" role="document"></div>
 </div>
 
-<form asp-action="Find" asp-controller="Search">
     <div class="container-fluid h-100">
         <div class="row section ">
+
             <div class="col-md-2 mh-100">
                 <div class="search-filter-bar">
                     <h5>Настройки поиска:</h5>
                     <p>Область поиска:</p>
+                    <form asp-action="Find" asp-controller="Search" id="search-form">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" id="select-all" />
+                                везде
+                            </label>
+                        </div>
+                        <hr />
 
-                    <div class="form-check">
-                        <label class="form-check-label">
-                            <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsYear" />
-                            год заключения договора
-                        </label>
-                    </div>
-                    <div class="form-check form-group">
-                        <label class="form-check-label">
-                            <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsContractNumber" />
-                            номер договора
-                        </label>
-                    </div>
-                    <hr />
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsYear" />
+                                год заключения договора
+                            </label>
+                        </div>
+                        <div class="form-check form-group">
+                            <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsContractNumber" />
+                                номер договора
+                            </label>
+                        </div>
+                        <hr />
 
-                    <div class="form-check">
-                        <label class="form-check-label">
-                            <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsDocumentNumber" />
-                            номер документа
-                        </label>
-                    </div>
-                    <div class="form-check form-group">
-                        <label class="form-check-label">
-                            <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsDocumentType" />
-                            тип документа
-                        </label>
-                    </div>
-                    <hr />
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsDocumentNumber" />
+                                номер документа
+                            </label>
+                        </div>
+                        <div class="form-check form-group">
+                            <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsDocumentType" />
+                                тип документа
+                            </label>
+                        </div>
+                        <hr />
 
-                    <div class="form-check">
-                        <label class="form-check-label">
-                            <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsClientName" />
-                            эксплуатирующая организация
-                        </label>
-                    </div>
-                    <div class="form-check form-group">
-                        <label class="form-check-label">
-                            <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsExploitationPlace" />
-                            место эксплуатации
-                        </label>
-                    </div>
-                    <hr />
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsClientName" />
+                                эксплуатирующая организация
+                            </label>
+                        </div>
+                        <div class="form-check form-group">
+                            <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsExploitationPlace" />
+                                место эксплуатации
+                            </label>
+                        </div>
+                        <hr />
 
-                    <div class="form-check">
-                        <label class="form-check-label">
-                            <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsRegisterNumber" />
-                            номер в гос.реестре
-                        </label>
-                    </div>
-                    <div class="form-check form-group">
-                        <label class="form-check-label">
-                            <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsVerificationMethodic" />
-                            методика поверки
-                        </label>
-                    </div>
-                    <hr />
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsRegisterNumber" />
+                                номер в гос.реестре
+                            </label>
+                        </div>
+                        <div class="form-check form-group">
+                            <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsVerificationMethodic" />
+                                методика поверки
+                            </label>
+                        </div>
+                        <hr />
 
-                    <div class="form-check">
-                        <label class="form-check-label">
-                            <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsDeviceType" />
-                            группа СИ
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <label class="form-check-label">
-                            <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsDeviceName" />
-                            название СИ
-                        </label>
-                    </div>
-                    <div class="form-check form-group">
-                        <label class="form-check-label">
-                            <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsSerialNumber" />
-                            заводской номер СИ
-                        </label>
-                    </div>
-                    <hr />
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsDeviceType" />
+                                группа СИ
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsDeviceName" />
+                                название СИ
+                            </label>
+                        </div>
+                        <div class="form-check form-group">
+                            <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsSerialNumber" />
+                                заводской номер СИ
+                            </label>
+                        </div>
+                        <hr />
 
-                    <div class="form-check">
-                        <label class="form-check-label">
-                            <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsCalibrationDate" />
-                            дата поверки
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <label class="form-check-label">
-                            <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsCalibrationExpireDate" />
-                            дата окончания поверки
-                        </label>
-                    </div>
-                    <div class="form-check form-group">
-                        <label class="form-check-label">
-                            <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsDocumentDate" />
-                            дата документа
-                        </label>
-                    </div>
-
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsCalibrationDate" />
+                                дата поверки
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsCalibrationExpireDate" />
+                                дата окончания поверки
+                            </label>
+                        </div>
+                        <div class="form-check form-group">
+                            <label class="form-check-label">
+                                <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsDocumentDate" />
+                                дата документа
+                            </label>
+                        </div>
+                    </form>
                 </div>
             </div>
 
-            <div class="col-md-10 bg-light">
+            <div class="col-md-10">
                 <div class="search-header">
-
                     <div class="form-group">
                         <div class="input-group">
-                            <input class="form-control" type="text" asp-for="SearchModel.SearchQuery" placeholder="Найти..." />
+                            <input class="form-control" type="text" asp-for="SearchModel.SearchQuery" placeholder="Найти..." autocomplete="off" form="search-form"/>
                             <div class="input-group-append">
-                                <button type="submit" class="input-group-text">
+                                <button type="submit" class="input-group-text" form="search-form">
                                     <img src="~/icons/icons8_search_24px.png" />
                                 </button>
                             </div>
                         </div>
                     </div>
-
                 </div>
-                <div class="">
-                    <h5>
-                        Результаты поиска:
-                        @if (Model.SearchResults != null)
-                        {
-                            @Model.SearchResults.Count() @:документов
-                        }
-                    </h5>
-                    @if (Model.SearchResults != null)
-                    {
-                        <partial name="_SearchResult" model="@Model.SearchResults" />
-                    }
-                </div>
-
+                @if (Model.SearchResults != null)
+                {
+                    <partial name="_SearchResult" for="@Model.SearchResults" />
+                }
             </div>
         </div>
     </div>
-</form>
+
+
 @section Scripts
 {
     <script>
-        $('#documents-table').DataTable({
-            paging: false,
+
+        let table = $('#documents-table').DataTable({
+            lengthMenu: [100, 250, 500],
+            pageLength: 500,
+            language: {
+                loadingRecords: 'Идет загрузка данных...',
+                processing: 'Идет обработка данных...',
+                lengthMenu: 'Показать _MENU_ документов',
+                info: 'Показано _START_ - _END_ из _TOTAL_ документов',
+                infoEmpty: 'Показано 0 из 0 документов',
+                zeroRecords: 'По вашему запросу ничего не найдено',
+                paginate: {
+                    previous: 'Предыдущая',
+                    next: 'Следующая'
+                }
+            },
             searching: false,
-            info: false,
-            scrollY: '65.5vh',
-            scrollX: true
+            info: true,
+            scrollY: '58vh',
+            scrollX: true,
+            data: @Json.Serialize(Model.SearchResults),
+            columnDefs: [
+                {
+                    targets: 0,
+                    visible: false,
+                    searchable: false
+                }
+            ],
+            columns: [
+                { 'data': 'id',  },
+                { 'data': 'documentNumber', 'autoWidth': true },
+                { 'data': 'documentType', 'autoWidth': true },
+                { 'data': 'year', 'autoWidth': true },
+                { 'data': 'contractNumber', 'autoWidth': true },
+                { 'data': 'clientName', 'autoWidth': true },
+                { 'data': 'exploitationPlace', 'autoWidth': true },
+                { 'data': 'deviceType', 'autoWidth': true },
+                { 'data': 'deviceName', 'autoWidth': true },
+                { 'data': 'serialNumber', 'autoWidth': true },
+                { 'data': 'calibrationDate', 'autoWidth': true },
+                { 'data': 'calibrationExpireDate', 'autoWidth': true },
+                { 'data': 'documentDate', 'autoWidth': true },
+                { 'data': 'registrationNumber', 'autoWidth': true },
+                { 'data': 'verificationMethodic', 'autoWidth': true }
+            ]
+        });
+
+        $('#documents-table tbody').on('click', 'tr', function () {
+            var id = table.row(this).data().id;
+            OpenDocument(id);
+        });
+
+        // Выбор или снятие всех чекбоксов в меню фильтрации поиска
+        document.querySelector('#select-all').addEventListener('change', function () {
+            const checkboxes = document.querySelectorAll('#search-form input[type="checkbox"]');
+
+            if (this.checked) {
+                checkboxes.forEach(function (checkbox) {
+                    checkbox.checked = true;
+                });
+            }
+            else {
+                checkboxes.forEach(function (checkbox) {
+                    checkbox.checked = false;
+                });
+            }
         });
 
     </script>
