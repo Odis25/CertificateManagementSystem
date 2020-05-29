@@ -37,10 +37,7 @@ namespace CertificateManagementSystem.Controllers
                 IsDeviceType = searchModel.IsDeviceType,
                 IsDeviceName = searchModel.IsDeviceName,
                 IsSerialNumber = searchModel.IsSerialNumber,
-                IsDocumentType = searchModel.IsDocumentType,
-                IsCalibrationDate = searchModel.IsCalibrationDate,
-                IsCalibrationExpireDate = searchModel.IsCalibrationExpireDate,
-                IsDocumentDate = searchModel.IsDocumentDate
+                IsDocumentType = searchModel.IsDocumentType
             };
 
             var searchResult = _search.Find(searchRequest);

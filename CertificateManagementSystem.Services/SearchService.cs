@@ -1,8 +1,10 @@
 ﻿using CertificateManagementSystem.Data;
 using CertificateManagementSystem.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace CertificateManagementSystem.Services
 {
@@ -19,31 +21,17 @@ namespace CertificateManagementSystem.Services
         {
             var result = new List<Document>();
 
-            var keyWords = searchRequest.SearchQuery.ToLower().Split(' ');
+            var query = searchRequest.SearchQuery.ToLower();
+            var dates = ExtractDatePatterns(ref query);
 
-            foreach (var word in keyWords)
-            {
-                if (searchRequest.IsDocumentNumber)
-                    result.AddRange(SearchInDocumentNumber(word));
-                if (searchRequest.IsYear)
-                    result.AddRange(SearchInYear(word));
-                if (searchRequest.IsContractNumber)
-                    result.AddRange(SearchInContractNumber(word));
-                if (searchRequest.IsClientName)
-                    result.AddRange(SearchInClientName(word));
-                if (searchRequest.IsExploitationPlace)
-                    result.AddRange(SearchInExploitationPlace(word));
-                if (searchRequest.IsVerificationMethodic)
-                    result.AddRange(SearchInVerificationMethodic(word));
-                if (searchRequest.IsRegisterNumber)
-                    result.AddRange(SearchInRegisterNumber(word));
-                if (searchRequest.IsDeviceType)
-                    result.AddRange(SearchInDeviceType(word));
-                if (searchRequest.IsDeviceName)
-                    result.AddRange(SearchInDeviceName(word));
-                if (searchRequest.IsSerialNumber)
-                    result.AddRange(SearchInSerialNumber(word));
-            }
+            searchRequest.SearchQuery = query;
+
+            var keyWords = query.Split(' ');
+
+            // Поиск по датам
+            result.AddRange(SearchByDatePatterns(dates));
+            // Поиск по ключевым словам
+            result.AddRange(SearchByKeywords(searchRequest));
 
             var filtredResult = result.Where(d => keyWords.All(word =>
             {
@@ -82,6 +70,114 @@ namespace CertificateManagementSystem.Services
             }));
 
             return filtredResult;
+        }
+
+        private IEnumerable<Document> SearchByKeywords(SearchRequest request)
+        {
+            var keyWords = request.SearchQuery.Split(' ');
+            var result = new List<Document>();
+
+            foreach (var word in keyWords)
+            {
+                if (request.IsDocumentNumber)
+                    result.AddRange(SearchInDocumentNumber(word));
+                if (request.IsYear)
+                    result.AddRange(SearchInYear(word));
+                if (request.IsContractNumber)
+                    result.AddRange(SearchInContractNumber(word));
+                if (request.IsClientName)
+                    result.AddRange(SearchInClientName(word));
+                if (request.IsExploitationPlace)
+                    result.AddRange(SearchInExploitationPlace(word));
+                if (request.IsVerificationMethodic)
+                    result.AddRange(SearchInVerificationMethodic(word));
+                if (request.IsRegisterNumber)
+                    result.AddRange(SearchInRegisterNumber(word));
+                if (request.IsDeviceType)
+                    result.AddRange(SearchInDeviceType(word));
+                if (request.IsDeviceName)
+                    result.AddRange(SearchInDeviceName(word));
+                if (request.IsSerialNumber)
+                    result.AddRange(SearchInSerialNumber(word));
+            }
+
+            return result;
+        }
+
+        // Поиск по дате
+        private IEnumerable<Document> SearchByDatePatterns(string[] dates)
+        {
+            var datePattern = new Regex(@"\d{2}.\d{2}.\d{4}");
+            var rangePattern = new Regex(@"\d{2}.\d{2}.\d{4}\s?-\s?\d{2}.\d{2}.\d{4}");
+            var result = new List<Document>();
+
+            foreach (var date in dates)
+            {
+                if (rangePattern.IsMatch(date))
+                {
+                    var startRange = Convert.ToDateTime(datePattern.Matches(date)[0].Value);
+                    var endRange = Convert.ToDateTime(datePattern.Matches(date)[1].Value);
+
+                    var certificates = _context.Documents.OfType<Certificate>().Where(d =>
+                        d.CalibrationDate >= startRange &&
+                        d.CalibrationExpireDate <= endRange);
+
+                    var notifications = _context.Documents.OfType<FailureNotification>().Where(d=>
+                        d.DocumentDate >= startRange &&
+                        d.DocumentDate <= endRange);
+
+                    result.AddRange(certificates);
+                    result.AddRange(notifications);
+                }
+                else
+                {
+                    var targetDate = Convert.ToDateTime(date);
+
+                    var certificates = _context.Documents.OfType<Certificate>().Where(d =>
+                        d.CalibrationDate == targetDate || d.CalibrationExpireDate == targetDate);
+
+                    var notifications = _context.Documents.OfType<FailureNotification>().Where(d =>
+                        d.DocumentDate == targetDate);
+
+                    result.AddRange(certificates);
+                    result.AddRange(notifications);
+                }     
+            }
+
+            return result;
+        }
+
+        // Извлекаем из строки запроса патерны дат если они там есть
+        private string[] ExtractDatePatterns(ref string query)
+        {
+            var datePattern = new Regex(@"\d{2}.\d{2}.\d{4}");
+            var rangePattern = new Regex(@"\d{2}.\d{2}.\d{4}\s?-\s?\d{2}.\d{2}.\d{4}");
+            var result = new List<string>();
+
+            // В строке запроса есть диапазоны дат
+            var rangeMatches = rangePattern.Matches(query);
+
+            if (rangeMatches.Count > 0)
+            {
+                foreach (Match match in rangeMatches)
+                {
+                    query = query.Remove(query.IndexOf(match.Value), match.Value.Length);
+                    result.Add(match.Value);
+                }
+            }
+
+            // В строке запроса есть одиночные даты
+            var dateMatches = datePattern.Matches(query);
+            if (dateMatches.Count > 0)
+            {
+                foreach (Match match in dateMatches)
+                {
+                    query = query.Remove(query.IndexOf(match.Value), match.Value.Length);
+                    result.Add(match.Value);
+                }
+            }
+
+            return result.ToArray();
         }
 
         // Искать в номере документа

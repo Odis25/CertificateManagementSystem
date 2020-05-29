@@ -1,4 +1,4 @@
-﻿@model SearchResultModel
+﻿ @model SearchResultModel
 
 <!-- Модальное окно -->
 <div class="modal fade" role="dialog" id="document-preview-modal">
@@ -95,26 +95,7 @@
                                 заводской номер СИ
                             </label>
                         </div>
-                        <hr />
-
-                        <div class="form-check">
-                            <label class="form-check-label">
-                                <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsCalibrationDate" />
-                                дата поверки
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <label class="form-check-label">
-                                <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsCalibrationExpireDate" />
-                                дата окончания поверки
-                            </label>
-                        </div>
-                        <div class="form-check form-group">
-                            <label class="form-check-label">
-                                <input type="checkbox" class="form-check-input" asp-for="SearchModel.IsDocumentDate" />
-                                дата документа
-                            </label>
-                        </div>
+                        
                     </form>
                 </div>
             </div>

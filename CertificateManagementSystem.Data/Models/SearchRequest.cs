@@ -15,8 +15,5 @@
         public bool IsRegisterNumber { get; set; }
         public bool IsDocumentNumber { get; set; }
         public bool IsDocumentType { get; set; }
-        public bool IsCalibrationDate { get; set; }
-        public bool IsCalibrationExpireDate { get; set; }
-        public bool IsDocumentDate { get; set; }
     }
 }
