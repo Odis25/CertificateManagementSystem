@@ -19,57 +19,23 @@ namespace CertificateManagementSystem.Services
 
         public IEnumerable<Document> Find(SearchRequest searchRequest)
         {
-            var result = new List<Document>();
+            //var result = new List<Document>();
 
             var query = searchRequest.SearchQuery.ToLower();
             var dates = ExtractDatePatterns(ref query);
 
             searchRequest.SearchQuery = query;
 
-            var keyWords = query.Split(' ');
 
-            // Поиск по датам
-            result.AddRange(SearchByDatePatterns(dates));
-            // Поиск по ключевым словам
-            result.AddRange(SearchByKeywords(searchRequest));
+            var result = SearchByKeywords(searchRequest);
+            result = result.Intersect(SearchByDatePatterns(dates));
 
-            var filtredResult = result.Where(d => keyWords.All(word =>
-            {
-                if (searchRequest.IsDocumentNumber)
-                    if (d.DocumentNumber?.ToLower().Contains(word) ?? false)
-                        return true;
-                if (searchRequest.IsYear)
-                    if (d.Contract.Year.ToString().ToLower().Contains(word))
-                        return true;
-                if (searchRequest.IsContractNumber)
-                    if (d.Contract.ContractNumber.ToString().ToLower().Contains(word))
-                        return true;
-                if (searchRequest.IsClientName)
-                    if (d.Client.Name.ToString().ToLower().Contains(word))
-                        return true;
-                if (searchRequest.IsExploitationPlace)
-                    if (d.Client.ExploitationPlace.ToString().ToLower().Contains(word))
-                        return true;
-                if (searchRequest.IsDeviceType)
-                    if (d.Device.Type.ToString().ToLower().Contains(word))
-                        return true;
-                if (searchRequest.IsDeviceName)
-                    if (d.Device.Name.ToString().ToLower().Contains(word))
-                        return true;
-                if (searchRequest.IsSerialNumber)
-                    if (d.Device.SerialNumber.ToString().ToLower().Contains(word))
-                        return true;
-                if (searchRequest.IsVerificationMethodic)
-                    if (d.Device.VerificationMethodic?.Name.ToString().ToLower().Contains(word) ?? false)
-                        return true;
-                if (searchRequest.IsRegisterNumber)
-                    if (d.Device.VerificationMethodic?.RegistrationNumber.ToString().ToLower().Contains(word) ?? false)
-                        return true;
+            //// Поиск по ключевым словам
+            //result.AddRange(SearchByKeywords(searchRequest));
+            //// Поиск по датам
+            //result.AddRange(SearchByDatePatterns(dates));
 
-                return false;
-            }));
-
-            return filtredResult;
+            return result;
         }
 
         private IEnumerable<Document> SearchByKeywords(SearchRequest request)
@@ -101,7 +67,41 @@ namespace CertificateManagementSystem.Services
                     result.AddRange(SearchInSerialNumber(word));
             }
 
-            return result;
+            return result.Where(d => keyWords.All(word =>
+            {
+                if (request.IsDocumentNumber)
+                    if (d.DocumentNumber?.ToLower().Contains(word) ?? false)
+                        return true;
+                if (request.IsYear)
+                    if (d.Contract.Year.ToString().ToLower().Contains(word))
+                        return true;
+                if (request.IsContractNumber)
+                    if (d.Contract.ContractNumber.ToString().ToLower().Contains(word))
+                        return true;
+                if (request.IsClientName)
+                    if (d.Client.Name.ToString().ToLower().Contains(word))
+                        return true;
+                if (request.IsExploitationPlace)
+                    if (d.Client.ExploitationPlace.ToString().ToLower().Contains(word))
+                        return true;
+                if (request.IsDeviceType)
+                    if (d.Device.Type.ToString().ToLower().Contains(word))
+                        return true;
+                if (request.IsDeviceName)
+                    if (d.Device.Name.ToString().ToLower().Contains(word))
+                        return true;
+                if (request.IsSerialNumber)
+                    if (d.Device.SerialNumber.ToString().ToLower().Contains(word))
+                        return true;
+                if (request.IsVerificationMethodic)
+                    if (d.Device.VerificationMethodic?.Name.ToString().ToLower().Contains(word) ?? false)
+                        return true;
+                if (request.IsRegisterNumber)
+                    if (d.Device.VerificationMethodic?.RegistrationNumber.ToString().ToLower().Contains(word) ?? false)
+                        return true;
+
+                return false;
+            }));
         }
 
         // Поиск по дате
