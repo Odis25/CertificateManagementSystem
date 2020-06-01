@@ -19,21 +19,21 @@ namespace CertificateManagementSystem.Services
 
         public IEnumerable<Document> Find(SearchRequest searchRequest)
         {
-            //var result = new List<Document>();
-
             var query = searchRequest.SearchQuery.ToLower();
             var dates = ExtractDatePatterns(ref query);
 
             searchRequest.SearchQuery = query;
 
-
+            // Поиск по ключевым словам
             var result = SearchByKeywords(searchRequest);
-            result = result.Intersect(SearchByDatePatterns(dates));
-
-            //// Поиск по ключевым словам
-            //result.AddRange(SearchByKeywords(searchRequest));
-            //// Поиск по датам
-            //result.AddRange(SearchByDatePatterns(dates));
+            // Поиск по датам
+            if (dates.Length > 0)
+            {
+                if (result.Any())
+                    result = result.Intersect(SearchByDatePatterns(dates));
+                else
+                    result = SearchByDatePatterns(dates);
+            }
 
             return result;
         }
@@ -67,7 +67,7 @@ namespace CertificateManagementSystem.Services
                     result.AddRange(SearchInSerialNumber(word));
             }
 
-            return result.Where(d => keyWords.All(word =>
+            var filtredResult = result.Where(d => keyWords.All(word =>
             {
                 if (request.IsDocumentNumber)
                     if (d.DocumentNumber?.ToLower().Contains(word) ?? false)
@@ -102,13 +102,15 @@ namespace CertificateManagementSystem.Services
 
                 return false;
             }));
+
+            return filtredResult;
         }
 
         // Поиск по дате
         private IEnumerable<Document> SearchByDatePatterns(string[] dates)
         {
             var datePattern = new Regex(@"\d{2}.\d{2}.\d{4}");
-            var rangePattern = new Regex(@"\d{2}.\d{2}.\d{4}\s?-\s?\d{2}.\d{2}.\d{4}");
+            var rangePattern = new Regex(@"\d{2}.\d{2}.\d{4}\s*-\s*\d{2}.\d{2}.\d{4}");
             var result = new List<Document>();
 
             foreach (var date in dates)
@@ -122,7 +124,7 @@ namespace CertificateManagementSystem.Services
                         d.CalibrationDate >= startRange &&
                         d.CalibrationExpireDate <= endRange);
 
-                    var notifications = _context.Documents.OfType<FailureNotification>().Where(d=>
+                    var notifications = _context.Documents.OfType<FailureNotification>().Where(d =>
                         d.DocumentDate >= startRange &&
                         d.DocumentDate <= endRange);
 
@@ -141,7 +143,7 @@ namespace CertificateManagementSystem.Services
 
                     result.AddRange(certificates);
                     result.AddRange(notifications);
-                }     
+                }
             }
 
             return result;
@@ -151,7 +153,7 @@ namespace CertificateManagementSystem.Services
         private string[] ExtractDatePatterns(ref string query)
         {
             var datePattern = new Regex(@"\d{2}.\d{2}.\d{4}");
-            var rangePattern = new Regex(@"\d{2}.\d{2}.\d{4}\s?-\s?\d{2}.\d{2}.\d{4}");
+            var rangePattern = new Regex(@"\d{2}.\d{2}.\d{4}\s*-\s*\d{2}.\d{2}.\d{4}");
             var result = new List<string>();
 
             // В строке запроса есть диапазоны дат
@@ -162,7 +164,8 @@ namespace CertificateManagementSystem.Services
                 foreach (Match match in rangeMatches)
                 {
                     query = query.Remove(query.IndexOf(match.Value), match.Value.Length);
-                    result.Add(match.Value);
+                    var res = Regex.Replace(match.Value, @"[^0-9\s-]", ".");
+                    result.Add(res);
                 }
             }
 
@@ -173,7 +176,8 @@ namespace CertificateManagementSystem.Services
                 foreach (Match match in dateMatches)
                 {
                     query = query.Remove(query.IndexOf(match.Value), match.Value.Length);
-                    result.Add(match.Value);
+                    var res = Regex.Replace(match.Value, @"[^0-9\s-]", ".");
+                    result.Add(res);
                 }
             }
 
