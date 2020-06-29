@@ -1,0 +1,27 @@
+﻿
+@model ManageAccountsModel
+
+<div class="">
+    <table class="table table-light table-hover">
+        <tbody>
+            @foreach (var user in Model.Users)
+            {
+            <tr>
+                <td>
+                    @user.Id
+                </td>
+                <td>
+                    @user.FullName
+                </td>
+                <td>
+                    @user.AccountName
+                </td>
+                <td>
+                    @user.Role
+                </td>
+            </tr>
+            }
+        </tbody>
+        
+    </table>
+</div>

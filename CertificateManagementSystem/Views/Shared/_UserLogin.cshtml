@@ -1,0 +1,32 @@
+﻿@inject Microsoft.AspNetCore.Identity.SignInManager<CertificateManagementSystem.Data.Models.ApplicationUser> SiginInManager
+@inject Microsoft.AspNetCore.Identity.UserManager<CertificateManagementSystem.Data.Models.ApplicationUser> UserManager
+
+<div id="userMenu">
+    @if (SiginInManager.IsSignedIn(User))
+    {
+        var user = UserManager.GetUserAsync(User).Result;
+        var role = UserManager.GetRolesAsync(user).Result.FirstOrDefault();
+        
+        <div class="dropdown">
+            <a class="btn" href="#" data-toggle="dropdown">
+                <div>
+                    <div id="username" class="dropdown-toggle">@user.FullName</div>
+                    <div id="role">(@role)</div>
+                </div>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" asp-controller="Account" asp-action="Logout">Выход</a>
+            </div>
+        </div>
+
+    }
+    else
+    {
+        <a class="btn" asp-controller="Account" asp-action="Login">
+            <div>
+                <div id="username">Гость</div>
+                <div id="role">(User)</div>
+            </div>
+        </a>
+    }
+</div>

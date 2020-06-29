@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/lib/jqueryui/jquery-ui.min.css" />
     <link rel="stylesheet" type="text/css" href="~/lib/datatables/css/jquery.dataTables.min.css">
-    @*<link rel="stylesheet" type="text/css" href="~/lib/select2/css/select2.css">*@
     <link rel="stylesheet" href="~/css/fonts.css" />
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
@@ -19,40 +18,35 @@
 
             <div class="row no-gutters panel-2 p-0 mainMenuBar">
 
-                <div class="col-3 d-flex">
-                    <nav class="navbar navbar-expand-md navbar-dark">
-                        <a class="navbar-brand navLogo" asp-controller="Home" asp-action="Index">
-                            <span class="logoLeft">Metrology</span>
-                            <span class="logoRight">App</span>
-                        </a>
-                    </nav>
-                </div>
-
-                <div class="col-9 d-flex">
+                <div class="col d-flex">
                     <nav class="navbar navbar-expand-md w-100 navbar-dark">
                         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                                 aria-expanded="false" aria-label="Toggle navigation">
                             <span class="navbar-toggler-icon"></span>
                         </button>
+
+                        <a class="navbar-brand navLogo" asp-controller="Home" asp-action="Index">
+                            <span class="logoLeft">Metrology</span>
+                            <span class="logoRight">App</span>
+                        </a>
+
                         <div class="collapse navbar-collapse ">
                             <ul class="navbar-nav flex-grow-1">
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Home" asp-action="Index">
-                                        Главная
-                                    </a>
-                                </li>
+                               
                                 <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">Добавить</a>
+                                    <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">Новый документ</a>
                                     <div class="dropdown-menu">
                                         <a class="dropdown-item" asp-controller="Document" asp-action="Create" asp-route-type="Certificate">Свидетельство</a>
                                         <a class="dropdown-item" asp-controller="Document" asp-action="Create" asp-route-type="FailureNotification">Извещение о непригодности</a>
                                     </div>
                                 </li>
+
                                 <li class="nav-item">
                                     <a class="nav-link" asp-controller="Document" asp-action="Index">
                                         Каталог
                                     </a>
                                 </li>
+
                                 <li class="nav-item">
                                     <a class="nav-link" asp-controller="Search" asp-action="Index">
                                         Поиск
@@ -64,11 +58,10 @@
                                     </a>
                                 </li>
                             </ul>
-                            <partial name="_SearchBar" model="new SearchModel()"/>
-                            
-                            <div id="userMenu">
-                                <a class="btn" asp-controller="Account" asp-action="Login">Буданов Артем</a>
-                            </div>
+                            <partial name="_SearchBar" model="new SearchModel()" />
+
+                            <partial name="_UserLogin" />
+
                         </div>
                     </nav>
                 </div>
@@ -85,7 +78,6 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/jqueryui/jquery-ui.min.js"></script>
-    @*<script src="~/lib/select2/js/select2.js"></script>*@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" charset="utf8" src="~/lib/datatables/js/jquery.dataTables.min.js"></script>
 

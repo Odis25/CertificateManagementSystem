@@ -24,20 +24,20 @@ $(document).ready(function () {
     }, 7000);
 
     // Показать или скрыть меню фильтрации поиска
-    document.querySelector('#search-bar-settings').addEventListener('click', function () {
+    //document.querySelector('#search-bar-settings').addEventListener('click', function () {
 
-        const filter = document.querySelector('.search-bar .search-bar-filter');
-        const searchbar = document.querySelector('.search-bar');
-        const searchbarCss = getComputedStyle(searchbar);
-        const width = searchbarCss.width;
+    //    const filter = document.querySelector('.search-bar .search-bar-filter');
+    //    const searchbar = document.querySelector('.search-bar');
+    //    const searchbarCss = getComputedStyle(searchbar);
+    //    const width = searchbarCss.width;
 
-        if (width == '200px') {
-            searchbar.style.width = '350px';
-        }
+    //    if (width == '200px') {
+    //        searchbar.style.width = '350px';
+    //    }
 
-        document.addEventListener('mouseup', LostFocus);
-        filter.classList.toggle('active');
-    })
+    //    document.addEventListener('mouseup', LostFocus);
+    //    filter.classList.toggle('active');
+    //})
 
     // Выбор или снятие всех чекбоксов в меню фильтрации поиска
     document.querySelector('#select-all-checkbox').addEventListener('change', function () {
@@ -59,7 +59,11 @@ $(document).ready(function () {
     document.querySelector('.search-bar').addEventListener('focus', function (e) {
         const searchbar = document.querySelector('.search-bar');
         const filter = document.querySelector('.search-bar .search-bar-filter');
+        const prepend = document.querySelector('.search-bar .input-group-text');
+        const input = document.querySelector('.search-bar input');
 
+        prepend.style.background = "#fff url('../icons/icons8_search_24px.png') no-repeat center";
+        input.style.background = '#fff';
         searchbar.style.width = '350px';
         document.addEventListener('mouseup', LostFocus);
         filter.classList.add('active');
@@ -70,8 +74,12 @@ $(document).ready(function () {
 function LostFocus(e) {
     const searchbar = document.querySelector('.search-bar');
     const filter = document.querySelector('.search-bar-filter');
+    const prepend = document.querySelector('.search-bar .input-group-text');
+    const input = document.querySelector('.search-bar input');
 
     if (!searchbar.isSameNode(e.target) && !searchbar.contains(e.target)) {
+        prepend.style.background = "transparent url('../icons/icons8_search_24px_1.png') no-repeat center";
+        input.style.background = 'transparent';
         searchbar.style.width = '200px';
         filter.classList.remove('active');
         document.removeEventListener('mouseup', LostFocus);

@@ -18,8 +18,8 @@ html {
 body {
     font-family: 'Roboto';
     height: 100%;
-    background-image: url('../img/Themes/clouds.jpg');
-    background-color: #eee;
+    /*background-image: url('../img/Themes/clouds.jpg');*/
+    background-color: #aaa;
     background-size: auto;
     background-repeat: no-repeat;
     background-attachment: fixed;
@@ -54,13 +54,13 @@ a {
 
 /*---- Секции и контейнеры ----*/
 #header {
-    height: 10vh;
+    height: 7vh;
     padding: 5px;
 }
 
 #main {
     padding: 5px;
-    height: 90vh;
+    height: 93vh;
 }
 
 .mainContainer {
@@ -79,6 +79,7 @@ a {
     font-weight: bold;
     font-size: 1.5em;
     text-shadow: 2px 2px 4px #888;
+    margin-right: 50px;
 }
 
     .navLogo .logoLeft {
@@ -94,7 +95,9 @@ a {
     }
 
 /*---- Главное меню ----*/
-
+#header .navbar{
+    padding: 0 1rem;
+}
 #header .nav-link {
     padding: 10px 20px;
     font-weight: bold;
@@ -107,18 +110,16 @@ a {
 
 #userMenu {
     color: white;
-    padding: 5px;
-    padding-right: 5px;
+    padding: 0px;
     height: 100%;
 }
 
-    #userMenu a {
+    #userMenu a.btn {
         font-style: normal;
         color: white;
         background: url('../icons/icons8_male_user_36px.png') no-repeat;
         background-position: left;
         padding: 5px 10px 5px 40px;
-        height: 36px;
         display: inline-block;
         border-radius: 3px;
     }
@@ -126,6 +127,9 @@ a {
         #userMenu a:hover {
             transition: all ease-in 0.1s;
             background-color: #555;
+        }
+        #role{
+            font-size: 12px;
         }
 
 /*---- Панели ----*/
@@ -472,31 +476,28 @@ span.file {
         transition: all ease-in 0.1s;
     }
 
+    .search-bar .input-group{
+        border-bottom: 2px solid #ccc;
+    }
+
     .search-bar input {
         border-right: none;
         border-left: none;
         border-bottom: none;
+
+        border: none;
+        background-color: transparent;
     }
 
         .search-bar input:focus {
-            background-color: #fff;
             box-shadow: none;
         }
 
     .search-bar .input-group-text {
-        border-radius: 5px 0 0 5px;
-        background: url('../icons/icons8_search_24px.png') no-repeat center;
-        background-color: #fff;
+        background: url('../icons/icons8_search_24px_1.png') no-repeat center;
         padding: 0px 15px;
+        border: none;
     }
-
-#search-bar-settings {
-    background: url('../icons/icons8_adjust_16px.png') no-repeat center;
-    background-color: #fff;
-    border-radius: 0 5px 5px 0;
-    cursor: pointer;
-}
-
 
 /*---- страница результатов поиска ----*/
 .search-header {
