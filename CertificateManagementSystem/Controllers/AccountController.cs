@@ -1,8 +1,11 @@
 ﻿using CertificateManagementSystem.Data;
 using CertificateManagementSystem.Data.Models;
+using CertificateManagementSystem.Extensions;
 using CertificateManagementSystem.Models.Account;
+using CertificateManagementSystem.Services.Components;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Linq;
@@ -15,15 +18,15 @@ namespace CertificateManagementSystem.Controllers
         private readonly ILDAPService _users;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
-        //private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public AccountController(ILDAPService users, SignInManager<ApplicationUser> signInManager,
-            UserManager<ApplicationUser> userManager)//, RoleManager<IdentityRole> roleManager)
+            UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _users = users;
             _signInManager = signInManager;
             _userManager = userManager;
-            //_roleManager = roleManager;
+            _roleManager = roleManager;
         }
 
         public IActionResult Login()
@@ -40,7 +43,7 @@ namespace CertificateManagementSystem.Controllers
                 try
                 {
                     // Получаем пользователя
-                    var user = _users.Login(model.UserLogin, model.UserPassword);
+                    var user = await _users.Login(model.UserLogin, model.UserPassword);
                     if (user == null)
                     {
                         ModelState.AddModelError("", "Неправильный логин и(или) пароль.");
@@ -85,7 +88,8 @@ namespace CertificateManagementSystem.Controllers
                 AccountName = u.UserName,
                 FullName = u.FullName,
                 Role = GetRole(u).Result
-            });
+            }).ToList();
+
             var model = new ManageAccountsModel
             {
                 Users = result
@@ -94,10 +98,49 @@ namespace CertificateManagementSystem.Controllers
             return View(model);
         }
 
-        private async Task<string> GetRole(ApplicationUser user)
+        [HttpPost]
+        public async Task<IActionResult> ManageAccounts(ManageAccountsModel model)
         {
+            try
+            {
+                foreach (var user in model.Users)
+                {
+                    await ChangeUserRole(user.Id, user.Role.ToString());
+                }
+                this.AddAlertSuccess("Изменения сохранены");
+            }
+            catch(Exception e)
+            {
+                this.AddAlertDanger(e.Message);
+            }
+            return RedirectToAction("ManageAccounts");
+        }
 
-            return (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+        // Изменить роль пользователя
+        private async Task ChangeUserRole(string userId, string newRole)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            var role = (await _userManager.GetRolesAsync(user))[0];
+
+            if (role == newRole)
+                return;
+
+            await _userManager.RemoveFromRoleAsync(user, role);
+            await _userManager.AddToRoleAsync(user, newRole);
+
+        }
+        // Получить роль пользователя
+        private async Task<UserRole> GetRole(ApplicationUser user)
+        {
+            var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+            return role switch
+            {
+                "Admin" => UserRole.Admin,
+                "Metrologist" => UserRole.Metrologist,
+                "Specialist" => UserRole.Specialist,
+                "User" => UserRole.User,
+                _ => UserRole.User,
+            };
         }
     }
 }

@@ -29,6 +29,7 @@ namespace CertificateManagementSystem.Data
             var hasAdminRole = _context.Roles.Any(r => r.Name == "Admin");
             var hasMetrologistRole = _context.Roles.Any(r => r.Name == "Metrologist");
             var hasSpecialistRole = _context.Roles.Any(r => r.Name == "Specialist");
+            var hasUserRole = _context.Roles.Any(r => r.Name == "User");
 
             if (!hasAdminRole)
                 await roleStore.CreateAsync(new IdentityRole { Name = "Admin", NormalizedName = "admin" });
@@ -38,6 +39,9 @@ namespace CertificateManagementSystem.Data
 
             if (!hasSpecialistRole)
                 await roleStore.CreateAsync(new IdentityRole { Name = "Specialist", NormalizedName = "specialist" });
+            
+            if (!hasUserRole)
+                await roleStore.CreateAsync(new IdentityRole { Name = "User", NormalizedName = "user" });
 
             await _context.SaveChangesAsync();
         }

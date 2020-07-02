@@ -1,27 +1,61 @@
 ﻿
 @model ManageAccountsModel
 
-<div class="">
-    <table class="table table-light table-hover">
-        <tbody>
-            @foreach (var user in Model.Users)
-            {
-            <tr>
-                <td>
-                    @user.Id
-                </td>
-                <td>
-                    @user.FullName
-                </td>
-                <td>
-                    @user.AccountName
-                </td>
-                <td>
-                    @user.Role
-                </td>
-            </tr>
-            }
-        </tbody>
-        
-    </table>
+
+<div class="alerts-container clearfix">
+    <alerts></alerts>
 </div>
+
+<div class="container-fluid mainContainer">
+    <form asp-action="ManageAccounts" method="post">
+        <div class="page-header">
+            <h5>Управление пользователями</h5>
+        </div>
+        <table class="table table-sm table-light" id="user-list">
+            <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Аккаунт</th>
+                    <th>Имя пользователя</th>
+                    <th>Уровень доступа</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Users.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            @(i+1)
+                        </td>
+                        <td>
+                            @Model.Users[i].AccountName
+                        </td>
+                        <td>
+                            @Model.Users[i].FullName
+                        </td>
+                        <td>
+                            <select class="form-control" asp-for="Users[i].Role" asp-items="@Html.GetEnumSelectList<UserRole>()"></select>
+                            <input type="hidden" asp-for="Users[i].Id" />
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+        <div class="text-center p-2">
+            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts
+{
+    <script>
+        $('#user-list').DataTable({
+            paging: false,
+            searching: false,
+            info: false,
+            scrollY: '66.5vh'
+        });
+    </script>
+}

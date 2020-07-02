@@ -1,10 +1,12 @@
 ﻿using CertificateManagementSystem.Data;
 using CertificateManagementSystem.Data.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace CertificateManagementSystem.Services
 {
@@ -23,7 +25,7 @@ namespace CertificateManagementSystem.Services
             _context = context;
         }
 
-        public ApplicationUser Login(string userName, string userPassword)
+        public async Task<ApplicationUser> Login(string userName, string userPassword)
         {
             using (var context = new PrincipalContext(ContextType.Domain, "INCOMSYSTEM.ru"))
             {
@@ -53,8 +55,10 @@ namespace CertificateManagementSystem.Services
                                 var displayName = result.Properties[DisplayNameAttribute][0].ToString();
                                 //var email = result.Properties[MailAttribute][0].ToString();
 
-                                var user = _context.ApplicationUsers.FirstOrDefault(u => u.UserName == accountName) ??
-                                    new ApplicationUser
+                                var user = _context.ApplicationUsers.FirstOrDefault(u => u.UserName == accountName);
+                                if (user == null)
+                                {
+                                    user = new ApplicationUser
                                     {
                                         UserName = accountName,
                                         NormalizedUserName = accountName.ToLower(),
@@ -63,7 +67,9 @@ namespace CertificateManagementSystem.Services
                                         ConcurrencyStamp = Guid.NewGuid().ToString(),
                                         FullName = displayName
                                     };
-
+                                    var userStore = new UserStore<ApplicationUser>(_context);
+                                    await userStore.CreateAsync(user);
+                                }
                                 return user;
                             }
                         }
@@ -76,41 +82,43 @@ namespace CertificateManagementSystem.Services
 
         public IEnumerable<ApplicationUser> GetApplicationUsers()
         {
-            using (var entry = new DirectoryEntry("LDAP://incomsystem.ru", "INCOMSYSTEM\\budanovav", "Narutaru25@"))
-            {
-                using (var searcher = new DirectorySearcher(entry))
-                {
-                    searcher.Filter = $"(&(objectClass=user)(sn=*))";
-                    // Получаемые свойства
-                    searcher.PropertiesToLoad.Add(SAMAccountNameAttribute);
-                    searcher.PropertiesToLoad.Add(DisplayNameAttribute);
-                    searcher.PropertiesToLoad.Add(GivenNameAttribute);
-                    searcher.PropertiesToLoad.Add(SnAttribute);
-                    //searcher.PropertiesToLoad.Add(MailAttribute);
+            //using (var entry = new DirectoryEntry("LDAP://incomsystem.ru", "INCOMSYSTEM\\budanovav", "Narutaru25@"))
+            //{
+            //    using (var searcher = new DirectorySearcher(entry))
+            //    {
+            //        searcher.Filter = $"(&(objectClass=user)(sn=*))";
+            //        // Получаемые свойства
+            //        searcher.PropertiesToLoad.Add(SAMAccountNameAttribute);
+            //        searcher.PropertiesToLoad.Add(DisplayNameAttribute);
+            //        searcher.PropertiesToLoad.Add(GivenNameAttribute);
+            //        searcher.PropertiesToLoad.Add(SnAttribute);
+            //        //searcher.PropertiesToLoad.Add(MailAttribute);
 
-                    var users = searcher.FindAll();
-                    var appUsers = new List<ApplicationUser>();
+            //        var users = searcher.FindAll();
+            //        var appUsers = new List<ApplicationUser>();
 
-                    foreach (SearchResult user in users)
-                    {
-                        var accountName = user.Properties[SAMAccountNameAttribute][0].ToString();
-                        var displayName = user.Properties[DisplayNameAttribute][0].ToString();
-                        //var email = user.Properties[MailAttribute][0].ToString();
+            //        foreach (SearchResult user in users)
+            //        {
+            //            var accountName = user.Properties[SAMAccountNameAttribute][0].ToString();
+            //            var displayName = user.Properties[DisplayNameAttribute][0].ToString();
+            //            //var email = user.Properties[MailAttribute][0].ToString();
 
-                        var appUser = new ApplicationUser
-                        {
-                            UserName = accountName,
-                            NormalizedUserName = accountName.ToLower(),
-                            //Email = email,
-                            //NormalizedEmail = email.ToLower(),
-                            ConcurrencyStamp = Guid.NewGuid().ToString(),
-                            FullName = displayName
-                        };
-                        appUsers.Add(appUser);
-                    }
-                    return appUsers;
-                }
-            }
+            //            var appUser = new ApplicationUser
+            //            {
+            //                UserName = accountName,
+            //                NormalizedUserName = accountName.ToLower(),
+            //                //Email = email,
+            //                //NormalizedEmail = email.ToLower(),
+            //                ConcurrencyStamp = Guid.NewGuid().ToString(),
+            //                FullName = displayName
+            //            };
+            //            appUsers.Add(appUser);
+            //        }
+            //        return appUsers;
+            //    }
+            //}
+
+            return _context.ApplicationUsers;
         }
     }
 }

@@ -6,12 +6,32 @@
     {
         var user = UserManager.GetUserAsync(User).Result;
         var role = UserManager.GetRolesAsync(user).Result.FirstOrDefault();
-        
+        string displayedRole;
+        switch (role)
+        {
+            case "Admin":
+                displayedRole = "Администратор";
+                break;
+            case "Metrologist":
+                displayedRole = "Метролог";
+                break;
+            case "Specialist":
+                displayedRole = "Сотрудник ТОиС";
+                break;
+            case "User":
+                displayedRole = "Пользователь";
+                break;
+            default:
+                displayedRole = "Пользователь";
+                break;
+        }
+
         <div class="dropdown">
             <a class="btn" href="#" data-toggle="dropdown">
                 <div>
                     <div id="username" class="dropdown-toggle">@user.FullName</div>
-                    <div id="role">(@role)</div>
+                    <div id="role">@*(@Enum.GetName(typeof(UserRole), Enum.Parse(typeof(UserRole), role)))*@</div>
+                    <div id="role">(@displayedRole)</div>
                 </div>
             </a>
             <div class="dropdown-menu dropdown-menu-right">

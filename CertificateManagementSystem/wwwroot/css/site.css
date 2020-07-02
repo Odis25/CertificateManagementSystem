@@ -73,6 +73,16 @@ a {
     }
 }
 
+.page-header {
+    background-color: rgba(0,0,0,0.7);
+    padding: 1.3rem;
+}
+.page-header h5{
+    color: #fff;
+    font-family: 'Roboto';
+
+}
+
 /*---- Логотип ----*/
 .navLogo {
     font-family: 'Roboto Mono';
@@ -95,17 +105,29 @@ a {
     }
 
 /*---- Главное меню ----*/
-#header .navbar{
+#header .navbar {
     padding: 0 1rem;
 }
+
 #header .nav-link {
     padding: 10px 20px;
     font-weight: bold;
     font-family: 'Roboto mono'
 }
 
-    #header .nav-link:hover {
-        background-color: #666;
+#header .dropdown-menu {
+    background-color: #444;
+    border-radius: 3px;
+    box-shadow: 5px 5px 5px rgba(0,0,0,0.5);
+}
+
+#header .dropdown-item {
+    color: #ccc;
+}
+
+    #header .dropdown-item:hover {
+        background-color: #c7e571;
+        color: #000;
     }
 
 #userMenu {
@@ -124,13 +146,15 @@ a {
         border-radius: 3px;
     }
 
-        #userMenu a:hover {
-            transition: all ease-in 0.1s;
-            background-color: #555;
-        }
-        #role{
-            font-size: 12px;
-        }
+    #userMenu a:hover, #userMenu a:focus {
+        transition: all ease-in 0.1s;
+        background-color: #444;
+        box-shadow: none;
+    }
+
+#role {
+    font-size: 12px;
+}
 
 /*---- Панели ----*/
 .section {
@@ -476,7 +500,7 @@ span.file {
         transition: all ease-in 0.1s;
     }
 
-    .search-bar .input-group{
+    .search-bar .input-group {
         border-bottom: 2px solid #ccc;
     }
 
@@ -484,7 +508,6 @@ span.file {
         border-right: none;
         border-left: none;
         border-bottom: none;
-
         border: none;
         background-color: transparent;
     }
@@ -534,7 +557,8 @@ span.file {
         font-style: italic;
         text-align: left;
     }
-#search-result-holder{
+
+#search-result-holder {
     background: #e8e8e8;
     padding: 10px 20px;
     height: 91%;
