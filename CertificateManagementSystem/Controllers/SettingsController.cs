@@ -1,4 +1,5 @@
 ﻿using CertificateManagementSystem.Models.Settings;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -6,6 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace CertificateManagementSystem.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class SettingsController: Controller
     {
         private IOptions<ApplicationOptions> _options;

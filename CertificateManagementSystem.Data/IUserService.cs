@@ -4,8 +4,9 @@ using System.Threading.Tasks;
 
 namespace CertificateManagementSystem.Data
 {
-    public interface ILDAPService
+    public interface IUserService
     {
+        Task ChangeUserRole(string userId, string newRole);
         Task<ApplicationUser> Login(string userName, string userPassword);
         IEnumerable<ApplicationUser> GetApplicationUsers();
     }

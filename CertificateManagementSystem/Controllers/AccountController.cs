@@ -3,10 +3,9 @@ using CertificateManagementSystem.Data.Models;
 using CertificateManagementSystem.Extensions;
 using CertificateManagementSystem.Models.Account;
 using CertificateManagementSystem.Services.Components;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,25 +14,25 @@ namespace CertificateManagementSystem.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly ILDAPService _users;
+        private readonly IUserService _userService;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AccountController(ILDAPService users, SignInManager<ApplicationUser> signInManager,
-            UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public AccountController(IUserService users, SignInManager<ApplicationUser> signInManager,
+            UserManager<ApplicationUser> userManager)
         {
-            _users = users;
+            _userService = users;
             _signInManager = signInManager;
             _userManager = userManager;
-            _roleManager = roleManager;
         }
 
+        // Страница входа в приложение
         public IActionResult Login()
         {
             return View(new LoginModel());
         }
 
+        // Вход в приложение
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginModel model)
@@ -43,18 +42,11 @@ namespace CertificateManagementSystem.Controllers
                 try
                 {
                     // Получаем пользователя
-                    var user = await _users.Login(model.UserLogin, model.UserPassword);
+                    var user = await _userService.Login(model.UserLogin, model.UserPassword);
                     if (user == null)
                     {
                         ModelState.AddModelError("", "Неправильный логин и(или) пароль.");
                         return View();
-                    }
-
-                    // Проверяем роль пользователя
-                    var roles = await _userManager.GetRolesAsync(user);
-                    if (!roles.Any())
-                    {
-                        await _userManager.AddToRoleAsync(user, "User");
                     }
 
                     // Авторизуем пользователя в программе
@@ -71,6 +63,7 @@ namespace CertificateManagementSystem.Controllers
             return View();
         }
 
+        // Выход из приложения
         public async Task<IActionResult> Logout()
         {
             var returnUrl = HttpContext.Request.Headers["Referer"];
@@ -79,9 +72,10 @@ namespace CertificateManagementSystem.Controllers
         }
 
         // Управление правами пользователей
+        [Authorize(Roles = "Admin, Metrologist, Specialist")]
         public IActionResult ManageAccounts()
         {
-            var users = _users.GetApplicationUsers();
+            var users = _userService.GetApplicationUsers();
             var result = users.Select(u => new UserModel
             {
                 Id = u.Id,
@@ -98,14 +92,20 @@ namespace CertificateManagementSystem.Controllers
             return View(model);
         }
 
+        // Изменение прав пользователей
         [HttpPost]
         public async Task<IActionResult> ManageAccounts(ManageAccountsModel model)
         {
             try
             {
+                var currentUser = await _userManager.GetUserAsync(User);
                 foreach (var user in model.Users)
                 {
-                    await ChangeUserRole(user.Id, user.Role.ToString());
+                    await _userService.ChangeUserRole(user.Id, user.Role.ToString());
+                    if (user.Id == currentUser.Id)
+                    {
+                        await _signInManager.RefreshSignInAsync(currentUser);
+                    }
                 }
                 this.AddAlertSuccess("Изменения сохранены");
             }
@@ -116,19 +116,12 @@ namespace CertificateManagementSystem.Controllers
             return RedirectToAction("ManageAccounts");
         }
 
-        // Изменить роль пользователя
-        private async Task ChangeUserRole(string userId, string newRole)
+        // Доступ запрещен
+        public IActionResult AccessDenied()
         {
-            var user = await _userManager.FindByIdAsync(userId);
-            var role = (await _userManager.GetRolesAsync(user))[0];
-
-            if (role == newRole)
-                return;
-
-            await _userManager.RemoveFromRoleAsync(user, role);
-            await _userManager.AddToRoleAsync(user, newRole);
-
+            return View();
         }
+
         // Получить роль пользователя
         private async Task<UserRole> GetRole(ApplicationUser user)
         {

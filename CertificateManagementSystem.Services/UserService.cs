@@ -1,5 +1,6 @@
 ﻿using CertificateManagementSystem.Data;
 using CertificateManagementSystem.Data.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace CertificateManagementSystem.Services
 {
-    public class LDAPService : ILDAPService
+    public class UserService : IUserService
     {
         private const string DisplayNameAttribute = "DisplayName";
         private const string GivenNameAttribute = "GivenName";
@@ -19,10 +20,16 @@ namespace CertificateManagementSystem.Services
         private const string SAMAccountNameAttribute = "SAMAccountName";
 
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public LDAPService(ApplicationDbContext context)
+        public UserService(ApplicationDbContext context,
+            UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager)
         {
             _context = context;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         public async Task<ApplicationUser> Login(string userName, string userPassword)
@@ -45,7 +52,6 @@ namespace CertificateManagementSystem.Services
                             searcher.PropertiesToLoad.Add(DisplayNameAttribute);
                             searcher.PropertiesToLoad.Add(GivenNameAttribute);
                             searcher.PropertiesToLoad.Add(SnAttribute);
-                            //searcher.PropertiesToLoad.Add(MailAttribute);
 
                             var result = searcher.FindOne();
 
@@ -53,7 +59,6 @@ namespace CertificateManagementSystem.Services
                             {
                                 var accountName = result.Properties[SAMAccountNameAttribute][0].ToString();
                                 var displayName = result.Properties[DisplayNameAttribute][0].ToString();
-                                //var email = result.Properties[MailAttribute][0].ToString();
 
                                 var user = _context.ApplicationUsers.FirstOrDefault(u => u.UserName == accountName);
                                 if (user == null)
@@ -62,13 +67,12 @@ namespace CertificateManagementSystem.Services
                                     {
                                         UserName = accountName,
                                         NormalizedUserName = accountName.ToLower(),
-                                        //Email = email,
-                                        //NormalizedEmail = email.ToLower(),
                                         ConcurrencyStamp = Guid.NewGuid().ToString(),
                                         FullName = displayName
                                     };
                                     var userStore = new UserStore<ApplicationUser>(_context);
                                     await userStore.CreateAsync(user);
+                                    await _userManager.AddToRoleAsync(user, "User");
                                 }
                                 return user;
                             }
@@ -80,44 +84,21 @@ namespace CertificateManagementSystem.Services
             return null;
         }
 
+        // Изменить роль пользователя
+        public async Task ChangeUserRole(string userId, string newRole)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            var role = (await _userManager.GetRolesAsync(user))[0];
+
+            if (role == newRole)
+                return;
+
+            await _userManager.RemoveFromRoleAsync(user, role);
+            await _userManager.AddToRoleAsync(user, newRole);
+        }
+
         public IEnumerable<ApplicationUser> GetApplicationUsers()
         {
-            //using (var entry = new DirectoryEntry("LDAP://incomsystem.ru", "INCOMSYSTEM\\budanovav", "Narutaru25@"))
-            //{
-            //    using (var searcher = new DirectorySearcher(entry))
-            //    {
-            //        searcher.Filter = $"(&(objectClass=user)(sn=*))";
-            //        // Получаемые свойства
-            //        searcher.PropertiesToLoad.Add(SAMAccountNameAttribute);
-            //        searcher.PropertiesToLoad.Add(DisplayNameAttribute);
-            //        searcher.PropertiesToLoad.Add(GivenNameAttribute);
-            //        searcher.PropertiesToLoad.Add(SnAttribute);
-            //        //searcher.PropertiesToLoad.Add(MailAttribute);
-
-            //        var users = searcher.FindAll();
-            //        var appUsers = new List<ApplicationUser>();
-
-            //        foreach (SearchResult user in users)
-            //        {
-            //            var accountName = user.Properties[SAMAccountNameAttribute][0].ToString();
-            //            var displayName = user.Properties[DisplayNameAttribute][0].ToString();
-            //            //var email = user.Properties[MailAttribute][0].ToString();
-
-            //            var appUser = new ApplicationUser
-            //            {
-            //                UserName = accountName,
-            //                NormalizedUserName = accountName.ToLower(),
-            //                //Email = email,
-            //                //NormalizedEmail = email.ToLower(),
-            //                ConcurrencyStamp = Guid.NewGuid().ToString(),
-            //                FullName = displayName
-            //            };
-            //            appUsers.Add(appUser);
-            //        }
-            //        return appUsers;
-            //    }
-            //}
-
             return _context.ApplicationUsers;
         }
     }

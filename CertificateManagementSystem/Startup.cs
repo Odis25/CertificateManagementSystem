@@ -35,17 +35,13 @@ namespace CertificateManagementSystem
             services.AddSession();
 
             services.AddControllersWithViews()
-                //.AddNewtonsoftJson(options =>
-                //{
-                //    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-                //})
                     .AddRazorRuntimeCompilation();
 
             services.Configure<ApplicationOptions>(Configuration.GetSection("Paths"));
 
             services.AddScoped<IDocumentService, DocumentService>();
             services.AddScoped<IFileService, FileService>();
-            services.AddScoped<ILDAPService, LDAPService>();
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<ISearchService, SearchService>();
             services.AddScoped<DataSeeder>();
         }

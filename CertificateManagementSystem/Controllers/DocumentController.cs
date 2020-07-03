@@ -3,6 +3,7 @@ using CertificateManagementSystem.Data.Models;
 using CertificateManagementSystem.Extensions;
 using CertificateManagementSystem.Models.Document;
 using CertificateManagementSystem.Services.Components;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -144,6 +145,7 @@ namespace CertificateManagementSystem.Controllers
 
         // Создание нового документа
         [HttpGet]
+        [Authorize(Roles = "Admin, Metrologist")]
         public IActionResult Create(DocumentType type)
         {
             CreateSelectLists();
@@ -162,6 +164,7 @@ namespace CertificateManagementSystem.Controllers
 
         // Создание нового документа
         [HttpPost]
+        [Authorize(Roles = "Admin, Metrologist")]
         public async Task<IActionResult> Create(CreateDocumentModel model)
         {
             var newDocument = CreateDocument(model);
