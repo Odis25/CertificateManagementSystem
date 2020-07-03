@@ -1,5 +1,6 @@
 using CertificateManagementSystem.Data;
 using CertificateManagementSystem.Data.Models;
+using CertificateManagementSystem.Models.Settings;
 using CertificateManagementSystem.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -37,7 +38,7 @@ namespace CertificateManagementSystem
             services.AddControllersWithViews()
                     .AddRazorRuntimeCompilation();
 
-            services.Configure<ApplicationOptions>(Configuration.GetSection("Paths"));
+            services.Configure<SettingsModel>(Configuration.GetSection("Paths"));
 
             services.AddScoped<IDocumentService, DocumentService>();
             services.AddScoped<IFileService, FileService>();
@@ -82,7 +83,9 @@ namespace CertificateManagementSystem
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapDefaultControllerRoute();
+                endpoints.MapControllerRoute(
+                    name:"default",
+                    pattern: "{controller=Document}/{action=Index}/{id?}");
             });
         }
     }

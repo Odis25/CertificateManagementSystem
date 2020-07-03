@@ -1,4 +1,5 @@
-﻿using CertificateManagementSystem.Models.Settings;
+﻿using CertificateManagementSystem.Extensions;
+using CertificateManagementSystem.Models.Settings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -10,9 +11,9 @@ namespace CertificateManagementSystem.Controllers
     [Authorize(Roles = "Admin")]
     public class SettingsController: Controller
     {
-        private IOptions<ApplicationOptions> _options;
+        private IOptions<SettingsModel> _options;
 
-        public SettingsController(IOptions<ApplicationOptions> options )
+        public SettingsController(IOptions<SettingsModel> options )
         {
             _options = options;
         }
@@ -20,15 +21,11 @@ namespace CertificateManagementSystem.Controllers
         // Открываем окно настроек
         public IActionResult Index()
         {
-            var documentFolder = _options.Value.DocumentsFolder;
-            var reserveFolder = _options.Value.ReserveFolder;
-            var methodicsFolder = _options.Value.MethodicsFolder;
-
             var model = new SettingsModel
             {
-                DocumentsFolder = documentFolder,
-                ReserveFolder = reserveFolder,
-                MethodicsFolder = methodicsFolder
+                DocumentsFolder = _options.Value.DocumentsFolder,
+                ReserveFolder = _options.Value.ReserveFolder,
+                MethodicsFolder = _options.Value.MethodicsFolder
             };
             return View(model);
         }
@@ -59,7 +56,9 @@ namespace CertificateManagementSystem.Controllers
             // Сохраняем файл с новыми настройками
             System.IO.File.WriteAllText("appsettings.json", jsonString);
 
-            return RedirectToAction("Index", "Home");
+            this.AddAlertSuccess("Новые настройки сохранены");
+
+            return RedirectToAction("Index", "Settings");
         }
     }
 }
