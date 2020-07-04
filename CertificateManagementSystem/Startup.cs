@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using System.IO;
 
 namespace CertificateManagementSystem
 {
@@ -45,6 +46,8 @@ namespace CertificateManagementSystem
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ISearchService, SearchService>();
             services.AddScoped<DataSeeder>();
+
+            services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Configuration.GetSection("Paths").GetSection("MethodicsFolder").Value));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -64,17 +67,29 @@ namespace CertificateManagementSystem
             app.UseHttpsRedirection();
 
             app.UseStaticFiles();
-            app.UseStaticFiles(new StaticFileOptions
+            if (Directory.Exists(Configuration.GetSection("Paths").GetSection("DocumentsFolder").Value))
             {
-                FileProvider = new PhysicalFileProvider(Configuration.GetSection("Paths").GetSection("DocumentsFolder").Value),
-                RequestPath = new PathString("/fileserver")
-            });
+                app.UseStaticFiles(new StaticFileOptions
+                {
+                    FileProvider = new PhysicalFileProvider(Configuration.GetSection("Paths").GetSection("DocumentsFolder").Value),
+                    RequestPath = new PathString("/documentsFolder")
+                });
+            }
+
+            if (Directory.Exists(Configuration.GetSection("Paths").GetSection("MethodicsFolder").Value))
+            {
+                app.UseStaticFiles(new StaticFileOptions
+                {
+                    FileProvider = new PhysicalFileProvider(Configuration.GetSection("Paths").GetSection("MethodicsFolder").Value),
+                    RequestPath = new PathString("/methodicsFolder")
+                });
+            }
 
             app.UseRouting();
 
             // Первичное заполнение базы данных
             dataSeeder.SeedDataBase();
-            
+
             // Аутентификация 
             app.UseAuthentication();
 
@@ -84,7 +99,7 @@ namespace CertificateManagementSystem
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
-                    name:"default",
+                    name: "default",
                     pattern: "{controller=Document}/{action=Index}/{id?}");
             });
         }

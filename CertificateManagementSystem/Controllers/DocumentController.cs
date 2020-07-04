@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,15 +27,17 @@ namespace CertificateManagementSystem.Controllers
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _appEnvironment;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IFileProvider _fileProvider;
 
         public DocumentController(IDocumentService documents, IFileService files,
-            IConfiguration configuration, IWebHostEnvironment appEnvironment, UserManager<ApplicationUser> userManager)
+            IConfiguration configuration, IWebHostEnvironment appEnvironment, UserManager<ApplicationUser> userManager, IFileProvider fileProvider)
         {
             _configuration = configuration;
             _documents = documents;
             _files = files;
             _appEnvironment = appEnvironment;
             _userManager = userManager;
+            _fileProvider = fileProvider;
         }
 
         // Построение дерева навигации по документам
@@ -78,7 +82,7 @@ namespace CertificateManagementSystem.Controllers
         {
             var document = _documents.GetDocumentById(id);
 
-            var filePath = Path.Combine("/fileserver", document.DocumentFile.Path);
+            var filePath = Path.Combine("/documentsFolder", document.DocumentFile.Path);
 
             var model = new DocumentListingModel
             {
@@ -229,7 +233,8 @@ namespace CertificateManagementSystem.Controllers
             ViewBag.ExploitationPlaces = new SelectList(exploitationPlaces);
             ViewBag.DeviceNames = new SelectList(deviceNames);
             ViewBag.DeviceTypes = new SelectList(deviceTypes);
-            ViewBag.VerificationMethodics = new SelectList(verificationMethodics);
+            //ViewBag.VerificationMethodics = new SelectList(verificationMethodics);
+            ViewBag.VerificationMethodics = new SelectList(GetMethodics());
             ViewBag.RegisterNumbers = new SelectList(registerNumbers);
         }
 
@@ -390,6 +395,14 @@ namespace CertificateManagementSystem.Controllers
             }
 
             return filePath;
+        }
+
+        // Получить список методик
+        private IEnumerable<string> GetMethodics()
+        {
+            var files = _fileProvider.GetDirectoryContents("");
+
+            return files.Select(f => Path.GetFileNameWithoutExtension(f.Name));           
         }
     }
 }
