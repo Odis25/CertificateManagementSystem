@@ -1,5 +1,6 @@
 ﻿using CertificateManagementSystem.Data;
 using CertificateManagementSystem.Data.Models;
+using CertificateManagementSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System;

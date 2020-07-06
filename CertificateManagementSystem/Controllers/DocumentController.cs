@@ -1,8 +1,8 @@
-﻿using CertificateManagementSystem.Data;
-using CertificateManagementSystem.Data.Models;
+﻿using CertificateManagementSystem.Data.Models;
 using CertificateManagementSystem.Extensions;
 using CertificateManagementSystem.Models.Document;
 using CertificateManagementSystem.Services.Components;
+using CertificateManagementSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using System;
 using System.Collections.Generic;
@@ -263,7 +262,7 @@ namespace CertificateManagementSystem.Controllers
         // Формируем новую метоздику поверки
         private VerificationMethodic CreateVerificationMethodic(CreateDocumentModel model)
         {
-            var methodic = _documents.FindVerificationMethodic(model.RegistrationNumber);
+            var methodic = _documents.FindVerificationMethodic(model.VerificationMethodic, model.RegistrationNumber);
             if (methodic == null)
             {
                 if (model.VerificationMethodic != null)

@@ -1,5 +1,5 @@
-﻿using CertificateManagementSystem.Data;
-using CertificateManagementSystem.Data.Models;
+﻿using CertificateManagementSystem.Data.Models;
+using CertificateManagementSystem.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 

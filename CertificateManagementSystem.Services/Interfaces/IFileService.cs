@@ -1,6 +1,6 @@
 ﻿using CertificateManagementSystem.Data.Models;
 
-namespace CertificateManagementSystem.Data
+namespace CertificateManagementSystem.Services.Interfaces
 {
     public interface IFileService
     {

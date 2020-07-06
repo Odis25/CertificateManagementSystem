@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace CertificateManagementSystem.Data
+namespace CertificateManagementSystem.Services.Interfaces
 {
     public interface IDocumentService
     {
@@ -22,7 +22,7 @@ namespace CertificateManagementSystem.Data
         Device FindDevice(string deviceName, string serialNumber);
 
         IEnumerable<VerificationMethodic> GetVerificationMethodics();
-        VerificationMethodic FindVerificationMethodic(string registrationNumber);
+        VerificationMethodic FindVerificationMethodic(string methodicName, string regNumber);
 
         Task Add(Document newDocument);
        

@@ -1,5 +1,6 @@
 ﻿using CertificateManagementSystem.Data;
 using CertificateManagementSystem.Data.Models;
+using CertificateManagementSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -84,9 +85,9 @@ namespace CertificateManagementSystem.Services
         {
             return _context.VerificationMethodics.OrderBy(vm => vm.Name);
         }
-        public VerificationMethodic FindVerificationMethodic(string registrationNumber)
+        public VerificationMethodic FindVerificationMethodic(string methodicName, string regNumber)
         {
-            return _context.VerificationMethodics.FirstOrDefault(m => m.RegistrationNumber == registrationNumber);
+            return _context.VerificationMethodics.FirstOrDefault(m => m.Name == methodicName);
         }
 
         public async Task Add(Document newDocument)

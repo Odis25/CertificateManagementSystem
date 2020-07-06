@@ -1,5 +1,6 @@
 ﻿using CertificateManagementSystem.Data;
 using CertificateManagementSystem.Data.Models;
+using CertificateManagementSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

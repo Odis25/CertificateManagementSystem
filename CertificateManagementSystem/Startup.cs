@@ -2,6 +2,7 @@ using CertificateManagementSystem.Data;
 using CertificateManagementSystem.Data.Models;
 using CertificateManagementSystem.Models.Settings;
 using CertificateManagementSystem.Services;
+using CertificateManagementSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;

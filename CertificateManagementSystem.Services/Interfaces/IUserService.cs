@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace CertificateManagementSystem.Data
+namespace CertificateManagementSystem.Services.Interfaces
 {
     public interface IUserService
     {

@@ -1,7 +1,7 @@
 ﻿using CertificateManagementSystem.Data.Models;
 using System.Collections.Generic;
 
-namespace CertificateManagementSystem.Data
+namespace CertificateManagementSystem.Services.Interfaces
 {
     public interface ISearchService
     {
