@@ -98,7 +98,7 @@ namespace CertificateManagementSystem.Services
                     if (d.Device.VerificationMethodic?.Name.ToString().ToLower().Contains(word) ?? false)
                         return true;
                 if (request.IsRegisterNumber)
-                    if (d.Device.VerificationMethodic?.RegistrationNumber.ToString().ToLower().Contains(word) ?? false)
+                    if (d.Device.RegistrationNumber?.ToString().ToLower().Contains(word) ?? false)
                         return true;
 
                 return false;
@@ -278,7 +278,7 @@ namespace CertificateManagementSystem.Services
         // Искать в номере госреестра
         private IEnumerable<Document> SearchInRegisterNumber(string query)
         {
-            return _context.Documents.Where(d => d.Device.VerificationMethodic.RegistrationNumber.ToLower().Contains(query))
+            return _context.Documents.Where(d => d.Device.RegistrationNumber.ToLower().Contains(query))
                 .Include(d => d.Client)
                 .Include(d => d.Contract)
                 .Include(d => d.DocumentFile)

@@ -62,14 +62,9 @@
                     <!-- Методика поверки -->
                     <div class="form-group">
                         <label asp-for="VerificationMethodic">Методика поверки</label>
-                        <input class="form-control form-control-sm shadow-sm" asp-for="VerificationMethodic"
-                               autocomplete="off" list="verificationMethodicList" />
-                        <datalist id="verificationMethodicList">
-                            @foreach (var item in ViewBag.VerificationMethodics)
-                            {
-                                <option value="@item.Text" title="@item.Text">@item.Text</option>
-                            }
-                        </datalist>
+                        <select class="form-control form-control-sm shadow-sm" asp-for="VerificationMethodic" asp-items="ViewBag.VerificationMethodics">
+                            <option selected></option>
+                        </select>
                     </div>
 
                     <div class="form-row">

@@ -54,7 +54,7 @@ namespace CertificateManagementSystem.Controllers
                 DeviceType = d.Device.Type,
                 DeviceName = d.Device.Name,
                 SerialNumber = d.Device.SerialNumber,
-                RegistrationNumber = d.Device.VerificationMethodic?.RegistrationNumber,
+                RegistrationNumber = d.Device.RegistrationNumber,
                 VerificationMethodic = d.Device.VerificationMethodic?.Name,
                 DocumentNumber = d.DocumentNumber,
                 CalibrationDate = (d as Certificate)?.CalibrationDate.ToString("dd-MM-yyyy"),

@@ -30,7 +30,6 @@
             <a class="btn" href="#" data-toggle="dropdown">
                 <div>
                     <div id="username" class="dropdown-toggle">@user.FullName</div>
-                    <div id="role">@*(@Enum.GetName(typeof(UserRole), Enum.Parse(typeof(UserRole), role)))*@</div>
                     <div id="role">(@displayedRole)</div>
                 </div>
             </a>
@@ -45,7 +44,7 @@
         <a class="btn" asp-controller="Account" asp-action="Login">
             <div>
                 <div id="username">Гость</div>
-                <div id="role">(User)</div>
+                <div id="role">(Пользователь)</div>
             </div>
         </a>
     }

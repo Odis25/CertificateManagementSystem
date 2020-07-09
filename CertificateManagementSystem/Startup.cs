@@ -48,7 +48,9 @@ namespace CertificateManagementSystem
             services.AddScoped<ISearchService, SearchService>();
             services.AddScoped<DataSeeder>();
 
-            services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Configuration.GetSection("Paths").GetSection("MethodicsFolder").Value));
+            var dir = Configuration.GetSection("Paths").GetSection("MethodicsFolder").Value;
+            if (Directory.Exists(dir))
+                services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Configuration.GetSection("Paths").GetSection("MethodicsFolder").Value));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

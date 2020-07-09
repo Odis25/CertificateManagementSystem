@@ -9,8 +9,8 @@ namespace CertificateManagementSystem.Data.Models
         public string Name { get; set; }
         public string Type { get; set; }
         public string SerialNumber { get; set; }
-
-        public VerificationMethodic VerificationMethodic { get; set; }
+        public string RegistrationNumber { get; set; }
+        public Methodic VerificationMethodic { get; set; }
 
         public IEnumerable<Document> Documents { get; set; }
     }

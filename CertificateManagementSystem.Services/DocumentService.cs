@@ -81,13 +81,13 @@ namespace CertificateManagementSystem.Services
                 .FirstOrDefault(d => d.Name == deviceName && d.SerialNumber == serialNumber);
         }
 
-        public IEnumerable<VerificationMethodic> GetVerificationMethodics()
+        public IEnumerable<Methodic> GetVerificationMethodics()
         {
             return _context.VerificationMethodics.OrderBy(vm => vm.Name);
         }
-        public VerificationMethodic FindVerificationMethodic(string methodicName, string regNumber)
+        public Methodic FindMethodic(string methodicName)
         {
-            return _context.VerificationMethodics.FirstOrDefault(m => m.Name == methodicName);
+            return _context.VerificationMethodics.FirstOrDefault(m => m.FileName == methodicName);
         }
 
         public async Task Add(Document newDocument)

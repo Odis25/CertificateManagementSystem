@@ -22,7 +22,7 @@ namespace CertificateManagementSystem.Data
         public DbSet<Device> Devices { get; set; }
         public DbSet<Document> Documents { get; set; }
         public DbSet<FailureNotification> FailureNotifications { get; set; }
-        public DbSet<VerificationMethodic> VerificationMethodics { get; set; }
+        public DbSet<Methodic> VerificationMethodics { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     }
 }

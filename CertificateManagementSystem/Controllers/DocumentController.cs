@@ -92,7 +92,7 @@ namespace CertificateManagementSystem.Controllers
                 DeviceName = document.Device.Name,
                 DeviceType = document.Device.Type,
                 SerialNumber = document.Device.SerialNumber,
-                RegistrationNumber = document.Device.VerificationMethodic?.RegistrationNumber,
+                RegistrationNumber = document.Device.RegistrationNumber,
                 VerificationMethodic = document.Device.VerificationMethodic?.Name,
                 DocumentNumber = document.DocumentNumber,
                 DocumentType = (document is Certificate) ? "Свидетельство о поверке" : "Извещение о непригодности",
@@ -127,7 +127,7 @@ namespace CertificateManagementSystem.Controllers
                 DeviceType = d.Device.Type,
                 DeviceName = d.Device.Name,
                 SerialNumber = d.Device.SerialNumber,
-                RegistrationNumber = d.Device.VerificationMethodic?.RegistrationNumber,
+                RegistrationNumber = d.Device.RegistrationNumber,
                 VerificationMethodic = d.Device.VerificationMethodic?.Name,
                 DocumentNumber = d.DocumentNumber,
                 CalibrationDate = (d as Certificate)?.CalibrationDate.ToString("dd-MM-yyyy"),
@@ -152,14 +152,14 @@ namespace CertificateManagementSystem.Controllers
         public IActionResult Create(DocumentType type)
         {
             CreateSelectLists();
-         
+
             var model = new CreateDocumentModel
             {
                 DocumentType = type,
                 Year = DateTime.Now.Year,
                 CalibrationDate = DateTime.Now,
                 CalibrationExpireDate = DateTime.Now.AddYears(1),
-                DocumentDate = DateTime.Now               
+                DocumentDate = DateTime.Now
             };
 
             return View(model);
@@ -177,8 +177,7 @@ namespace CertificateManagementSystem.Controllers
                 var user = await _userManager.GetUserAsync(User);
                 var destinationFilePath = newDocument.DocumentFile.Path;
 
-                //todo: не забыть раскоментировать
-                //newDocument.CreatedBy = user.FullName;
+                newDocument.CreatedBy = user.FullName;
                 newDocument.CreatedOn = DateTime.Now;
 
                 try
@@ -197,7 +196,7 @@ namespace CertificateManagementSystem.Controllers
                     ModelState.AddModelError("", exception.Message);
                 }
             }
-            
+
             CreateSelectLists();
 
             foreach (var state in ModelState.Values)
@@ -224,17 +223,15 @@ namespace CertificateManagementSystem.Controllers
             var exploitationPlaces = clients.OrderBy(c => c.ExploitationPlace).Select(c => c.ExploitationPlace).Distinct();
             var deviceNames = devices.Select(d => d.Name).Distinct();
             var deviceTypes = devices.OrderBy(d => d.Type).Select(d => d.Type).Distinct();
-            var verificationMethodics = methodics.Select(vm => vm.Name).Distinct();
-            var registerNumbers = methodics.OrderBy(vm => vm.RegistrationNumber).Select(vm => vm.RegistrationNumber).Distinct();
+            var registerNumbers = devices.OrderBy(d => d.RegistrationNumber).Select(d => d.RegistrationNumber).Distinct();
 
             ViewBag.Contracts = new SelectList(contractNumbers);
             ViewBag.ClientNames = new SelectList(clientNames);
-            ViewBag.ExploitationPlaces = new SelectList(exploitationPlaces);
             ViewBag.DeviceNames = new SelectList(deviceNames);
             ViewBag.DeviceTypes = new SelectList(deviceTypes);
-            //ViewBag.VerificationMethodics = new SelectList(verificationMethodics);
-            ViewBag.VerificationMethodics = new SelectList(GetMethodics());
+            ViewBag.ExploitationPlaces = new SelectList(exploitationPlaces);
             ViewBag.RegisterNumbers = new SelectList(registerNumbers);
+            ViewBag.VerificationMethodics = new SelectList(GetMethodics(), "FileName", "Name");
         }
 
         // Формируем нового заказчика
@@ -260,34 +257,18 @@ namespace CertificateManagementSystem.Controllers
         }
 
         // Формируем новую метоздику поверки
-        private VerificationMethodic CreateVerificationMethodic(CreateDocumentModel model)
+        private Methodic CreateMethodic(CreateDocumentModel model)
         {
-            var methodic = _documents.FindVerificationMethodic(model.VerificationMethodic, model.RegistrationNumber);
+            var methodic = _documents.FindMethodic(model.VerificationMethodic?.ToLower());
             if (methodic == null)
             {
                 if (model.VerificationMethodic != null)
                 {
-                    methodic = new VerificationMethodic
+                    methodic = new Methodic
                     {
-                        Name = model.VerificationMethodic,
-                        RegistrationNumber = model.RegistrationNumber?.Trim(),
-                        //todo: продумать как добавлять методику поверки
-                        FileName = ""
+                        Name = Path.GetFileNameWithoutExtension(model.VerificationMethodic),
+                        FileName = model.VerificationMethodic
                     };
-                }
-            }
-            else
-            {
-                //todo: Что если методика поверки и регистрационный номер отличаются от указанных ранее для этого устройства?
-                if (methodic.RegistrationNumber.ToLower() != model.RegistrationNumber?.ToLower())
-                {
-                    // Номер в гос.реестре не совпадает
-                    ModelState.AddModelError("", "За данным оборудованием закреплен другой номер в гос.реестре.");
-                }
-                if (methodic.Name.ToLower() != model.VerificationMethodic?.ToLower())
-                {
-                    // Название методики поверки не совпадает
-                    ModelState.AddModelError("", "За данным оборудованием закреплена другая методика поверки.");
                 }
             }
 
@@ -298,13 +279,14 @@ namespace CertificateManagementSystem.Controllers
         private Device CreateDevice(CreateDocumentModel model)
         {
             var device = _documents.FindDevice(model.DeviceName, model.SerialNumber);
-            var methodic = CreateVerificationMethodic(model);
+            var methodic = CreateMethodic(model);
 
             device ??= new Device
             {
                 Name = model.DeviceName?.Trim(),
                 Type = model.DeviceType?.Trim(),
                 SerialNumber = model.SerialNumber?.Trim(),
+                RegistrationNumber = model.RegistrationNumber?.Trim(),
                 VerificationMethodic = methodic
             };
             return device;
@@ -381,7 +363,7 @@ namespace CertificateManagementSystem.Controllers
                     return null;
             }
         }
-        
+
         // Загрузка файла на сервер
         private string UploadFile(IFormFile documentFile)
         {
@@ -397,11 +379,15 @@ namespace CertificateManagementSystem.Controllers
         }
 
         // Получить список методик
-        private IEnumerable<string> GetMethodics()
+        private IEnumerable<MethodicModel> GetMethodics()
         {
             var files = _fileProvider.GetDirectoryContents("");
 
-            return files.Select(f => Path.GetFileNameWithoutExtension(f.Name));           
+            return files.Where(f => f.IsDirectory == false).Select(f => new MethodicModel
+            {
+                Name = Path.GetFileNameWithoutExtension(f.Name),
+                FileName = f.Name
+            });
         }
     }
 }
