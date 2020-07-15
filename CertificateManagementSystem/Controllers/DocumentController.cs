@@ -85,6 +85,7 @@ namespace CertificateManagementSystem.Controllers
 
             var model = new DocumentListingModel
             {
+                Id = document.Id,
                 Year = document.Contract.Year,
                 ContractNumber = document.Contract.ContractNumber,
                 ClientName = document.Client.Name,
@@ -107,6 +108,34 @@ namespace CertificateManagementSystem.Controllers
             };
 
             return PartialView("_DocumentPreview", model);
+        }
+
+        [HttpGet]
+        public IActionResult DocumentEdit(int id)
+        {
+            var document = _documents.GetDocumentById(id);
+
+            var model = new EditDocumentModel
+            {
+                Id = document.Id,
+                Year = document.Contract.Year,
+                ContractNumber = document.Contract.ContractNumber,
+                ClientName = document.Client.Name,
+                ExploitationPlace = document.Client.ExploitationPlace,
+                DeviceName = document.Device.Name,
+                DeviceType = document.Device.Type,
+                SerialNumber = document.Device.SerialNumber,
+                RegistrationNumber = document.Device.RegistrationNumber,
+                VerificationMethodic = document.Device.VerificationMethodic?.Name,
+                DocumentNumber = document.DocumentNumber,
+                DocumentType = (document is Certificate) ? DocumentType.Certificate : DocumentType.FailureNotification,
+                CalibrationDate = (document as Certificate)?.CalibrationDate,
+                CalibrationExpireDate = (document as Certificate)?.CalibrationExpireDate,
+                DocumentDate = (document as FailureNotification)?.DocumentDate
+            };
+
+            ViewBag.Methodics = new SelectList(GetMethodics(), "FileName", "Name");
+            return PartialView("_DocumentEdit", model);
         }
 
         // Отобразить на странице документы соответствующие году и номеру договора

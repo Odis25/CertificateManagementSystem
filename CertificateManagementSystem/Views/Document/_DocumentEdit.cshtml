@@ -1,0 +1,96 @@
+﻿@model EditDocumentModel
+
+<table id="document-details-table">
+    <tr>
+        <td>Год заключения договора:</td>
+        <td>
+            <input asp-for="Year" type="number" class="form-control form-control-sm" />
+        </td>
+    </tr>
+    <tr>
+        <td>Номер договора:</td>
+        <td>
+            <input asp-for="ContractNumber" class="form-control form-control-sm" />
+        </td>
+    </tr>
+    <tr>
+        <td>Эксплуатирующая организация:</td>
+        <td>
+            <input asp-for="ClientName" class="form-control form-control-sm" />
+        </td>
+    </tr>
+    <tr>
+        <td>Место эксплуатации:</td>
+        <td>
+            <input asp-for="ExploitationPlace" class="form-control form-control-sm" />
+        </td>
+    </tr>
+    <tr>
+        <td>Группа СИ:</td>
+        <td>
+            <input asp-for="DeviceType" class="form-control form-control-sm" />
+        </td>
+    </tr>
+    <tr>
+        <td>Наименование СИ:</td>
+        <td>
+            <input asp-for="DeviceName" class="form-control form-control-sm" />
+        </td>
+    </tr>
+    <tr>
+        <td>Заводской номер СИ:</td>
+        <td>
+            <input asp-for="SerialNumber" class="form-control form-control-sm" />
+        </td>
+    </tr>
+    <tr>
+        <td>Номер в гос. реестре:</td>
+        <td>
+            <input asp-for="RegistrationNumber" class="form-control form-control-sm" />
+        </td>
+    </tr>
+    <tr>
+        <td>Методика поверки:</td>
+        <td>
+            <select asp-for="VerificationMethodic" asp-items="ViewBag.Methodics" class="form-control form-control-sm"></select>
+        </td>
+    </tr>
+    <tr>
+        <td>Тип документа:</td>
+        <td>
+            <select asp-for="DocumentType" asp-items="Html.GetEnumSelectList(typeof(DocumentType))" class="form-control form-control-sm"></select>
+        </td>
+    </tr>
+    <tr>
+        <td>Номер документа:</td>
+        <td>
+            <input asp-for="DocumentNumber" class="form-control form-control-sm" />
+        </td>
+    </tr>
+
+    @if (Model.DocumentType == DocumentType.Certificate)
+    {
+        <tr>
+            <td>Дата поверки:</td>
+            <td>
+                <input type="date" asp-for="CalibrationDate" class="form-control form-control-sm" />
+            </td>
+        </tr>
+        <tr>
+            <td>Дата окончания срока поверки:</td>
+            <td>
+                <input type="date" asp-for="CalibrationExpireDate" class="form-control form-control-sm" />
+            </td>
+        </tr>
+    }
+    else
+    {
+        <tr>
+            <td>Дата оформления документа:</td>
+            <td>
+                <input type="date" asp-for="DocumentDate" class="form-control form-control-sm" />
+            </td>
+        </tr>
+    }
+
+</table>

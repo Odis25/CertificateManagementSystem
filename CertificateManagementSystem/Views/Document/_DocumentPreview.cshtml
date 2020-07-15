@@ -9,9 +9,10 @@
         </button>
     </div>
 
-    <div class="modal-body custom-modal-body">
+    <div class="modal-body custom-modal-body" >
         <div class="row">
-            <div class="col-6">
+            <div class="col-6" id="html-holder">
+
                 <table id="document-details-table">
                     <tr>
                         <td>Год заключения договора:</td>
@@ -85,7 +86,6 @@
                         <td>Последнее изменение:</td>
                         <td>@Model.UpdatedOn (@Model.UpdatedBy)</td>
                     </tr>
-
                 </table>
             </div>
             <div class="col-6">
@@ -96,6 +96,6 @@
     <div class="modal-footer custom-modal-footer">
         <button class="btn  btn-success">Открыть документ</button>
         <button class="btn  btn-primary">Отправить по e-mail</button>
-        <button class="btn  btn-secondary">Редактировать</button>
+        <button class="btn  btn-secondary" onclick="EditDocument(@Model.Id)">Редактировать</button>
     </div>
 </div>

@@ -59,7 +59,7 @@ namespace CertificateManagementSystem.Data
                 NormalizedUserName = "budanovav",
                 Email = "artem.budanov@incomsystem.ru",
                 NormalizedEmail = "artem.budanov@incomsystem.ru",
-                FullName = "Артем Буданов",
+                FullName = "Буданов Артем Владимирович",
                 EmailConfirmed = true,
                 SecurityStamp = Guid.NewGuid().ToString()
             };

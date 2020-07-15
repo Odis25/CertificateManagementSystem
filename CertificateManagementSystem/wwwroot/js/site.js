@@ -23,22 +23,6 @@ $(document).ready(function () {
         });
     }, 7000);
 
-    // Показать или скрыть меню фильтрации поиска
-    //document.querySelector('#search-bar-settings').addEventListener('click', function () {
-
-    //    const filter = document.querySelector('.search-bar .search-bar-filter');
-    //    const searchbar = document.querySelector('.search-bar');
-    //    const searchbarCss = getComputedStyle(searchbar);
-    //    const width = searchbarCss.width;
-
-    //    if (width == '200px') {
-    //        searchbar.style.width = '350px';
-    //    }
-
-    //    document.addEventListener('mouseup', LostFocus);
-    //    filter.classList.toggle('active');
-    //})
-
     // Выбор или снятие всех чекбоксов в меню фильтрации поиска
     document.querySelector('#select-all-checkbox').addEventListener('change', function () {
         const checkboxes = document.querySelectorAll('.search-bar-filter input[type="checkbox"]');
@@ -107,6 +91,13 @@ function LoadDocuments(contractId) {
                 info: false,
                 scrollY: '66.5vh'
             });
+        });
+}
+
+function EditDocument(id) {
+    $.get("/Document/DocumentEdit", { id },
+        function (result) {
+            document.querySelector('#html-holder').innerHTML = result;
         });
 }
 

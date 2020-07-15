@@ -4,7 +4,9 @@ namespace CertificateManagementSystem.Services.Components
 {
     public enum DocumentType
     {
+        [Display(Name = "Свидетельство о поверке")]
         Certificate,
+        [Display(Name = "Извещение о непригодности")]
         FailureNotification
     }
 
