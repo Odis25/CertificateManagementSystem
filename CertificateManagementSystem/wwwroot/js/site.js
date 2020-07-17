@@ -70,7 +70,6 @@ function LostFocus(e) {
     }
 }
 
-
 // Открыть окно просмотра документа
 function OpenDocument(id) {
     $.get('/Document/Details', { id },
@@ -78,6 +77,29 @@ function OpenDocument(id) {
             document.querySelector('.modal .modal-dialog').innerHTML = result;
             $('#document-preview-modal').modal('show');
         });
+}
+
+// Открыть окно редактирования документа
+function EditDocument(id) {
+    $.get("/Document/DocumentEdit", { id },
+        function (result) {
+            document.querySelector('.modal .modal-dialog').innerHTML = result;
+            $('#document-preview-modal').modal('show');
+        });
+}
+
+// POST-запрос на сохранение изменений документа
+function ApplyChanges(id) {
+    let model = $('.modal form').serialize();
+    $.post('/Document/DocumentEdit', model).done(function (result) {
+
+        // Код обработки результата
+        document.querySelector('.modal .modal-dialog').innerHTML = result;
+        var isValid = $('.modal-body').find('[name="IsValid"]').val() == 'True';
+        if (isValid) {
+            OpenDocument(id);
+        }
+    })
 }
 
 // Загрузка документов при выборе договора
@@ -91,13 +113,6 @@ function LoadDocuments(contractId) {
                 info: false,
                 scrollY: '66.5vh'
             });
-        });
-}
-
-function EditDocument(id) {
-    $.get("/Document/DocumentEdit", { id },
-        function (result) {
-            document.querySelector('#html-holder').innerHTML = result;
         });
 }
 

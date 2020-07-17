@@ -1,101 +1,101 @@
 ﻿@model DocumentListingModel
+   
+    <div class="modal-content">
 
-<div class="modal-content">
+        <div class="modal-header custom-modal-header">
+            <h5>Информация о документе</h5>
+            <button type="button" class="close" data-dismiss="modal">
+                <span>&times;</span>
+            </button>
+        </div>
 
-    <div class="modal-header custom-modal-header">
-        <h5>Информация о документе</h5>
-        <button type="button" class="close" data-dismiss="modal">
-            <span>&times;</span>
-        </button>
-    </div>
+        <div class="modal-body custom-modal-body">
+            <div class="row">
+                <div class="col-6" id="html-holder">
 
-    <div class="modal-body custom-modal-body" >
-        <div class="row">
-            <div class="col-6" id="html-holder">
-
-                <table id="document-details-table">
-                    <tr>
-                        <td>Год заключения договора:</td>
-                        <td>@Model.Year</td>
-                    </tr>
-                    <tr>
-                        <td>Номер договора:</td>
-                        <td>@Model.ContractNumber</td>
-                    </tr>
-                    <tr>
-                        <td>Эксплуатирующая организация:</td>
-                        <td>@Model.ClientName</td>
-                    </tr>
-                    <tr>
-                        <td>Место эксплуатации:</td>
-                        <td>@Model.ExploitationPlace</td>
-                    </tr>
-                    <tr>
-                        <td>Группа СИ:</td>
-                        <td>@Model.DeviceType</td>
-                    </tr>
-                    <tr>
-                        <td>Наименование СИ:</td>
-                        <td>@Model.DeviceName</td>
-                    </tr>
-                    <tr>
-                        <td>Заводской номер СИ:</td>
-                        <td>@Model.SerialNumber</td>
-                    </tr>
-                    <tr>
-                        <td>Номер в гос. реестре:</td>
-                        <td>@Model.RegistrationNumber</td>
-                    </tr>
-                    <tr>
-                        <td>Методика поверки:</td>
-                        <td>@Model.VerificationMethodic</td>
-                    </tr>
-                    <tr>
-                        <td>Тип документа:</td>
-                        <td>@Model.DocumentType</td>
-                    </tr>
-                    <tr>
-                        <td>Номер документа:</td>
-                        <td>@Model.DocumentNumber</td>
-                    </tr>
-
-                    @if (Model.DocumentType == "Свидетельство о поверке")
-                    {
+                    <table id="document-details-table">
                         <tr>
-                            <td>Дата поверки:</td>
-                            <td>@Model.CalibrationDate</td>
+                            <td>Год заключения договора:</td>
+                            <td>@Model.Year</td>
                         </tr>
                         <tr>
-                            <td>Дата окончания срока поверки:</td>
-                            <td>@Model.CalibrationExpireDate</td>
+                            <td>Номер договора:</td>
+                            <td>@Model.ContractNumber</td>
                         </tr>
-                    }
-                    else
-                    {
                         <tr>
-                            <td>Дата оформления документа:</td>
-                            <td>@Model.DocumentDate</td>
+                            <td>Эксплуатирующая организация:</td>
+                            <td>@Model.ClientName</td>
                         </tr>
-                    }
+                        <tr>
+                            <td>Место эксплуатации:</td>
+                            <td>@Model.ExploitationPlace</td>
+                        </tr>
+                        <tr>
+                            <td>Группа СИ:</td>
+                            <td>@Model.DeviceType</td>
+                        </tr>
+                        <tr>
+                            <td>Наименование СИ:</td>
+                            <td>@Model.DeviceName</td>
+                        </tr>
+                        <tr>
+                            <td>Заводской номер СИ:</td>
+                            <td>@Model.SerialNumber</td>
+                        </tr>
+                        <tr>
+                            <td>Номер в гос. реестре:</td>
+                            <td>@Model.RegistrationNumber</td>
+                        </tr>
+                        <tr>
+                            <td>Методика поверки:</td>
+                            <td>@Model.VerificationMethodic</td>
+                        </tr>
+                        <tr>
+                            <td>Тип документа:</td>
+                            <td>@Model.DocumentType</td>
+                        </tr>
+                        <tr>
+                            <td>Номер документа:</td>
+                            <td>@Model.DocumentNumber</td>
+                        </tr>
 
-                    <tr>
-                        <td>Добавлен в базу:</td>
-                        <td>@Model.CreatedOn (@Model.CreatedBy)</td>
-                    </tr>
-                    <tr>
-                        <td>Последнее изменение:</td>
-                        <td>@Model.UpdatedOn (@Model.UpdatedBy)</td>
-                    </tr>
-                </table>
-            </div>
-            <div class="col-6">
-                <iframe src="@Model.FilePath"></iframe>
+                        @if (Model.DocumentType == "Свидетельство о поверке")
+                        {
+                            <tr>
+                                <td>Дата поверки:</td>
+                                <td>@Model.CalibrationDate</td>
+                            </tr>
+                            <tr>
+                                <td>Дата окончания срока поверки:</td>
+                                <td>@Model.CalibrationExpireDate</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td>Дата оформления документа:</td>
+                                <td>@Model.DocumentDate</td>
+                            </tr>
+                        }
+
+                        <tr>
+                            <td>Добавлен в базу:</td>
+                            <td>@Model.CreatedOn (@Model.CreatedBy)</td>
+                        </tr>
+                        <tr>
+                            <td>Последнее изменение:</td>
+                            <td>@Model.UpdatedOn (@Model.UpdatedBy)</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-6">
+                    <iframe src="@Model.FilePath"></iframe>
+                </div>
             </div>
         </div>
+        <div class="modal-footer custom-modal-footer">
+            <button class="btn  btn-success">Открыть документ</button>
+            <button class="btn  btn-primary">Отправить по e-mail</button>
+            <button class="btn  btn-secondary" onclick="EditDocument(@Model.Id)">Редактировать</button>
+        </div>
     </div>
-    <div class="modal-footer custom-modal-footer">
-        <button class="btn  btn-success">Открыть документ</button>
-        <button class="btn  btn-primary">Отправить по e-mail</button>
-        <button class="btn  btn-secondary" onclick="EditDocument(@Model.Id)">Редактировать</button>
-    </div>
-</div>

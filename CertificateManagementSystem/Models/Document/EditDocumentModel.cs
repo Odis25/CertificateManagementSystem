@@ -41,5 +41,7 @@ namespace CertificateManagementSystem.Models.Document
 
         public DateTime UpdatedOn { get; set; }
         public string UpdatedBy { get; set; }
+
+        public string FilePath { get; set; }
     }
 }

@@ -110,11 +110,12 @@ namespace CertificateManagementSystem.Controllers
             return PartialView("_DocumentPreview", model);
         }
 
+        // Редактирование документа
         [HttpGet]
         public IActionResult DocumentEdit(int id)
         {
             var document = _documents.GetDocumentById(id);
-
+            var filePath = Path.Combine("/documentsFolder", document.DocumentFile.Path);
             var model = new EditDocumentModel
             {
                 Id = document.Id,
@@ -131,10 +132,21 @@ namespace CertificateManagementSystem.Controllers
                 DocumentType = (document is Certificate) ? DocumentType.Certificate : DocumentType.FailureNotification,
                 CalibrationDate = (document as Certificate)?.CalibrationDate,
                 CalibrationExpireDate = (document as Certificate)?.CalibrationExpireDate,
-                DocumentDate = (document as FailureNotification)?.DocumentDate
+                DocumentDate = (document as FailureNotification)?.DocumentDate,
+                FilePath = filePath
             };
 
-            ViewBag.Methodics = new SelectList(GetMethodics(), "FileName", "Name");
+            CreateSelectLists();
+
+            return PartialView("_DocumentEdit", model);
+        }
+
+        [HttpPost]
+        public IActionResult DocumentEdit(EditDocumentModel model)
+        {
+            var url = HttpContext.Request.Headers["Referer"];
+            CreateSelectLists();
+            
             return PartialView("_DocumentEdit", model);
         }
 
@@ -260,7 +272,7 @@ namespace CertificateManagementSystem.Controllers
             ViewBag.DeviceTypes = new SelectList(deviceTypes);
             ViewBag.ExploitationPlaces = new SelectList(exploitationPlaces);
             ViewBag.RegisterNumbers = new SelectList(registerNumbers);
-            ViewBag.VerificationMethodics = new SelectList(GetMethodics(), "FileName", "Name");
+            ViewBag.Methodics = new SelectList(GetMethodics(), "FileName", "Name");
         }
 
         // Формируем нового заказчика

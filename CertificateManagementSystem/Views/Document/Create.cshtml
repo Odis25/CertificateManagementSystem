@@ -25,7 +25,6 @@
                         <button class="btn btn-outline-secondary" type="submit" form="newDocumentForm">Добавить</button>
                     </div>
 
-
                     <div class="form-row">
                         <!-- Год -->
                         <div class="form-group col-md-3">
@@ -62,7 +61,7 @@
                     <!-- Методика поверки -->
                     <div class="form-group">
                         <label asp-for="VerificationMethodic">Методика поверки</label>
-                        <select class="form-control form-control-sm shadow-sm" asp-for="VerificationMethodic" asp-items="ViewBag.VerificationMethodics">
+                        <select class="form-control form-control-sm shadow-sm" asp-for="VerificationMethodic" asp-items="ViewBag.Methodics">
                             <option selected></option>
                         </select>
                     </div>
