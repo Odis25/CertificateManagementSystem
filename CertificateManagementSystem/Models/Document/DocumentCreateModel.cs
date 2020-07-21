@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CertificateManagementSystem.Models.Document
 {
-    public class CreateDocumentModel
+    public class DocumentCreateModel
     {
         public int Year { get; set; }
 

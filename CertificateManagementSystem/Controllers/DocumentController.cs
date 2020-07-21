@@ -75,7 +75,7 @@ namespace CertificateManagementSystem.Controllers
             return View(model);
         }
 
-        // Детализированная информация о документе
+        // Подробная информация о документе
         [HttpGet]
         public IActionResult Details(int id)
         {
@@ -83,13 +83,16 @@ namespace CertificateManagementSystem.Controllers
 
             var filePath = Path.Combine("/documentsFolder", document.DocumentFile.Path);
 
-            var model = new DocumentListingModel
+            var model = new DocumentDetailsModel
             {
                 Id = document.Id,
                 Year = document.Contract.Year,
+                ContractId = document.Contract.Id,
                 ContractNumber = document.Contract.ContractNumber,
+                ClientId = document.Client.Id,
                 ClientName = document.Client.Name,
                 ExploitationPlace = document.Client.ExploitationPlace,
+                DeviceId = document.Device.Id,
                 DeviceName = document.Device.Name,
                 DeviceType = document.Device.Type,
                 SerialNumber = document.Device.SerialNumber,
@@ -107,16 +110,17 @@ namespace CertificateManagementSystem.Controllers
                 FilePath = filePath
             };
 
-            return PartialView("_DocumentPreview", model);
+            return PartialView("_DocumentDetails", model);
         }
 
         // Редактирование документа
         [HttpGet]
+        [Authorize(Roles = "Admin, Metrologist")]
         public IActionResult DocumentEdit(int id)
         {
             var document = _documents.GetDocumentById(id);
             var filePath = Path.Combine("/documentsFolder", document.DocumentFile.Path);
-            var model = new EditDocumentModel
+            var model = new DocumentEditModel
             {
                 Id = document.Id,
                 Year = document.Contract.Year,
@@ -142,11 +146,78 @@ namespace CertificateManagementSystem.Controllers
         }
 
         [HttpPost]
-        public IActionResult DocumentEdit(EditDocumentModel model)
+        [Authorize(Roles = "Admin, Metrologist")]
+        public async Task<IActionResult> DocumentEdit(DocumentEditModel model)
         {
-            var url = HttpContext.Request.Headers["Referer"];
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (model.DocumentType == DocumentType.Certificate)
+                {
+                    var document = new Certificate
+                    {
+                        Id = model.Id,
+                        CalibrationDate = (DateTime)model.CalibrationDate,
+                        CalibrationExpireDate = (DateTime)model.CalibrationExpireDate,
+                        DocumentNumber = model.DocumentNumber,
+                        Client = new Client
+                        {
+                            Name = model.ClientName,
+                            ExploitationPlace = model.ExploitationPlace
+                        },
+                        Contract = new Contract
+                        {
+                            Year = model.Year,
+                            ContractNumber = model.ContractNumber
+                        },
+                        Device = new Device
+                        {
+                            Name = model.DeviceName,
+                            Type = model.DeviceType,
+                            SerialNumber = model.SerialNumber,
+                            RegistrationNumber = model.RegistrationNumber,
+                            VerificationMethodic = new Methodic { FileName = model.VerificationMethodic }
+                        },
+                        UpdatedOn = DateTime.Now,
+                        UpdatedBy = user.FullName
+                    };
+                    await _documents.Edit(document);
+                }
+                else
+                {
+                    var document = new FailureNotification
+                    {
+                        Id = model.Id,
+                        DocumentDate = (DateTime)model.DocumentDate,
+                        DocumentNumber = model.DocumentNumber,
+                        Client = new Client
+                        {
+                            Name = model.ClientName,
+                            ExploitationPlace = model.ExploitationPlace
+                        },
+                        Contract = new Contract
+                        {
+                            Year = model.Year,
+                            ContractNumber = model.ContractNumber
+                        },
+                        Device = new Device
+                        {
+                            Name = model.DeviceName,
+                            Type = model.DeviceType,
+                            SerialNumber = model.SerialNumber,
+                            RegistrationNumber = model.RegistrationNumber,
+                            VerificationMethodic = new Methodic { FileName = model.VerificationMethodic }
+                        },
+                        UpdatedOn = DateTime.Now,
+                        UpdatedBy = user.FullName
+                    };
+                    await _documents.Edit(document);
+                }
+                
+            }
+
             CreateSelectLists();
-            
+
             return PartialView("_DocumentEdit", model);
         }
 
@@ -194,7 +265,7 @@ namespace CertificateManagementSystem.Controllers
         {
             CreateSelectLists();
 
-            var model = new CreateDocumentModel
+            var model = new DocumentCreateModel
             {
                 DocumentType = type,
                 Year = DateTime.Now.Year,
@@ -209,7 +280,7 @@ namespace CertificateManagementSystem.Controllers
         // Создание нового документа
         [HttpPost]
         [Authorize(Roles = "Admin, Metrologist")]
-        public async Task<IActionResult> Create(CreateDocumentModel model)
+        public async Task<IActionResult> Create(DocumentCreateModel model)
         {
             var newDocument = CreateDocument(model);
 
@@ -276,7 +347,7 @@ namespace CertificateManagementSystem.Controllers
         }
 
         // Формируем нового заказчика
-        private Client CreateClient(CreateDocumentModel model)
+        private Client CreateClient(DocumentCreateModel model)
         {
             return _documents.FindClient(model.ClientName, model.ExploitationPlace) ??
                 new Client
@@ -287,7 +358,7 @@ namespace CertificateManagementSystem.Controllers
         }
 
         // Формируем новый договор
-        private Contract CreateContract(CreateDocumentModel model)
+        private Contract CreateContract(DocumentCreateModel model)
         {
             return _documents.FindContract(model.ContractNumber, model.Year)
                 ?? new Contract
@@ -298,7 +369,7 @@ namespace CertificateManagementSystem.Controllers
         }
 
         // Формируем новую метоздику поверки
-        private Methodic CreateMethodic(CreateDocumentModel model)
+        private Methodic CreateMethodic(DocumentCreateModel model)
         {
             var methodic = _documents.FindMethodic(model.VerificationMethodic?.ToLower());
             if (methodic == null)
@@ -317,7 +388,7 @@ namespace CertificateManagementSystem.Controllers
         }
 
         // Формируем новое устройство
-        private Device CreateDevice(CreateDocumentModel model)
+        private Device CreateDevice(DocumentCreateModel model)
         {
             var device = _documents.FindDevice(model.DeviceName, model.SerialNumber);
             var methodic = CreateMethodic(model);
@@ -334,7 +405,7 @@ namespace CertificateManagementSystem.Controllers
         }
 
         // Формируем модель файла документа
-        private FileModel CreateFilePath(CreateDocumentModel model)
+        private FileModel CreateFilePath(DocumentCreateModel model)
         {
             var year = model.Year.ToString();
             var contract = model.ContractNumber.ReplaceInvalidChars('-') ?? "";
@@ -359,7 +430,7 @@ namespace CertificateManagementSystem.Controllers
         }
 
         // Формируем новый документ
-        private Document CreateDocument(CreateDocumentModel model)
+        private Document CreateDocument(DocumentCreateModel model)
         {
             // Если документ с таким номером уже есть в базе
             if (_documents.IsDocumentExist(model.DocumentNumber))

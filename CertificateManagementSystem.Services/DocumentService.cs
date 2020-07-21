@@ -95,6 +95,62 @@ namespace CertificateManagementSystem.Services
             _context.Documents.Add(newDocument);
             await _context.SaveChangesAsync();
         }
+        public async Task Edit(Document document)
+        {
+            var doc = _context.Documents.FirstOrDefault(d => d.Id == document.Id);
+
+            var client = FindClient(document.Client.Name, document.Client.ExploitationPlace);
+            var contract = FindContract(document.Contract.ContractNumber, document.Contract.Year);
+            var device = FindDevice(document.Device.Name, document.Device.SerialNumber);
+            var methodic = FindMethodic(document.Device.VerificationMethodic.FileName);  
+
+            contract ??= new Contract
+            {
+                ContractNumber = document.Contract.ContractNumber,
+                Year = document.Contract.Year
+            };
+            
+            client ??= new Client
+            {
+                Name = document.Client.Name,
+                ExploitationPlace = document.Client.ExploitationPlace
+            };
+
+            methodic ??= new Methodic
+            {
+                Name = document.Device.VerificationMethodic.Name,
+                FileName = document.Device.VerificationMethodic.FileName
+            };
+
+            device ??= new Device
+            {
+                Name = document.Device.Name,
+                Type = document.Device.Type,
+                SerialNumber = document.Device.SerialNumber,               
+                VerificationMethodic = methodic,
+            };
+
+            _context.Update(doc);
+
+            doc.DocumentNumber = document.DocumentNumber;
+            doc.Client = client;
+            doc.Contract = contract;
+            doc.Device = device;
+            doc.Device.RegistrationNumber = document.Device.RegistrationNumber;
+            if (doc is Certificate)
+            {
+                ((Certificate)doc).CalibrationDate = ((Certificate)document).CalibrationDate;
+                ((Certificate)doc).CalibrationExpireDate = ((Certificate)document).CalibrationExpireDate;
+            }
+            else
+            {
+                ((FailureNotification)doc).DocumentDate = ((FailureNotification)document).DocumentDate;
+            }
+            doc.UpdatedOn = document.UpdatedOn;
+            doc.UpdatedBy = doc.UpdatedBy;
+
+            await _context.SaveChangesAsync();
+        }
 
         public bool IsDocumentExist(string documentNumber)
         {
@@ -113,5 +169,6 @@ namespace CertificateManagementSystem.Services
         {
             return await _context.Documents.OfType<FailureNotification>().CountAsync();
         }
+
     }
 }

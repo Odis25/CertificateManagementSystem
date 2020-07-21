@@ -25,7 +25,7 @@ namespace CertificateManagementSystem.Services.Interfaces
         Methodic FindMethodic(string methodicName);
 
         Task Add(Document newDocument);
-       
+        Task Edit(Document  document);
         bool IsDocumentExist(string documentNumber);
 
         Task<int> DocumentsCount();
