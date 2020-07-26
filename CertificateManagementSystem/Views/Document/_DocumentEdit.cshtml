@@ -17,6 +17,7 @@
                     <!--Скрытые поля-->
                     <input type="hidden" asp-for="Id" />
                     <input type="hidden" asp-for="FilePath" />
+                    <input type="hidden" asp-for="DocumentType" />
                     <input type="hidden" name="IsValid" value="@ViewData.ModelState.IsValid.ToString()" />
 
                     <!--Поля ввода данных-->
@@ -113,12 +114,12 @@
                                 </select>
                             </td>
                         </tr>
-                        <tr>
+                        @*<tr>
                             <td>Тип документа:</td>
                             <td>
                                 <select asp-for="DocumentType" asp-items="Html.GetEnumSelectList(typeof(DocumentType))" class="form-control form-control-sm"></select>
                             </td>
-                        </tr>
+                        </tr>*@
                         <tr>
                             <td>Номер документа:</td>
                             <td>

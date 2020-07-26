@@ -66,6 +66,7 @@ namespace CertificateManagementSystem.Services
                     result.AddRange(SearchInDeviceName(word));
                 if (request.IsSerialNumber)
                     result.AddRange(SearchInSerialNumber(word));
+                result.AddRange(SearchInDocumentType(word));
             }
 
             var filtredResult = result.Where(d => keyWords.All(word =>
@@ -77,28 +78,34 @@ namespace CertificateManagementSystem.Services
                     if (d.Contract.Year.ToString().ToLower().Contains(word))
                         return true;
                 if (request.IsContractNumber)
-                    if (d.Contract.ContractNumber.ToString().ToLower().Contains(word))
+                    if (d.Contract.ContractNumber.ToLower().Contains(word))
                         return true;
                 if (request.IsClientName)
-                    if (d.Client.Name.ToString().ToLower().Contains(word))
+                    if (d.Client.Name.ToLower().Contains(word))
                         return true;
                 if (request.IsExploitationPlace)
-                    if (d.Client.ExploitationPlace.ToString().ToLower().Contains(word))
+                    if (d.Client.ExploitationPlace?.ToLower().Contains(word) ?? false)
                         return true;
                 if (request.IsDeviceType)
-                    if (d.Device.Type.ToString().ToLower().Contains(word))
+                    if (d.Device.Type.ToLower().Contains(word))
                         return true;
                 if (request.IsDeviceName)
-                    if (d.Device.Name.ToString().ToLower().Contains(word))
+                    if (d.Device.Name.ToLower().Contains(word))
                         return true;
                 if (request.IsSerialNumber)
-                    if (d.Device.SerialNumber.ToString().ToLower().Contains(word))
+                    if (d.Device.SerialNumber.ToLower().Contains(word))
                         return true;
                 if (request.IsVerificationMethodic)
-                    if (d.Device.VerificationMethodic?.Name.ToString().ToLower().Contains(word) ?? false)
+                    if (d.Device.VerificationMethodic?.Name?.ToLower().Contains(word) ?? false)
                         return true;
                 if (request.IsRegisterNumber)
-                    if (d.Device.RegistrationNumber?.ToString().ToLower().Contains(word) ?? false)
+                    if (d.Device.RegistrationNumber?.ToLower().Contains(word) ?? false)
+                        return true;
+                if ("свидетельство о поверке".Contains(word))
+                    if (d is Certificate)
+                        return true;
+                if ("извещение о непригодности".Contains(word))
+                    if (d is FailureNotification)
                         return true;
 
                 return false;
@@ -284,6 +291,29 @@ namespace CertificateManagementSystem.Services
                 .Include(d => d.DocumentFile)
                 .Include(d => d.Device)
                 .ThenInclude(dev => dev.VerificationMethodic);
+        }
+
+        private IEnumerable<Document> SearchInDocumentType(string query)
+        {
+            if ("свидетельство о поверке".Contains(query))
+            {
+                return _context.Documents.OfType<Certificate>()
+                .Include(d => d.Client)
+                .Include(d => d.Contract)
+                .Include(d => d.DocumentFile)
+                .Include(d => d.Device)
+                .ThenInclude(dev => dev.VerificationMethodic);
+            }
+            else if ("извещение о непригодности".Contains(query))
+            {
+                return _context.Documents.OfType<FailureNotification>()
+                .Include(d => d.Client)
+                .Include(d => d.Contract)
+                .Include(d => d.DocumentFile)
+                .Include(d => d.Device)
+                .ThenInclude(dev => dev.VerificationMethodic);
+            }
+            return new List<Document>();
         }
 
     }

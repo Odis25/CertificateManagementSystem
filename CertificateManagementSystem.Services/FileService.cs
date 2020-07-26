@@ -44,7 +44,7 @@ namespace CertificateManagementSystem.Services
                 if (file.Size == fileInfo.Length)
                     return filePath.Replace(documentsFolderPath, "");
 
-                var newFileName = fileName + $"_({i++})";
+                var newFileName = $"{fileName}_({i++})";
                 filePath = Path.Combine(fileFolder, newFileName + extension);
             }
 

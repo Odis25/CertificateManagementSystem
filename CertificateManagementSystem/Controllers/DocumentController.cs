@@ -1,5 +1,6 @@
 ﻿using CertificateManagementSystem.Data.Models;
 using CertificateManagementSystem.Extensions;
+using CertificateManagementSystem.Helpers;
 using CertificateManagementSystem.Models.Document;
 using CertificateManagementSystem.Services.Components;
 using CertificateManagementSystem.Services.Interfaces;
@@ -21,15 +22,21 @@ namespace CertificateManagementSystem.Controllers
 {
     public class DocumentController : Controller
     {
-        private readonly IDocumentService _documents;
-        private readonly IFileService _files;
         private readonly IConfiguration _configuration;
+        private readonly IDocumentService _documents;
+        private readonly IFileProvider _fileProvider;
+        private readonly IFileService _files;
+        private readonly IMapper _mapper;
         private readonly IWebHostEnvironment _appEnvironment;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IFileProvider _fileProvider;
 
-        public DocumentController(IDocumentService documents, IFileService files,
-            IConfiguration configuration, IWebHostEnvironment appEnvironment, UserManager<ApplicationUser> userManager, IFileProvider fileProvider)
+        public DocumentController(IDocumentService documents,
+            IConfiguration configuration,
+            IFileProvider fileProvider,
+            IFileService files,
+            IMapper mapper,
+            IWebHostEnvironment appEnvironment,
+            UserManager<ApplicationUser> userManager)
         {
             _configuration = configuration;
             _documents = documents;
@@ -37,6 +44,7 @@ namespace CertificateManagementSystem.Controllers
             _appEnvironment = appEnvironment;
             _userManager = userManager;
             _fileProvider = fileProvider;
+            _mapper = mapper;
         }
 
         // Построение дерева навигации по документам
@@ -103,8 +111,8 @@ namespace CertificateManagementSystem.Controllers
                 CalibrationDate = (document as Certificate)?.CalibrationDate.ToString("dd-MM-yyyy"),
                 CalibrationExpireDate = (document as Certificate)?.CalibrationExpireDate.ToString("dd-MM-yyyy"),
                 DocumentDate = (document as FailureNotification)?.DocumentDate.ToString("dd-MM-yyyy"),
-                CreatedOn = document.CreatedOn.ToString("dd-MM-yyyy hh:mm"),
-                UpdatedOn = document.UpdatedOn?.ToString("dd-MM-yyyy hh:mm") ?? document.CreatedOn.ToString("dd-MM-yyyy hh:mm"),
+                CreatedOn = document.CreatedOn.ToString("dd-MM-yyyy HH:mm"),
+                UpdatedOn = document.UpdatedOn?.ToString("dd-MM-yyyy HH:mm") ?? document.CreatedOn.ToString("dd-MM-yyyy HH:mm"),
                 CreatedBy = document.CreatedBy,
                 UpdatedBy = document.UpdatedBy ?? document.CreatedBy,
                 FilePath = filePath
@@ -152,68 +160,12 @@ namespace CertificateManagementSystem.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.GetUserAsync(User);
-                if (model.DocumentType == DocumentType.Certificate)
-                {
-                    var document = new Certificate
-                    {
-                        Id = model.Id,
-                        CalibrationDate = (DateTime)model.CalibrationDate,
-                        CalibrationExpireDate = (DateTime)model.CalibrationExpireDate,
-                        DocumentNumber = model.DocumentNumber,
-                        Client = new Client
-                        {
-                            Name = model.ClientName,
-                            ExploitationPlace = model.ExploitationPlace
-                        },
-                        Contract = new Contract
-                        {
-                            Year = model.Year,
-                            ContractNumber = model.ContractNumber
-                        },
-                        Device = new Device
-                        {
-                            Name = model.DeviceName,
-                            Type = model.DeviceType,
-                            SerialNumber = model.SerialNumber,
-                            RegistrationNumber = model.RegistrationNumber,
-                            VerificationMethodic = new Methodic { FileName = model.VerificationMethodic }
-                        },
-                        UpdatedOn = DateTime.Now,
-                        UpdatedBy = user.FullName
-                    };
-                    await _documents.Edit(document);
-                }
-                else
-                {
-                    var document = new FailureNotification
-                    {
-                        Id = model.Id,
-                        DocumentDate = (DateTime)model.DocumentDate,
-                        DocumentNumber = model.DocumentNumber,
-                        Client = new Client
-                        {
-                            Name = model.ClientName,
-                            ExploitationPlace = model.ExploitationPlace
-                        },
-                        Contract = new Contract
-                        {
-                            Year = model.Year,
-                            ContractNumber = model.ContractNumber
-                        },
-                        Device = new Device
-                        {
-                            Name = model.DeviceName,
-                            Type = model.DeviceType,
-                            SerialNumber = model.SerialNumber,
-                            RegistrationNumber = model.RegistrationNumber,
-                            VerificationMethodic = new Methodic { FileName = model.VerificationMethodic }
-                        },
-                        UpdatedOn = DateTime.Now,
-                        UpdatedBy = user.FullName
-                    };
-                    await _documents.Edit(document);
-                }
-                
+                model.UpdatedOn = DateTime.Now;
+                model.UpdatedBy = user.FullName;
+
+                var document = _mapper.MapDocumentModel(model);
+
+                await _documents.Edit(document);
             }
 
             CreateSelectLists();
@@ -282,22 +234,29 @@ namespace CertificateManagementSystem.Controllers
         [Authorize(Roles = "Admin, Metrologist")]
         public async Task<IActionResult> Create(DocumentCreateModel model)
         {
-            var newDocument = CreateDocument(model);
+            // Если документ с таким номером уже есть в базе
+            if (_documents.IsDocumentExist(model.DocumentNumber))
+            {
+                ModelState.AddModelError("", "Документ с таким номером уже есть в базе.");
+            }
 
             if (ModelState.IsValid)
             {
                 var user = await _userManager.GetUserAsync(User);
-                var destinationFilePath = newDocument.DocumentFile.Path;
+                model.CreatedBy = user.FullName;
+                model.CreatedOn = DateTime.Now;
 
-                newDocument.CreatedBy = user.FullName;
-                newDocument.CreatedOn = DateTime.Now;
+                // Маппинг сущности
+                var newDocument = _mapper.MapDocumentModel(model);
+
+                var destination = newDocument.DocumentFile.Path;
 
                 try
                 {
                     // Загружаем файл на сервер
-                    var sourceFilePath = UploadFile(model.DocumentFile);
+                    var source = UploadFile(model.DocumentFile);
                     // Создаем файл по месту хранения
-                    _files.CreateFile(sourceFilePath, destinationFilePath);
+                    _files.CreateFile(source, destination);
                     // Добавляем запись в базу
                     await _documents.Add(newDocument);
                     // Уведомляем пользователя об успешном добавлении
@@ -311,6 +270,7 @@ namespace CertificateManagementSystem.Controllers
 
             CreateSelectLists();
 
+            // Отображаем ошибки операции
             foreach (var state in ModelState.Values)
             {
                 foreach (var error in state.Errors)
@@ -344,136 +304,6 @@ namespace CertificateManagementSystem.Controllers
             ViewBag.ExploitationPlaces = new SelectList(exploitationPlaces);
             ViewBag.RegisterNumbers = new SelectList(registerNumbers);
             ViewBag.Methodics = new SelectList(GetMethodics(), "FileName", "Name");
-        }
-
-        // Формируем нового заказчика
-        private Client CreateClient(DocumentCreateModel model)
-        {
-            return _documents.FindClient(model.ClientName, model.ExploitationPlace) ??
-                new Client
-                {
-                    Name = model.ClientName?.Trim().Capitalize(),
-                    ExploitationPlace = model.ExploitationPlace?.Trim().Capitalize()
-                };
-        }
-
-        // Формируем новый договор
-        private Contract CreateContract(DocumentCreateModel model)
-        {
-            return _documents.FindContract(model.ContractNumber, model.Year)
-                ?? new Contract
-                {
-                    Year = model.Year,
-                    ContractNumber = model.ContractNumber?.Trim()
-                };
-        }
-
-        // Формируем новую метоздику поверки
-        private Methodic CreateMethodic(DocumentCreateModel model)
-        {
-            var methodic = _documents.FindMethodic(model.VerificationMethodic?.ToLower());
-            if (methodic == null)
-            {
-                if (model.VerificationMethodic != null)
-                {
-                    methodic = new Methodic
-                    {
-                        Name = Path.GetFileNameWithoutExtension(model.VerificationMethodic),
-                        FileName = model.VerificationMethodic
-                    };
-                }
-            }
-
-            return methodic;
-        }
-
-        // Формируем новое устройство
-        private Device CreateDevice(DocumentCreateModel model)
-        {
-            var device = _documents.FindDevice(model.DeviceName, model.SerialNumber);
-            var methodic = CreateMethodic(model);
-
-            device ??= new Device
-            {
-                Name = model.DeviceName?.Trim(),
-                Type = model.DeviceType?.Trim(),
-                SerialNumber = model.SerialNumber?.Trim(),
-                RegistrationNumber = model.RegistrationNumber?.Trim(),
-                VerificationMethodic = methodic
-            };
-            return device;
-        }
-
-        // Формируем модель файла документа
-        private FileModel CreateFilePath(DocumentCreateModel model)
-        {
-            var year = model.Year.ToString();
-            var contract = model.ContractNumber.ReplaceInvalidChars('-') ?? "";
-            var deviceType = model.DeviceType.ReplaceInvalidChars('-');
-            var deviceName = model.DeviceName.ReplaceInvalidChars('-');
-            var docType = model.DocumentType == DocumentType.Certificate ? "Свидетельства" : "Извещения о непригодности";
-
-            var extension = Path.GetExtension(model.DocumentFile?.FileName);
-            var fileName = deviceType + "_" + deviceName + extension;
-            var filePath = Path.Combine(year, contract, docType, fileName);
-
-            var file = new FileModel
-            {
-                Size = model.DocumentFile?.Length ?? 0,
-                ContentType = model.DocumentFile?.ContentType,
-                Path = filePath
-            };
-            // Актуализируем путь к файлу
-            file.Path = _files.GetRealFilePath(file);
-
-            return file;
-        }
-
-        // Формируем новый документ
-        private Document CreateDocument(DocumentCreateModel model)
-        {
-            // Если документ с таким номером уже есть в базе
-            if (_documents.IsDocumentExist(model.DocumentNumber))
-            {
-                ModelState.AddModelError("", "Документ с таким номером уже есть в базе.");
-                return null;
-            }
-
-            var device = CreateDevice(model);
-            var contract = CreateContract(model);
-            var client = CreateClient(model);
-            var filePath = CreateFilePath(model);
-
-            switch (model.DocumentType)
-            {
-                // Создаем новое свидетельство
-                case DocumentType.Certificate:
-                    return new Certificate
-                    {
-                        Device = device,
-                        Contract = contract,
-                        Client = client,
-                        DocumentNumber = model.DocumentNumber?.Trim(),
-                        CalibrationDate = model.CalibrationDate,
-                        CalibrationExpireDate = model.CalibrationExpireDate,
-                        DocumentFile = filePath
-                    };
-
-                // Создаем новое извещение о непригодности
-                case DocumentType.FailureNotification:
-                    return new FailureNotification
-                    {
-                        Device = device,
-                        Contract = contract,
-                        Client = client,
-                        DocumentNumber = model.DocumentNumber?.Trim(),
-                        DocumentDate = model.DocumentDate,
-                        DocumentFile = filePath
-                    };
-
-                default:
-                    return null;
-            }
         }
 
         // Загрузка файла на сервер

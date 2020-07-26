@@ -102,18 +102,18 @@ namespace CertificateManagementSystem.Services
             var client = FindClient(document.Client.Name, document.Client.ExploitationPlace);
             var contract = FindContract(document.Contract.ContractNumber, document.Contract.Year);
             var device = FindDevice(document.Device.Name, document.Device.SerialNumber);
-            var methodic = FindMethodic(document.Device.VerificationMethodic.FileName);  
+            var methodic = FindMethodic(document.Device.VerificationMethodic.FileName);
 
             contract ??= new Contract
             {
                 ContractNumber = document.Contract.ContractNumber,
                 Year = document.Contract.Year
             };
-            
+
             client ??= new Client
             {
                 Name = document.Client.Name,
-                ExploitationPlace = document.Client.ExploitationPlace
+                ExploitationPlace = document.Client.ExploitationPlace ?? ""
             };
 
             methodic ??= new Methodic
@@ -126,8 +126,7 @@ namespace CertificateManagementSystem.Services
             {
                 Name = document.Device.Name,
                 Type = document.Device.Type,
-                SerialNumber = document.Device.SerialNumber,               
-                VerificationMethodic = methodic,
+                SerialNumber = document.Device.SerialNumber
             };
 
             _context.Update(doc);
@@ -136,7 +135,10 @@ namespace CertificateManagementSystem.Services
             doc.Client = client;
             doc.Contract = contract;
             doc.Device = device;
-            doc.Device.RegistrationNumber = document.Device.RegistrationNumber;
+            doc.Device.Type = document.Device.Type;
+            doc.Device.VerificationMethodic = methodic;
+            doc.Device.RegistrationNumber = document.Device.RegistrationNumber;           
+            
             if (doc is Certificate)
             {
                 ((Certificate)doc).CalibrationDate = ((Certificate)document).CalibrationDate;
@@ -147,7 +149,7 @@ namespace CertificateManagementSystem.Services
                 ((FailureNotification)doc).DocumentDate = ((FailureNotification)document).DocumentDate;
             }
             doc.UpdatedOn = document.UpdatedOn;
-            doc.UpdatedBy = doc.UpdatedBy;
+            doc.UpdatedBy = document.UpdatedBy;
 
             await _context.SaveChangesAsync();
         }

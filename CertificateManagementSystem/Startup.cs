@@ -1,5 +1,6 @@
 using CertificateManagementSystem.Data;
 using CertificateManagementSystem.Data.Models;
+using CertificateManagementSystem.Helpers;
 using CertificateManagementSystem.Models.Settings;
 using CertificateManagementSystem.Services;
 using CertificateManagementSystem.Services.Interfaces;
@@ -46,6 +47,7 @@ namespace CertificateManagementSystem
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ISearchService, SearchService>();
+            services.AddScoped<IMapper, Mapper>();
             services.AddScoped<DataSeeder>();
 
             var dir = Configuration.GetSection("Paths").GetSection("MethodicsFolder").Value;
