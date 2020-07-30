@@ -139,7 +139,7 @@ namespace CertificateManagementSystem.Controllers
                 DeviceType = document.Device.Type,
                 SerialNumber = document.Device.SerialNumber,
                 RegistrationNumber = document.Device.RegistrationNumber,
-                VerificationMethodic = document.Device.VerificationMethodic?.Name,
+                VerificationMethodic = document.Device.VerificationMethodic?.FileName,
                 DocumentNumber = document.DocumentNumber,
                 DocumentType = (document is Certificate) ? DocumentType.Certificate : DocumentType.FailureNotification,
                 CalibrationDate = (document as Certificate)?.CalibrationDate,
@@ -169,6 +169,15 @@ namespace CertificateManagementSystem.Controllers
             }
 
             CreateSelectLists();
+
+            // Отображаем ошибки операции
+            foreach (var state in ModelState.Values)
+            {
+                foreach (var error in state.Errors)
+                {
+                    this.AddAlertDanger(error.ErrorMessage);
+                }
+            }
 
             return PartialView("_DocumentEdit", model);
         }
@@ -234,6 +243,7 @@ namespace CertificateManagementSystem.Controllers
         [Authorize(Roles = "Admin, Metrologist")]
         public async Task<IActionResult> Create(DocumentCreateModel model)
         {
+            //todo: создать отдельный класс валидации свойства
             // Если документ с таким номером уже есть в базе
             if (_documents.IsDocumentExist(model.DocumentNumber))
             {
@@ -248,15 +258,13 @@ namespace CertificateManagementSystem.Controllers
 
                 // Маппинг сущности
                 var newDocument = _mapper.MapDocumentModel(model);
-
+                // Путь к создаваемому файлу
                 var destination = newDocument.DocumentFile.Path;
 
                 try
                 {
                     // Загружаем файл на сервер
-                    var source = UploadFile(model.DocumentFile);
-                    // Создаем файл по месту хранения
-                    _files.CreateFile(source, destination);
+                    var result = _files.UploadFile(model.DocumentFile, destination);                   
                     // Добавляем запись в базу
                     await _documents.Add(newDocument);
                     // Уведомляем пользователя об успешном добавлении
@@ -287,8 +295,8 @@ namespace CertificateManagementSystem.Controllers
         {
             var clients = _documents.GetClients();
             var devices = _documents.GetDevices();
-            var methodics = _documents.GetVerificationMethodics();
             var contracts = _documents.GetContracts();
+            var methodics = _documents.GetMethodics();
 
             var contractNumbers = contracts.Select(c => c.ContractNumber).Distinct();
             var clientNames = clients.Select(c => c.Name).Distinct();
@@ -303,33 +311,7 @@ namespace CertificateManagementSystem.Controllers
             ViewBag.DeviceTypes = new SelectList(deviceTypes);
             ViewBag.ExploitationPlaces = new SelectList(exploitationPlaces);
             ViewBag.RegisterNumbers = new SelectList(registerNumbers);
-            ViewBag.Methodics = new SelectList(GetMethodics(), "FileName", "Name");
-        }
-
-        // Загрузка файла на сервер
-        private string UploadFile(IFormFile documentFile)
-        {
-            var fileName = User.Identity.Name + "_temp.tmp";
-            var filePath = Path.Combine(_appEnvironment.WebRootPath, "files", "uploads", fileName);
-
-            using (var file = new FileStream(filePath, FileMode.Create))
-            {
-                documentFile.CopyTo(file);
-            }
-
-            return filePath;
-        }
-
-        // Получить список методик
-        private IEnumerable<MethodicModel> GetMethodics()
-        {
-            var files = _fileProvider.GetDirectoryContents("");
-
-            return files.Where(f => f.IsDirectory == false).Select(f => new MethodicModel
-            {
-                Name = Path.GetFileNameWithoutExtension(f.Name),
-                FileName = f.Name
-            });
+            ViewBag.Methodics = new SelectList(methodics, "FileName", "Name");
         }
     }
 }

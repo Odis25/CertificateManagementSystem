@@ -2,7 +2,9 @@
 using CertificateManagementSystem.Data.Models;
 using CertificateManagementSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,10 +13,12 @@ namespace CertificateManagementSystem.Services
     public class DocumentService : IDocumentService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IFileProvider _fileProvider;
 
-        public DocumentService(ApplicationDbContext context)
+        public DocumentService(ApplicationDbContext context, IFileProvider fileProvider)
         {
             _context = context;
+            _fileProvider = fileProvider;
         }
 
         public IEnumerable<int> GetYears()
@@ -81,13 +85,19 @@ namespace CertificateManagementSystem.Services
                 .FirstOrDefault(d => d.Name == deviceName && d.SerialNumber == serialNumber);
         }
 
-        public IEnumerable<Methodic> GetVerificationMethodics()
+        public IEnumerable<Methodic> GetMethodics()
         {
-            return _context.VerificationMethodics.OrderBy(vm => vm.Name);
+            var files = _fileProvider.GetDirectoryContents("");
+
+            return files.Where(f => f.IsDirectory == false).Select(f => new Methodic
+            {
+                Name = Path.GetFileNameWithoutExtension(f.Name),
+                FileName = f.Name
+            }).OrderBy(f => f.FileName);
         }
-        public Methodic FindMethodic(string methodicName)
+        public Methodic FindMethodic(string methodicFileName)
         {
-            return _context.VerificationMethodics.FirstOrDefault(m => m.FileName == methodicName);
+            return _context.VerificationMethodics.FirstOrDefault(m => m.FileName == methodicFileName);
         }
 
         public async Task Add(Document newDocument)
@@ -137,8 +147,8 @@ namespace CertificateManagementSystem.Services
             doc.Device = device;
             doc.Device.Type = document.Device.Type;
             doc.Device.VerificationMethodic = methodic;
-            doc.Device.RegistrationNumber = document.Device.RegistrationNumber;           
-            
+            doc.Device.RegistrationNumber = document.Device.RegistrationNumber;
+
             if (doc is Certificate)
             {
                 ((Certificate)doc).CalibrationDate = ((Certificate)document).CalibrationDate;

@@ -1,10 +1,11 @@
 ﻿using CertificateManagementSystem.Data.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace CertificateManagementSystem.Services.Interfaces
 {
     public interface IFileService
     {
-        void CreateFile(string sourceFilePath, string destinationFilePath);
-        string GetRealFilePath(FileModel file);
+        bool UploadFile(IFormFile file, string destinationPath);
+        string ActualizeFilePath(FileModel file);
     }
 }

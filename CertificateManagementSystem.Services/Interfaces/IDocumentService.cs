@@ -21,7 +21,7 @@ namespace CertificateManagementSystem.Services.Interfaces
         IEnumerable<Device> GetDevices();
         Device FindDevice(string deviceName, string serialNumber);
 
-        IEnumerable<Methodic> GetVerificationMethodics();
+        IEnumerable<Methodic> GetMethodics();
         Methodic FindMethodic(string methodicName);
 
         Task Add(Document newDocument);

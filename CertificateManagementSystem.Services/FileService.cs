@@ -1,5 +1,6 @@
 ﻿using CertificateManagementSystem.Data.Models;
 using CertificateManagementSystem.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 
@@ -15,22 +16,30 @@ namespace CertificateManagementSystem.Services
         }
 
         // Создать файл документа
-        public void CreateFile(string sourceFilePath, string destinationFilePath)
+        public bool UploadFile(IFormFile file, string destinationPath)
         {
             var documentsFolderPath = _configuration.GetSection("Paths").GetSection("DocumentsFolder").Value;
-            destinationFilePath = Path.Combine(documentsFolderPath, destinationFilePath);
+            destinationPath = Path.Combine(documentsFolderPath, destinationPath);
+            var destinationFolder = Path.GetDirectoryName(destinationPath);
+            
+            // Директория не существует?
+            if (!Directory.Exists(destinationFolder))
+                Directory.CreateDirectory(destinationFolder);
 
-            if (File.Exists(destinationFilePath))
-                return;
+            if (File.Exists(destinationPath))
+                return false;
 
-            File.Copy(sourceFilePath, destinationFilePath);
+            using (var document = new FileStream(destinationPath, FileMode.Create))
+            {
+                file.CopyTo(document);
+            }
+            return true;
         }
 
-        public string GetRealFilePath(FileModel file)
+        public string ActualizeFilePath(FileModel file)
         {
             var documentsFolderPath = _configuration.GetSection("Paths").GetSection("DocumentsFolder").Value;
             var filePath = Path.Combine(documentsFolderPath, file.Path);
-
             var fileFolder = Path.GetDirectoryName(filePath);
             var fileName = Path.GetFileNameWithoutExtension(filePath);
             var extension = Path.GetExtension(filePath);
@@ -47,10 +56,6 @@ namespace CertificateManagementSystem.Services
                 var newFileName = $"{fileName}_({i++})";
                 filePath = Path.Combine(fileFolder, newFileName + extension);
             }
-
-            // Директория не существует?
-            if (!Directory.Exists(fileFolder))
-                Directory.CreateDirectory(fileFolder);
 
             return filePath.Replace(documentsFolderPath, "");
         }

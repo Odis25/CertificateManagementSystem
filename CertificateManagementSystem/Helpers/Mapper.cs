@@ -3,10 +3,7 @@ using CertificateManagementSystem.Models.Document;
 using CertificateManagementSystem.Services.Components;
 using CertificateManagementSystem.Services.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace CertificateManagementSystem.Helpers
 {
@@ -141,8 +138,10 @@ namespace CertificateManagementSystem.Helpers
                 ContentType = model.DocumentFile?.ContentType,
                 Path = filePath
             };
+
             // Актуализируем путь к файлу
-            file.Path = _fileService.GetRealFilePath(file);
+            file.Path = _fileService.ActualizeFilePath(file);
+            file.FileName = Path.GetFileName(file.Path);
 
             return file;
         }
@@ -169,18 +168,12 @@ namespace CertificateManagementSystem.Helpers
         // Формируем новую метоздику поверки
         private Methodic CreateMethodic(DocumentCreateModel model)
         {
-            var methodic = _documentService.FindMethodic(model.VerificationMethodic?.ToLower());
-            if (methodic == null)
-            {
-                if (model.VerificationMethodic != null)
+            var methodic = _documentService.FindMethodic(model.VerificationMethodic) ??
+                new Methodic
                 {
-                    methodic = new Methodic
-                    {
-                        Name = Path.GetFileNameWithoutExtension(model.VerificationMethodic),
-                        FileName = model.VerificationMethodic
-                    };
-                }
-            }
+                    Name = Path.GetFileNameWithoutExtension(model.VerificationMethodic),
+                    FileName = model.VerificationMethodic
+                };
 
             return methodic;
         }

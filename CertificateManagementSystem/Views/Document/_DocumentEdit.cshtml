@@ -1,169 +1,163 @@
 ﻿@model DocumentEditModel
 
-<div class="modal-content">
+    <div class="modal-content">
 
-    <div class="modal-header custom-modal-header">
-        <h5>Редактирование документа</h5>
-        <button type="button" class="close" data-dismiss="modal">
-            <span>&times;</span>
-        </button>
-    </div>
+        <div class="modal-header custom-modal-header">
+            <h5>Редактирование документа</h5>
+            <button type="button" class="close" data-dismiss="modal">
+                <span>&times;</span>
+            </button>
+        </div>
 
-    <div class="modal-body custom-modal-body">
-        <div class="row">
-            <div class="col-6" id="html-holder">
-                <form method="post" id="edit-document-form">
+        <div class="modal-body custom-modal-body">
+            <div class="row">
+                <div class="col-6" id="html-holder">
+                    <form method="post" id="edit-document-form">
 
-                    <!--Скрытые поля-->
-                    <input type="hidden" asp-for="Id" />
-                    <input type="hidden" asp-for="FilePath" />
-                    <input type="hidden" asp-for="DocumentType" />
-                    <input type="hidden" name="IsValid" value="@ViewData.ModelState.IsValid.ToString()" />
+                        <!--Скрытые поля-->
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="FilePath" />
+                        <input type="hidden" asp-for="DocumentType" />
+                        <input type="hidden" name="IsValid" value="@ViewData.ModelState.IsValid.ToString()" />
 
-                    <!--Поля ввода данных-->
-                    <table id="document-details-table">
-                        <tr>
-                            <td>Год заключения договора:</td>
-                            <td>
-                                <input asp-for="Year" type="number" class="form-control form-control-sm" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Номер договора:</td>
-                            <td>
-                                <input asp-for="ContractNumber" class="form-control form-control-sm" list="contractNumberList" />
-                                <datalist id="contractNumberList">
-                                    @foreach (var item in ViewBag.Contracts)
-                                    {
-                                        <option value="@item.Text" title="@item.Text">@item.Text</option>
-                                    }
-                                </datalist>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Эксплуатирующая организация:</td>
-                            <td>
-                                <input asp-for="ClientName" class="form-control form-control-sm" list="clientNameList" />
-                                <datalist id="clientNameList">
-                                    @foreach (var item in ViewBag.ClientNames)
-                                    {
-                                        <option value="@item.Text" title="@item.Text">@item.Text</option>
-                                    }
-                                </datalist>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Место эксплуатации:</td>
-                            <td>
-                                <input asp-for="ExploitationPlace" class="form-control form-control-sm" list="exploitationPlaceList" />
-                                <datalist id="exploitationPlaceList">
-                                    @foreach (var item in ViewBag.ExploitationPlaces)
-                                    {
-                                        <option value="@item.Text" title="@item.Text">@item.Text</option>
-                                    }
-                                </datalist>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Группа СИ:</td>
-                            <td>
-                                <input asp-for="DeviceType" class="form-control form-control-sm" list="deviceTypeList" />
-                                <datalist id="deviceTypeList">
-                                    @foreach (var item in ViewBag.DeviceTypes)
-                                    {
-                                        <option value="@item.Text" title="@item.Text">@item.Text</option>
-                                    }
-                                </datalist>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Наименование СИ:</td>
-                            <td>
-                                <input asp-for="DeviceName" class="form-control form-control-sm" list="deviceNameList" />
-                                <datalist id="deviceNameList">
-                                    @foreach (var item in ViewBag.DeviceNames)
-                                    {
-                                        <option value="@item.Text" title="@item.Text">@item.Text</option>
-                                    }
-                                </datalist>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Заводской номер СИ:</td>
-                            <td>
-                                <input asp-for="SerialNumber" class="form-control form-control-sm" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Номер в гос. реестре:</td>
-                            <td>
-                                <input asp-for="RegistrationNumber" class="form-control form-control-sm" list="registrationNumberList" />
-                                <datalist id="registrationNumberList">
-                                    @foreach (var item in ViewBag.RegisterNumbers)
-                                    {
-                                        <option value="@item.Text" title="@item.Text">@item.Text</option>
-                                    }
-                                </datalist>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Методика поверки:</td>
-                            <td>
-                                <select asp-for="VerificationMethodic" asp-items="ViewBag.Methodics" class="form-control form-control-sm">
-                                    <option></option>
-                                </select>
-                            </td>
-                        </tr>
-                        @*<tr>
-                            <td>Тип документа:</td>
-                            <td>
-                                <select asp-for="DocumentType" asp-items="Html.GetEnumSelectList(typeof(DocumentType))" class="form-control form-control-sm"></select>
-                            </td>
-                        </tr>*@
-                        <tr>
-                            <td>Номер документа:</td>
-                            <td>
-                                <input asp-for="DocumentNumber" class="form-control form-control-sm" />
-                            </td>
-                        </tr>
-
-                        @if (Model.DocumentType == DocumentType.Certificate)
-                        {
+                        <!--Поля ввода данных-->
+                        <table id="document-details-table">
                             <tr>
-                                <td>Дата поверки:</td>
+                                <td>Год заключения договора:</td>
                                 <td>
-                                    <input type="date" asp-for="CalibrationDate" class="form-control form-control-sm" />
+                                    <input asp-for="Year" type="number" class="form-control form-control-sm" />
                                 </td>
                             </tr>
                             <tr>
-                                <td>Дата окончания срока поверки:</td>
+                                <td>Номер договора:</td>
                                 <td>
-                                    <input type="date" asp-for="CalibrationExpireDate" class="form-control form-control-sm" />
+                                    <input asp-for="ContractNumber" class="form-control form-control-sm" list="contractNumberList" />
+                                    <datalist id="contractNumberList">
+                                        @foreach (var item in ViewBag.Contracts)
+                                        {
+                                            <option value="@item.Text" title="@item.Text">@item.Text</option>
+                                        }
+                                    </datalist>
                                 </td>
                             </tr>
-                        }
-                        else
-                        {
                             <tr>
-                                <td>Дата оформления документа:</td>
+                                <td>Эксплуатирующая организация:</td>
                                 <td>
-                                    <input type="date" asp-for="DocumentDate" class="form-control form-control-sm" />
+                                    <input asp-for="ClientName" class="form-control form-control-sm" list="clientNameList" />
+                                    <datalist id="clientNameList">
+                                        @foreach (var item in ViewBag.ClientNames)
+                                        {
+                                            <option value="@item.Text" title="@item.Text">@item.Text</option>
+                                        }
+                                    </datalist>
                                 </td>
                             </tr>
-                        }
+                            <tr>
+                                <td>Место эксплуатации:</td>
+                                <td>
+                                    <input asp-for="ExploitationPlace" class="form-control form-control-sm" list="exploitationPlaceList" />
+                                    <datalist id="exploitationPlaceList">
+                                        @foreach (var item in ViewBag.ExploitationPlaces)
+                                        {
+                                            <option value="@item.Text" title="@item.Text">@item.Text</option>
+                                        }
+                                    </datalist>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Группа СИ:</td>
+                                <td>
+                                    <input asp-for="DeviceType" class="form-control form-control-sm" list="deviceTypeList" />
+                                    <datalist id="deviceTypeList">
+                                        @foreach (var item in ViewBag.DeviceTypes)
+                                        {
+                                            <option value="@item.Text" title="@item.Text">@item.Text</option>
+                                        }
+                                    </datalist>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Наименование СИ:</td>
+                                <td>
+                                    <input asp-for="DeviceName" class="form-control form-control-sm" list="deviceNameList" />
+                                    <datalist id="deviceNameList">
+                                        @foreach (var item in ViewBag.DeviceNames)
+                                        {
+                                            <option value="@item.Text" title="@item.Text">@item.Text</option>
+                                        }
+                                    </datalist>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Заводской номер СИ:</td>
+                                <td>
+                                    <input asp-for="SerialNumber" class="form-control form-control-sm" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Номер в гос. реестре:</td>
+                                <td>
+                                    <input asp-for="RegistrationNumber" class="form-control form-control-sm" list="registrationNumberList" />
+                                    <datalist id="registrationNumberList">
+                                        @foreach (var item in ViewBag.RegisterNumbers)
+                                        {
+                                            <option value="@item.Text" title="@item.Text">@item.Text</option>
+                                        }
+                                    </datalist>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Методика поверки:</td>
+                                <td>
+                                    <select asp-for="VerificationMethodic" asp-items="ViewBag.Methodics" class="form-control form-control-sm">
+                                        <option></option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Номер документа:</td>
+                                <td>
+                                    <input asp-for="DocumentNumber" class="form-control form-control-sm" />
+                                </td>
+                            </tr>
 
-                    </table>
-                </form>
-            </div>
-            <div class="col-6">
-                <iframe src="@Model.FilePath"></iframe>
+                            @if (Model.DocumentType == DocumentType.Certificate)
+                            {
+                                <tr>
+                                    <td>Дата поверки:</td>
+                                    <td>
+                                        <input type="date" asp-for="CalibrationDate" class="form-control form-control-sm" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Дата окончания срока поверки:</td>
+                                    <td>
+                                        <input type="date" asp-for="CalibrationExpireDate" class="form-control form-control-sm" />
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td>Дата оформления документа:</td>
+                                    <td>
+                                        <input type="date" asp-for="DocumentDate" class="form-control form-control-sm" />
+                                    </td>
+                                </tr>
+                            }
+
+                        </table>
+                    </form>
+                </div>
+                <div class="col-6">
+                    <iframe src="@Model.FilePath"></iframe>
+                </div>
             </div>
         </div>
+        <div class="modal-footer custom-modal-footer">
+            <button class="btn btn-primary" type="button" onclick="ApplyChanges(@Model.Id)">Сохранить изменения</button>
+            <button class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+        </div>
     </div>
-    <div class="modal-footer custom-modal-footer">
-        <button class="btn btn-primary" type="button" onclick="ApplyChanges(@Model.Id)">Сохранить изменения</button>
-        <button class="btn btn-secondary" data-dismiss="modal">Отмена</button>
-    </div>
-</div>
 
 
