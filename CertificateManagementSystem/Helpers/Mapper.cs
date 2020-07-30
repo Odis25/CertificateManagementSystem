@@ -80,7 +80,11 @@ namespace CertificateManagementSystem.Helpers
                             Type = model.DeviceType,
                             SerialNumber = model.SerialNumber,
                             RegistrationNumber = model.RegistrationNumber,
-                            VerificationMethodic = new Methodic { FileName = model.VerificationMethodic }
+                            VerificationMethodic = new Methodic 
+                            {
+                                Name = Path.GetFileNameWithoutExtension(model.VerificationMethodic),
+                                FileName = model.VerificationMethodic
+                            }
                         },
                         UpdatedBy = model.UpdatedBy,
                         UpdatedOn = model.UpdatedOn
@@ -108,7 +112,11 @@ namespace CertificateManagementSystem.Helpers
                             Type = model.DeviceType,
                             SerialNumber = model.SerialNumber,
                             RegistrationNumber = model.RegistrationNumber,
-                            VerificationMethodic = new Methodic { FileName = model.VerificationMethodic }
+                            VerificationMethodic = new Methodic 
+                            {
+                                Name = Path.GetFileNameWithoutExtension(model.VerificationMethodic),
+                                FileName = model.VerificationMethodic
+                            }
                         },
                         UpdatedBy = model.UpdatedBy,
                         UpdatedOn = model.UpdatedOn
