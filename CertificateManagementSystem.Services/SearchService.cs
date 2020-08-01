@@ -1,6 +1,8 @@
-﻿using CertificateManagementSystem.Data;
+﻿using AutoMapper;
+using CertificateManagementSystem.Data;
 using CertificateManagementSystem.Data.Models;
 using CertificateManagementSystem.Services.Interfaces;
+using CertificateManagementSystem.Services.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -12,13 +14,15 @@ namespace CertificateManagementSystem.Services
     public class SearchService : ISearchService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public SearchService(ApplicationDbContext context)
+        public SearchService(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public IEnumerable<Document> Find(SearchRequest searchRequest)
+        public IEnumerable<DocumentDTO> Find(SearchRequestDTO searchRequest)
         {
             var query = searchRequest.SearchQuery.ToLower();
             var dates = ExtractDatePatterns(ref query);
@@ -26,20 +30,21 @@ namespace CertificateManagementSystem.Services
             searchRequest.SearchQuery = query;
 
             // Поиск по ключевым словам
-            var result = SearchByKeywords(searchRequest);
+            var documents = SearchByKeywords(searchRequest);
             // Поиск по датам
             if (dates.Length > 0)
             {
-                if (result.Any())
-                    result = result.Intersect(SearchByDatePatterns(dates));
+                if (documents.Any())
+                    documents = documents.Intersect(SearchByDatePatterns(dates));
                 else
-                    result = SearchByDatePatterns(dates);
+                    documents = SearchByDatePatterns(dates);
             }
 
+            var result = _mapper.Map<List<DocumentDTO>>(documents);
             return result;
         }
 
-        private IEnumerable<Document> SearchByKeywords(SearchRequest request)
+        private IEnumerable<Document> SearchByKeywords(SearchRequestDTO request)
         {
             var keyWords = request.SearchQuery.Split(' ');
             var result = new List<Document>();

@@ -1,9 +1,11 @@
+using AutoMapper;
 using CertificateManagementSystem.Data;
 using CertificateManagementSystem.Data.Models;
 using CertificateManagementSystem.Helpers;
 using CertificateManagementSystem.Models.Settings;
 using CertificateManagementSystem.Services;
 using CertificateManagementSystem.Services.Interfaces;
+using CertificateManagementSystem.Services.Mapping;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -47,8 +49,10 @@ namespace CertificateManagementSystem
             services.AddScoped<IFileService, FileService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ISearchService, SearchService>();
-            services.AddScoped<IMapper, Mapper>();
+            services.AddScoped<IViewModelMapper, ViewModelMapper>();
             services.AddScoped<DataSeeder>();
+
+            services.AddAutoMapper(c => c.AddProfile<EntityMappingProfile>(), typeof(Startup));
 
             var dir = Configuration.GetSection("Paths").GetSection("MethodicsFolder").Value;
             if (Directory.Exists(dir))

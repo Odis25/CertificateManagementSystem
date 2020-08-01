@@ -4,6 +4,7 @@ using CertificateManagementSystem.Helpers;
 using CertificateManagementSystem.Models.Document;
 using CertificateManagementSystem.Services.Components;
 using CertificateManagementSystem.Services.Interfaces;
+using CertificateManagementSystem.Services.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -26,7 +27,7 @@ namespace CertificateManagementSystem.Controllers
         private readonly IDocumentService _documents;
         private readonly IFileProvider _fileProvider;
         private readonly IFileService _files;
-        private readonly IMapper _mapper;
+        private readonly IViewModelMapper _vmMapper;
         private readonly IWebHostEnvironment _appEnvironment;
         private readonly UserManager<ApplicationUser> _userManager;
 
@@ -34,7 +35,7 @@ namespace CertificateManagementSystem.Controllers
             IConfiguration configuration,
             IFileProvider fileProvider,
             IFileService files,
-            IMapper mapper,
+            IViewModelMapper vmMapper,
             IWebHostEnvironment appEnvironment,
             UserManager<ApplicationUser> userManager)
         {
@@ -44,7 +45,7 @@ namespace CertificateManagementSystem.Controllers
             _appEnvironment = appEnvironment;
             _userManager = userManager;
             _fileProvider = fileProvider;
-            _mapper = mapper;
+            _vmMapper = vmMapper;
         }
 
         // Построение дерева навигации по документам
@@ -107,10 +108,10 @@ namespace CertificateManagementSystem.Controllers
                 RegistrationNumber = document.Device.RegistrationNumber,
                 VerificationMethodic = document.Device.VerificationMethodic?.Name,
                 DocumentNumber = document.DocumentNumber,
-                DocumentType = (document is Certificate) ? "Свидетельство о поверке" : "Извещение о непригодности",
-                CalibrationDate = (document as Certificate)?.CalibrationDate.ToString("dd-MM-yyyy"),
-                CalibrationExpireDate = (document as Certificate)?.CalibrationExpireDate.ToString("dd-MM-yyyy"),
-                DocumentDate = (document as FailureNotification)?.DocumentDate.ToString("dd-MM-yyyy"),
+                DocumentType = (document is CertificateDTO) ? "Свидетельство о поверке" : "Извещение о непригодности",
+                CalibrationDate = (document as CertificateDTO)?.CalibrationDate.ToString("dd-MM-yyyy"),
+                CalibrationExpireDate = (document as CertificateDTO)?.CalibrationExpireDate.ToString("dd-MM-yyyy"),
+                DocumentDate = (document as FailureNotificationDTO)?.DocumentDate.ToString("dd-MM-yyyy"),
                 CreatedOn = document.CreatedOn.ToString("dd-MM-yyyy HH:mm"),
                 UpdatedOn = document.UpdatedOn?.ToString("dd-MM-yyyy HH:mm") ?? document.CreatedOn.ToString("dd-MM-yyyy HH:mm"),
                 CreatedBy = document.CreatedBy,
@@ -127,6 +128,7 @@ namespace CertificateManagementSystem.Controllers
         public IActionResult DocumentEdit(int id)
         {
             var document = _documents.GetDocumentById(id);
+
             var filePath = Path.Combine("/documentsFolder", document.DocumentFile.Path);
             var model = new DocumentEditModel
             {
@@ -141,10 +143,10 @@ namespace CertificateManagementSystem.Controllers
                 RegistrationNumber = document.Device.RegistrationNumber,
                 VerificationMethodic = document.Device.VerificationMethodic?.FileName,
                 DocumentNumber = document.DocumentNumber,
-                DocumentType = (document is Certificate) ? DocumentType.Certificate : DocumentType.FailureNotification,
-                CalibrationDate = (document as Certificate)?.CalibrationDate,
-                CalibrationExpireDate = (document as Certificate)?.CalibrationExpireDate,
-                DocumentDate = (document as FailureNotification)?.DocumentDate,
+                DocumentType = (document is CertificateDTO) ? DocumentType.Certificate : DocumentType.FailureNotification,
+                CalibrationDate = (document as CertificateDTO)?.CalibrationDate,
+                CalibrationExpireDate = (document as CertificateDTO)?.CalibrationExpireDate,
+                DocumentDate = (document as FailureNotificationDTO)?.DocumentDate,
                 FilePath = filePath
             };
 
@@ -163,7 +165,7 @@ namespace CertificateManagementSystem.Controllers
                 model.UpdatedOn = DateTime.Now;
                 model.UpdatedBy = user.FullName;
 
-                var document = _mapper.MapDocumentModel(model);
+                var document = _vmMapper.MapDocumentModel(model);
 
                 await _documents.Edit(document);
             }
@@ -203,11 +205,11 @@ namespace CertificateManagementSystem.Controllers
                 RegistrationNumber = d.Device.RegistrationNumber,
                 VerificationMethodic = d.Device.VerificationMethodic?.Name,
                 DocumentNumber = d.DocumentNumber,
-                CalibrationDate = (d as Certificate)?.CalibrationDate.ToString("dd-MM-yyyy"),
-                CalibrationExpireDate = (d as Certificate)?.CalibrationExpireDate.ToString("dd-MM-yyyy"),
+                CalibrationDate = (d as CertificateDTO)?.CalibrationDate.ToString("dd-MM-yyyy"),
+                CalibrationExpireDate = (d as CertificateDTO)?.CalibrationExpireDate.ToString("dd-MM-yyyy"),
                 FilePath = d.DocumentFile.Path,
-                DocumentType = (d is Certificate) ? "Свидетельство" : "Извещение о непригодности",
-                DocumentDate = (d as FailureNotification)?.DocumentDate.ToString("dd-MM-yyyy"),
+                DocumentType = (d is CertificateDTO) ? "Свидетельство" : "Извещение о непригодности",
+                DocumentDate = (d as FailureNotificationDTO)?.DocumentDate.ToString("dd-MM-yyyy"),
                 CreatedOn = d.CreatedOn.ToString("dd-MM-yyyy hh:mm"),
                 UpdatedOn = d.UpdatedOn?.ToString("dd-MM-yyyy hh:mm") ?? d.CreatedOn.ToString("dd-MM-yyyy hh:mm"),
                 CreatedBy = d.CreatedBy,
@@ -257,7 +259,7 @@ namespace CertificateManagementSystem.Controllers
                 model.CreatedOn = DateTime.Now;
 
                 // Маппинг сущности
-                var newDocument = _mapper.MapDocumentModel(model);
+                var newDocument = _vmMapper.MapDocumentModel(model);
                 // Путь к создаваемому файлу
                 var destination = newDocument.DocumentFile.Path;
 

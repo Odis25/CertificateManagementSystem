@@ -2,6 +2,7 @@
 using CertificateManagementSystem.Models.Document;
 using CertificateManagementSystem.Models.Search;
 using CertificateManagementSystem.Services.Interfaces;
+using CertificateManagementSystem.Services.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 
@@ -24,7 +25,7 @@ namespace CertificateManagementSystem.Controllers
         [HttpPost]
         public IActionResult Find(SearchModel searchModel)
         {
-            var searchRequest = new SearchRequest
+            var searchRequest = new SearchRequestDTO
             {
                 SearchQuery = searchModel.SearchQuery,
                 IsDocumentNumber = searchModel.IsDocumentNumber,
@@ -57,11 +58,11 @@ namespace CertificateManagementSystem.Controllers
                 RegistrationNumber = d.Device.RegistrationNumber,
                 VerificationMethodic = d.Device.VerificationMethodic?.Name,
                 DocumentNumber = d.DocumentNumber,
-                CalibrationDate = (d as Certificate)?.CalibrationDate.ToString("dd-MM-yyyy"),
-                CalibrationExpireDate = (d as Certificate)?.CalibrationExpireDate.ToString("dd-MM-yyyy"),
+                CalibrationDate = (d as CertificateDTO)?.CalibrationDate.ToString("dd-MM-yyyy"),
+                CalibrationExpireDate = (d as CertificateDTO)?.CalibrationExpireDate.ToString("dd-MM-yyyy"),
                 FilePath = d.DocumentFile.Path,
-                DocumentType = (d is Certificate) ? "Свидетельство" : "Извещение о непригодности",
-                DocumentDate = (d as FailureNotification)?.DocumentDate.ToString("dd-MM-yyyy"),
+                DocumentType = (d is CertificateDTO) ? "Свидетельство" : "Извещение о непригодности",
+                DocumentDate = (d as FailureNotificationDTO)?.DocumentDate.ToString("dd-MM-yyyy"),
                 CreatedOn = d.CreatedOn.ToString("dd-MM-yyyy hh:mm"),
                 UpdatedOn = d.UpdatedOn?.ToString("dd-MM-yyyy hh:mm") ?? d.CreatedOn.ToString("dd-MM-yyyy hh:mm"),
                 CreatedBy = d.CreatedBy,

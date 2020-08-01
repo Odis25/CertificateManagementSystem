@@ -1,10 +1,10 @@
-﻿using CertificateManagementSystem.Data.Models;
+﻿using CertificateManagementSystem.Services.Models;
 using System.Collections.Generic;
 
 namespace CertificateManagementSystem.Services.Interfaces
 {
     public interface ISearchService
     {
-        IEnumerable<Document> Find(SearchRequest searchRequest);
+        IEnumerable<DocumentDTO> Find(SearchRequestDTO searchRequest);
     }
 }

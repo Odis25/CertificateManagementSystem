@@ -1,5 +1,5 @@
-﻿using CertificateManagementSystem.Data.Models;
-using CertificateManagementSystem.Services.Interfaces;
+﻿using CertificateManagementSystem.Services.Interfaces;
+using CertificateManagementSystem.Services.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System.IO;
@@ -36,7 +36,7 @@ namespace CertificateManagementSystem.Services
             return true;
         }
 
-        public string ActualizeFilePath(FileModel file)
+        public string ActualizeFilePath(FileModelDTO file)
         {
             var documentsFolderPath = _configuration.GetSection("Paths").GetSection("DocumentsFolder").Value;
             var filePath = Path.Combine(documentsFolderPath, file.Path);

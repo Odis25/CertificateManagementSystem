@@ -1,4 +1,4 @@
-﻿using CertificateManagementSystem.Data.Models;
+﻿using CertificateManagementSystem.Services.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -8,24 +8,24 @@ namespace CertificateManagementSystem.Services.Interfaces
     {
         IEnumerable<int> GetYears();
 
-        Document GetDocumentById(int id);
-        IEnumerable<Document> GetDocumentsByContractId(int contractId);
+        DocumentDTO GetDocumentById(int id);
+        IEnumerable<DocumentDTO> GetDocumentsByContractId(int contractId);
 
-        IEnumerable<Contract> GetContracts();
-        IEnumerable<Contract> GetContracts(int year);
-        Contract FindContract(string contractNumber, int year);
+        IEnumerable<ContractDTO> GetContracts();
+        IEnumerable<ContractDTO> GetContracts(int year);
+        ContractDTO FindContract(string contractNumber, int year);
 
-        IEnumerable<Client> GetClients();
-        Client FindClient(string clientName, string exploitationPlace);
+        IEnumerable<ClientDTO> GetClients();
+        ClientDTO FindClient(string clientName, string exploitationPlace);
 
-        IEnumerable<Device> GetDevices();
-        Device FindDevice(string deviceName, string serialNumber);
+        IEnumerable<DeviceDTO> GetDevices();
+        DeviceDTO FindDevice(string deviceName, string serialNumber);
 
-        IEnumerable<Methodic> GetMethodics();
-        Methodic FindMethodic(string methodicName);
+        IEnumerable<MethodicDTO> GetMethodics();
+        MethodicDTO FindMethodic(string methodicName);
 
-        Task Add(Document newDocument);
-        Task Edit(Document  document);
+        Task Add(DocumentDTO newDocument);
+        Task Edit(DocumentDTO document);
         bool IsDocumentExist(string documentNumber);
 
         Task<int> DocumentsCount();
