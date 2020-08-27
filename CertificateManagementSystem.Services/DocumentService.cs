@@ -26,13 +26,29 @@ namespace CertificateManagementSystem.Services
             _mapper = mapper;
         }
 
-        public IEnumerable<int> GetYears()
+        public IEnumerable<YearDTO> GetYears()
         {
-            return _context.Contracts
-                .Where(c => c.Documents.Any())
+            var years = _context.Contracts
+                
                 .Select(c => c.Year)
                 .Distinct()
-                .OrderBy(y => y);
+                .OrderBy(y => y)
+                .ToList();
+
+            var result = years.Select(y => new YearDTO
+            {
+                Year = y,
+                Contracts = _context.Contracts
+                   .Where(c => c.Year == y && c.Documents.Any())
+                   .OrderBy(c => c.ContractNumber)
+                   .Select(c => new ContractDTO
+                   {
+                       Id = c.Id,
+                       ContractNumber = c.ContractNumber,
+                       Year = c.Year
+                   }).ToList()
+            });
+            return result;
         }
 
         public DocumentDTO GetDocumentById(int id)
@@ -65,16 +81,6 @@ namespace CertificateManagementSystem.Services
         public IEnumerable<ContractDTO> GetContracts()
         {
             var contracts = _context.Contracts
-                .OrderBy(c => c.ContractNumber)
-                .ToList();
-
-            var result = _mapper.Map<List<ContractDTO>>(contracts);
-            return result;
-        }
-        public IEnumerable<ContractDTO> GetContracts(int year)
-        {
-            var contracts = _context.Contracts
-                .Where(c => c.Year == year)
                 .OrderBy(c => c.ContractNumber)
                 .ToList();
 
@@ -117,7 +123,7 @@ namespace CertificateManagementSystem.Services
             var device = SetDevice(newDocument.Device);
 
             var doc = _mapper.Map<Document>(newDocument);
-            
+
             doc.Client = client;
             doc.Contract = contract;
             doc.Device = device;
@@ -129,10 +135,6 @@ namespace CertificateManagementSystem.Services
         public async Task Edit(DocumentDTO documentDTO)
         {
             var document = _context.Documents
-                //.Include(d => d.Contract)
-                //.Include(d => d.Client)
-                //.Include(d => d.Device)
-                //    .ThenInclude(dev => dev.VerificationMethodic)
                 .FirstOrDefault(d => d.Id == documentDTO.Id);
 
             var client = SetClient(documentDTO.Client);
@@ -146,6 +148,7 @@ namespace CertificateManagementSystem.Services
             document.Device.VerificationMethodic = methodic;
             document.Device.RegistrationNumber = documentDTO.Device.RegistrationNumber;
             document.Device.Type = documentDTO.Device.Type;
+            document.DocumentNumber = documentDTO.DocumentNumber;
             document.UpdatedBy = documentDTO.UpdatedBy;
             document.UpdatedOn = documentDTO.UpdatedOn;
 
@@ -159,22 +162,11 @@ namespace CertificateManagementSystem.Services
                 Console.WriteLine(e.Message);
             }
         }
-        public bool IsDocumentExist(string documentNumber)
-        {
-            return _context.Documents.Any(c => c.DocumentNumber == documentNumber);
-        }
-        public async Task<int> DocumentsCount()
-        {
-            return await _context.Documents.CountAsync();
-        }
-        public async Task<int> CertificatesCount()
-        {
-            return await _context.Documents.OfType<Certificate>().CountAsync();
-        }
-        public async Task<int> FailureNotificationsCount()
-        {
-            return await _context.Documents.OfType<FailureNotification>().CountAsync();
-        }
+
+        public bool IsDocumentExist(string documentNumber) => _context.Documents.Any(c => c.DocumentNumber == documentNumber);
+        public async Task<int> DocumentsCount() => await _context.Documents.CountAsync();    
+        public async Task<int> CertificatesCount() => await _context.Documents.OfType<Certificate>().CountAsync();      
+        public async Task<int> FailureNotificationsCount() => await _context.Documents.OfType<FailureNotification>().CountAsync();     
 
         // Приватные методы
         private Contract SetContract(ContractDTO dto)
@@ -206,7 +198,7 @@ namespace CertificateManagementSystem.Services
             var device = _context.Devices
                 .Include(d => d.VerificationMethodic)
                 .FirstOrDefault(d => d.Name == dto.Name && d.SerialNumber == dto.SerialNumber)
-                ?? new Device 
+                ?? new Device
                 {
                     Name = dto.Name,
                     Type = dto.Type,
@@ -221,7 +213,7 @@ namespace CertificateManagementSystem.Services
         {
             var methodic = _context.VerificationMethodics
                 .FirstOrDefault(m => m.FileName == dto.FileName)
-                ?? new Methodic 
+                ?? new Methodic
                 {
                     FileName = dto.FileName,
                     Name = Path.GetFileNameWithoutExtension(dto.FileName)

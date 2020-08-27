@@ -52,32 +52,13 @@ namespace CertificateManagementSystem.Controllers
         public async Task<IActionResult> Index()
         {
             var years = _documents.GetYears();
-            var yearModels = new List<YearModel>();
-
-            foreach (var year in years)
-            {
-                var contractModels = _documents.GetContracts(year)
-                    .Select(c => new ContractModel
-                    {
-                        Id = c.Id,
-                        ContractNumber = c.ContractNumber
-                    });
-
-                var yearModel = new YearModel
-                {
-                    Year = year,
-                    Contracts = contractModels
-                };
-
-                yearModels.Add(yearModel);
-            }
 
             var model = new DocumentIndexModel
             {
                 DocumentsCount = await _documents.DocumentsCount(),
                 CertificatesCount = await _documents.CertificatesCount(),
                 FailureNotificationsCount = await _documents.FailureNotificationsCount(),
-                Years = yearModels
+                Years = years
             };
 
             return View(model);
@@ -88,8 +69,6 @@ namespace CertificateManagementSystem.Controllers
         public IActionResult Details(int id)
         {
             var document = _documents.GetDocumentById(id);
-
-            var filePath = Path.Combine("/documentsFolder", document.DocumentFile.Path);
 
             var model = new DocumentDetailsModel
             {
@@ -115,7 +94,7 @@ namespace CertificateManagementSystem.Controllers
                 UpdatedOn = document.UpdatedOn?.ToString("dd-MM-yyyy HH:mm") ?? document.CreatedOn.ToString("dd-MM-yyyy HH:mm"),
                 CreatedBy = document.CreatedBy,
                 UpdatedBy = document.UpdatedBy ?? document.CreatedBy,
-                FilePath = filePath
+                FilePath = Path.Combine("/documentsFolder", document.DocumentFile.Path)
             };
 
             return PartialView("_DocumentDetails", model);
@@ -128,7 +107,6 @@ namespace CertificateManagementSystem.Controllers
         {
             var document = _documents.GetDocumentById(id);
 
-            var filePath = Path.Combine("/documentsFolder", document.DocumentFile.Path);
             var model = new DocumentEditModel
             {
                 Id = document.Id,
@@ -146,8 +124,8 @@ namespace CertificateManagementSystem.Controllers
                 CalibrationDate = (document as CertificateDTO)?.CalibrationDate,
                 CalibrationExpireDate = (document as CertificateDTO)?.CalibrationExpireDate,
                 DocumentDate = (document as FailureNotificationDTO)?.DocumentDate,
-                FilePath = filePath
-            };
+                FilePath = Path.Combine("/documentsFolder", document.DocumentFile.Path)
+        };
 
             CreateSelectLists();
 
@@ -211,13 +189,13 @@ namespace CertificateManagementSystem.Controllers
                 DocumentNumber = d.DocumentNumber,
                 CalibrationDate = (d as CertificateDTO)?.CalibrationDate.ToString("dd-MM-yyyy"),
                 CalibrationExpireDate = (d as CertificateDTO)?.CalibrationExpireDate.ToString("dd-MM-yyyy"),
-                FilePath = d.DocumentFile.Path,
                 DocumentType = (d is CertificateDTO) ? "Свидетельство" : "Извещение о непригодности",
                 DocumentDate = (d as FailureNotificationDTO)?.DocumentDate.ToString("dd-MM-yyyy"),
                 CreatedOn = d.CreatedOn.ToString("dd-MM-yyyy hh:mm"),
                 UpdatedOn = d.UpdatedOn?.ToString("dd-MM-yyyy hh:mm") ?? d.CreatedOn.ToString("dd-MM-yyyy hh:mm"),
                 CreatedBy = d.CreatedBy,
                 UpdatedBy = d.UpdatedBy ?? d.CreatedBy,
+                FilePath = d.DocumentFile.Path
             });
 
             var model = new DocumentIndexModel { Documents = result };

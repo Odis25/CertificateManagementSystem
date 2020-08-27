@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CertificateManagementSystem.Services.Models;
+using System.Collections.Generic;
 
 namespace CertificateManagementSystem.Services.ViewModels.Document
 {
@@ -9,6 +10,6 @@ namespace CertificateManagementSystem.Services.ViewModels.Document
         public int FailureNotificationsCount { get; set; }
 
         public IEnumerable<DocumentListingModel> Documents { get; set; }
-        public IEnumerable<YearModel> Years { get; set; }
+        public IEnumerable<YearDTO> Years { get; set; }
     }
 }

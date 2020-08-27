@@ -6,17 +6,16 @@ namespace CertificateManagementSystem.Services.Interfaces
 {
     public interface IDocumentService
     {
-        IEnumerable<int> GetYears();
+        IEnumerable<YearDTO> GetYears();
 
         DocumentDTO GetDocumentById(int id);
         IEnumerable<DocumentDTO> GetDocumentsByContractId(int contractId);
         IEnumerable<ContractDTO> GetContracts();
-        IEnumerable<ContractDTO> GetContracts(int year);
         IEnumerable<ClientDTO> GetClients();
         IEnumerable<DeviceDTO> GetDevices();
         IEnumerable<MethodicDTO> GetMethodics();
 
-        Task Add(DocumentDTO newDocument);
+        Task Add(DocumentDTO document);
         Task Edit(DocumentDTO document);
         bool IsDocumentExist(string documentNumber);
 
