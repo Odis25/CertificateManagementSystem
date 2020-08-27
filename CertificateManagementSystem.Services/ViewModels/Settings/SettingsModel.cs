@@ -1,4 +1,4 @@
-﻿namespace CertificateManagementSystem.Models.Settings
+﻿namespace CertificateManagementSystem.Services.ViewModels.Settings
 {
     public class SettingsModel
     {

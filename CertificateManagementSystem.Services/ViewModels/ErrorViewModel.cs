@@ -1,6 +1,4 @@
-using System;
-
-namespace CertificateManagementSystem.Models
+namespace CertificateManagementSystem.Services.ViewModels
 {
     public class ErrorViewModel
     {

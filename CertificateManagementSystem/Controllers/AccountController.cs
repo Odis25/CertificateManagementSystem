@@ -1,8 +1,8 @@
 ﻿using CertificateManagementSystem.Data.Models;
 using CertificateManagementSystem.Extensions;
-using CertificateManagementSystem.Models.Account;
 using CertificateManagementSystem.Services.Components;
 using CertificateManagementSystem.Services.Interfaces;
+using CertificateManagementSystem.Services.ViewModels.Account;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

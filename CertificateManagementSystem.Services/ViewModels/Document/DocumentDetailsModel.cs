@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CertificateManagementSystem.Models.Document
+namespace CertificateManagementSystem.Services.ViewModels.Document
 {
     public class DocumentDetailsModel
     {

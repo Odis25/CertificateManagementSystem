@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace CertificateManagementSystem.Models.Document
+namespace CertificateManagementSystem.Services.ViewModels.Document
 {
     public class DocumentCreateModel
     {
@@ -30,7 +30,7 @@ namespace CertificateManagementSystem.Models.Document
 
         public string RegistrationNumber { get; set; }
         public string VerificationMethodic { get; set; }
-        
+
         public DateTime CalibrationDate { get; set; }
         public DateTime CalibrationExpireDate { get; set; }
         public DateTime DocumentDate { get; set; }

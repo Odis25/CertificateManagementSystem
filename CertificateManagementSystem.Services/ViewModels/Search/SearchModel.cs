@@ -1,4 +1,4 @@
-﻿namespace CertificateManagementSystem.Models.Search
+﻿namespace CertificateManagementSystem.Services.ViewModels.Search
 {
     public class SearchModel
     {

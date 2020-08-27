@@ -1,7 +1,7 @@
-﻿using CertificateManagementSystem.Models.Document;
+﻿using CertificateManagementSystem.Services.ViewModels.Document;
 using System.Collections.Generic;
 
-namespace CertificateManagementSystem.Models.Search
+namespace CertificateManagementSystem.Services.ViewModels.Search
 {
     public class SearchResultModel
     {

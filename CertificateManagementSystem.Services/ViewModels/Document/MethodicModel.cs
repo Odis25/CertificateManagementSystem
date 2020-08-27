@@ -1,4 +1,4 @@
-﻿namespace CertificateManagementSystem.Models.Document
+﻿namespace CertificateManagementSystem.Services.ViewModels.Document
 {
     public class MethodicModel
     {

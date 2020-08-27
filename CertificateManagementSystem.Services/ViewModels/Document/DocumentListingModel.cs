@@ -1,4 +1,4 @@
-﻿namespace CertificateManagementSystem.Models.Document
+﻿namespace CertificateManagementSystem.Services.ViewModels.Document
 {
     public class DocumentListingModel
     {
@@ -22,7 +22,7 @@
         public string DocumentNumber { get; set; }
         public string DocumentType { get; set; }
         public string SerialNumber { get; set; }
-        
+
         public string DocumentDate { get; set; }
         public string CalibrationDate { get; set; }
         public string CalibrationExpireDate { get; set; }

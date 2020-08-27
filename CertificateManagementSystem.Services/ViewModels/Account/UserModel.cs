@@ -1,6 +1,6 @@
 ﻿using CertificateManagementSystem.Services.Components;
 
-namespace CertificateManagementSystem.Models.Account
+namespace CertificateManagementSystem.Services.ViewModels.Account
 {
     public class UserModel
     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CertificateManagementSystem.Models.Document
+namespace CertificateManagementSystem.Services.ViewModels.Document
 {
     public class DocumentIndexModel
     {

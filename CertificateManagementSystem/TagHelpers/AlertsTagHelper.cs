@@ -1,4 +1,4 @@
-﻿using CertificateManagementSystem.Models;
+﻿using CertificateManagementSystem.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;

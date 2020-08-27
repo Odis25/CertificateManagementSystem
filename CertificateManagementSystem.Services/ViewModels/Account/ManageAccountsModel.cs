@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CertificateManagementSystem.Models.Account
+namespace CertificateManagementSystem.Services.ViewModels.Account
 {
     public class ManageAccountsModel
     {

@@ -1,5 +1,5 @@
 ﻿using CertificateManagementSystem.Extensions;
-using CertificateManagementSystem.Models.Settings;
+using CertificateManagementSystem.Services.ViewModels.Settings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;

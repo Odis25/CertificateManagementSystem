@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace CertificateManagementSystem.Models.Document
+namespace CertificateManagementSystem.Services.ViewModels.Document
 {
     public class DocumentEditModel
     {

@@ -1,13 +1,12 @@
-﻿using CertificateManagementSystem.Data.Models;
+﻿using AutoMapper;
+using CertificateManagementSystem.Data.Models;
 using CertificateManagementSystem.Extensions;
-using CertificateManagementSystem.Helpers;
-using CertificateManagementSystem.Models.Document;
 using CertificateManagementSystem.Services.Components;
 using CertificateManagementSystem.Services.Interfaces;
 using CertificateManagementSystem.Services.Models;
+using CertificateManagementSystem.Services.ViewModels.Document;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -27,7 +26,7 @@ namespace CertificateManagementSystem.Controllers
         private readonly IDocumentService _documents;
         private readonly IFileProvider _fileProvider;
         private readonly IFileService _files;
-        private readonly IViewModelMapper _vmMapper;
+        private readonly IMapper _mapper;
         private readonly IWebHostEnvironment _appEnvironment;
         private readonly UserManager<ApplicationUser> _userManager;
 
@@ -35,7 +34,7 @@ namespace CertificateManagementSystem.Controllers
             IConfiguration configuration,
             IFileProvider fileProvider,
             IFileService files,
-            IViewModelMapper vmMapper,
+            IMapper mapper,
             IWebHostEnvironment appEnvironment,
             UserManager<ApplicationUser> userManager)
         {
@@ -45,7 +44,7 @@ namespace CertificateManagementSystem.Controllers
             _appEnvironment = appEnvironment;
             _userManager = userManager;
             _fileProvider = fileProvider;
-            _vmMapper = vmMapper;
+            _mapper = mapper;
         }
 
         // Построение дерева навигации по документам
@@ -164,10 +163,15 @@ namespace CertificateManagementSystem.Controllers
                 var user = await _userManager.GetUserAsync(User);
                 model.UpdatedOn = DateTime.Now;
                 model.UpdatedBy = user.FullName;
-
-                var document = _vmMapper.MapDocumentModel(model);
-
-                await _documents.Edit(document);
+                try
+                {
+                    var document = _mapper.Map<DocumentEditModel, DocumentDTO>(model);
+                    await _documents.Edit(document);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
             }
 
             CreateSelectLists();
@@ -258,15 +262,12 @@ namespace CertificateManagementSystem.Controllers
                 model.CreatedBy = user.FullName;
                 model.CreatedOn = DateTime.Now;
 
-                // Маппинг сущности
-                var newDocument = _vmMapper.MapDocumentModel(model);
-                // Путь к создаваемому файлу
-                var destination = newDocument.DocumentFile.Path;
-
                 try
                 {
+                    // Маппинг сущности
+                    var newDocument = _mapper.Map<DocumentDTO>(model);
                     // Загружаем файл на сервер
-                    var result = _files.UploadFile(model.DocumentFile, destination);                   
+                    var result = _files.UploadFile(model.DocumentFile, newDocument.DocumentFile.Path);
                     // Добавляем запись в базу
                     await _documents.Add(newDocument);
                     // Уведомляем пользователя об успешном добавлении

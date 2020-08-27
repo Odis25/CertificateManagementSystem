@@ -5,6 +5,7 @@ using CertificateManagementSystem.Services.Interfaces;
 using CertificateManagementSystem.Services.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -44,10 +45,8 @@ namespace CertificateManagementSystem.Services
                 .Include(d => d.DocumentFile)
                 .FirstOrDefault(d => d.Id == id);
 
-
             var result = _mapper.Map<DocumentDTO>(document);
             return result;
-
         }
         public IEnumerable<DocumentDTO> GetDocumentsByContractId(int contractId)
         {
@@ -60,7 +59,6 @@ namespace CertificateManagementSystem.Services
                 .ToList();
 
             var result = _mapper.Map<List<DocumentDTO>>(documents);
-
             return result;
         }
 
@@ -68,9 +66,6 @@ namespace CertificateManagementSystem.Services
         {
             var contracts = _context.Contracts
                 .OrderBy(c => c.ContractNumber)
-                .Include(c => c.Documents).ThenInclude(doc => doc.Client)
-                .Include(c => c.Documents).ThenInclude(doc => doc.Device)
-                .Include(c => c.Documents).ThenInclude(doc => doc.DocumentFile)
                 .ToList();
 
             var result = _mapper.Map<List<ContractDTO>>(contracts);
@@ -86,14 +81,6 @@ namespace CertificateManagementSystem.Services
             var result = _mapper.Map<List<ContractDTO>>(contracts);
             return result;
         }
-        public ContractDTO FindContract(string contractNumber, int year)
-        {
-            var contract = _context.Contracts
-                .FirstOrDefault(c => c.ContractNumber == contractNumber && c.Year == year);
-
-            var result = _mapper.Map<ContractDTO>(contract);
-            return result;
-        }
 
         public IEnumerable<ClientDTO> GetClients()
         {
@@ -104,15 +91,6 @@ namespace CertificateManagementSystem.Services
             var result = _mapper.Map<List<ClientDTO>>(clients);
             return result;
         }
-        public ClientDTO FindClient(string clientName, string exploitationPlace)
-        {
-            var client = _context.Clients
-                .FirstOrDefault(c => c.Name == clientName && c.ExploitationPlace == exploitationPlace);
-
-            var result = _mapper.Map<ClientDTO>(client);
-            return result;
-        }
-
         public IEnumerable<DeviceDTO> GetDevices()
         {
             var devices = _context.Devices
@@ -122,16 +100,6 @@ namespace CertificateManagementSystem.Services
             var result = _mapper.Map<List<DeviceDTO>>(devices);
             return result;
         }
-        public DeviceDTO FindDevice(string deviceName, string serialNumber)
-        {
-            var device = _context.Devices
-                .Include(d => d.VerificationMethodic)
-                .FirstOrDefault(d => d.Name == deviceName && d.SerialNumber == serialNumber);
-
-            var result = _mapper.Map<DeviceDTO>(device);
-            return result;
-        }
-
         public IEnumerable<MethodicDTO> GetMethodics()
         {
             var files = _fileProvider.GetDirectoryContents("");
@@ -142,90 +110,59 @@ namespace CertificateManagementSystem.Services
                 FileName = f.Name
             }).OrderBy(f => f.FileName);
         }
-        public MethodicDTO FindMethodic(string methodicFileName)
-        {
-            var methodic = _context.VerificationMethodics
-                .FirstOrDefault(m => m.FileName == methodicFileName);
-
-            var result = _mapper.Map<MethodicDTO>(methodic);
-            return result;
-        }
-
         public async Task Add(DocumentDTO newDocument)
         {
+            var client = SetClient(newDocument.Client);
+            var contract = SetContract(newDocument.Contract);
+            var device = SetDevice(newDocument.Device);
+
             var doc = _mapper.Map<Document>(newDocument);
+            
+            doc.Client = client;
+            doc.Contract = contract;
+            doc.Device = device;
+
             _context.Documents.Add(doc);
 
             await _context.SaveChangesAsync();
         }
-        public async Task Edit(DocumentDTO document)
+        public async Task Edit(DocumentDTO documentDTO)
         {
-            var doc = _context.Documents.FirstOrDefault(d => d.Id == document.Id);
-            var docDTO = _mapper.Map<DocumentDTO>(document);
+            var document = _context.Documents
+                //.Include(d => d.Contract)
+                //.Include(d => d.Client)
+                //.Include(d => d.Device)
+                //    .ThenInclude(dev => dev.VerificationMethodic)
+                .FirstOrDefault(d => d.Id == documentDTO.Id);
 
-            var clientDTO = FindClient(document.Client.Name, document.Client.ExploitationPlace);
-            var contractDTO = FindContract(document.Contract.ContractNumber, document.Contract.Year);
-            var deviceDTO = FindDevice(document.Device.Name, document.Device.SerialNumber);
-            var methodicDTO = FindMethodic(document.Device.VerificationMethodic.FileName);
+            var client = SetClient(documentDTO.Client);
+            var contract = SetContract(documentDTO.Contract);
+            var device = SetDevice(documentDTO.Device);
+            var methodic = SetMethodic(documentDTO.Device.VerificationMethodic);
 
-            contractDTO ??= new ContractDTO
+            document.Client = client;
+            document.Contract = contract;
+            document.Device = device;
+            document.Device.VerificationMethodic = methodic;
+            document.Device.RegistrationNumber = documentDTO.Device.RegistrationNumber;
+            document.Device.Type = documentDTO.Device.Type;
+            document.UpdatedBy = documentDTO.UpdatedBy;
+            document.UpdatedOn = documentDTO.UpdatedOn;
+
+            try
             {
-                ContractNumber = document.Contract.ContractNumber,
-                Year = document.Contract.Year
-            };
-
-            clientDTO ??= new ClientDTO
-            {
-                Name = document.Client.Name,
-                ExploitationPlace = document.Client.ExploitationPlace ?? ""
-            };
-
-            methodicDTO ??= new MethodicDTO
-            {
-                Name = document.Device.VerificationMethodic.Name,
-                FileName = document.Device.VerificationMethodic.FileName
-            };
-
-            deviceDTO ??= new DeviceDTO
-            {
-                Name = document.Device.Name,
-                Type = document.Device.Type,
-                SerialNumber = document.Device.SerialNumber
-            };
-
-
-            docDTO.DocumentNumber = document.DocumentNumber;
-            docDTO.Client = clientDTO;
-            docDTO.Contract = contractDTO;
-            docDTO.Device = deviceDTO;
-            docDTO.Device.Type = document.Device.Type;
-            docDTO.Device.VerificationMethodic = methodicDTO;
-            docDTO.Device.RegistrationNumber = document.Device.RegistrationNumber;
-            docDTO.UpdatedOn = document.UpdatedOn;
-            docDTO.UpdatedBy = document.UpdatedBy;
-          
-            if (docDTO is CertificateDTO)
-            {
-                ((CertificateDTO)docDTO).CalibrationDate = ((CertificateDTO)document).CalibrationDate;
-                ((CertificateDTO)docDTO).CalibrationExpireDate = ((CertificateDTO)document).CalibrationExpireDate;
+                _context.Update(document);
+                await _context.SaveChangesAsync();
             }
-            else
+            catch (Exception e)
             {
-                ((FailureNotificationDTO)docDTO).DocumentDate = ((FailureNotificationDTO)document).DocumentDate;
+                Console.WriteLine(e.Message);
             }
-
-            doc = _mapper.Map<Document>(docDTO);
-
-            _context.Update(doc);
-
-            await _context.SaveChangesAsync();
         }
-
         public bool IsDocumentExist(string documentNumber)
         {
             return _context.Documents.Any(c => c.DocumentNumber == documentNumber);
         }
-
         public async Task<int> DocumentsCount()
         {
             return await _context.Documents.CountAsync();
@@ -239,5 +176,58 @@ namespace CertificateManagementSystem.Services
             return await _context.Documents.OfType<FailureNotification>().CountAsync();
         }
 
+        // Приватные методы
+        private Contract SetContract(ContractDTO dto)
+        {
+            var contract = _context.Contracts
+                .FirstOrDefault(c => c.ContractNumber == dto.ContractNumber && c.Year == dto.Year)
+                ?? new Contract
+                {
+                    Year = dto.Year,
+                    ContractNumber = dto.ContractNumber
+                };
+
+            return contract;
+        }
+        private Client SetClient(ClientDTO dto)
+        {
+            var client = _context.Clients
+                .FirstOrDefault(c => c.Name == dto.Name && c.ExploitationPlace == dto.ExploitationPlace)
+                ?? new Client
+                {
+                    Name = dto.Name,
+                    ExploitationPlace = dto.ExploitationPlace
+                };
+
+            return client;
+        }
+        private Device SetDevice(DeviceDTO dto)
+        {
+            var device = _context.Devices
+                .Include(d => d.VerificationMethodic)
+                .FirstOrDefault(d => d.Name == dto.Name && d.SerialNumber == dto.SerialNumber)
+                ?? new Device 
+                {
+                    Name = dto.Name,
+                    Type = dto.Type,
+                    SerialNumber = dto.SerialNumber,
+                    RegistrationNumber = dto.RegistrationNumber
+                };
+            device.VerificationMethodic = SetMethodic(dto.VerificationMethodic);
+
+            return device;
+        }
+        private Methodic SetMethodic(MethodicDTO dto)
+        {
+            var methodic = _context.VerificationMethodics
+                .FirstOrDefault(m => m.FileName == dto.FileName)
+                ?? new Methodic 
+                {
+                    FileName = dto.FileName,
+                    Name = Path.GetFileNameWithoutExtension(dto.FileName)
+                };
+
+            return methodic;
+        }
     }
 }

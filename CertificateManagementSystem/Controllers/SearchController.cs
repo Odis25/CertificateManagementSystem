@@ -1,8 +1,7 @@
-﻿using CertificateManagementSystem.Data.Models;
-using CertificateManagementSystem.Models.Document;
-using CertificateManagementSystem.Models.Search;
-using CertificateManagementSystem.Services.Interfaces;
+﻿using CertificateManagementSystem.Services.Interfaces;
 using CertificateManagementSystem.Services.Models;
+using CertificateManagementSystem.Services.ViewModels.Document;
+using CertificateManagementSystem.Services.ViewModels.Search;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 
